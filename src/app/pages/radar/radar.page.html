@@ -1,0 +1,16 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-title style="color: var(--ion-color-primary)">Radar</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen="true">
+  <ion-header collapse="condense" class="ion-no-margin">
+    <ion-toolbar>
+      <ion-title size="large" style="color: var(--ion-color-primary)">Radar</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <div class="ion-padding-horizontal ion-padding-bottom" style="width: 100%; height: calc(100% - 120px)">
+    <app-radar-display [longitude]="location.longitude" [latitude]="location.latitude"></app-radar-display>
+  </div>
+</ion-content>

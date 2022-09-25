@@ -1,0 +1,42 @@
+.user-icon-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--ion-color-primary);
+  padding-bottom: 60px;
+}
+
+.user-icon-wrapper:before {
+  content:'';
+  position:absolute;
+  top:50%;
+  right: -14px;
+  width:60px;
+  height:60px;
+  border-radius: 30px;
+  border: 1px solid black;
+  transform: translateY(-50%)rotate(-90deg);
+  z-index: 6;
+}
+
+.user-icon {
+  transform: skewX(3deg);
+  z-index: 2;
+  width: 35px;
+  height: 35px;
+}
+
+.nearby-user-icon-wrapper {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  color: var(--ion-color-secondary);
+  padding-bottom: 60px;
+}
+
+.nearby-user-icon {
+  transform: skewX(3deg);
+  z-index: 2;
+  width: 35px;
+  height: 35px;
+}

@@ -1,0 +1,18 @@
+{
+	"appId": "ch.lucabruegger.frienradar",
+	"appName": "Frienradar",
+	"webDir": "www",
+	"bundledWebRuntime": false,
+	"plugins": {
+		"PushNotifications": {
+			"presentationOptions": [
+				"badge",
+				"sound",
+				"alert"
+			]
+		}
+	},
+	"ios": {
+		"scheme": "Frienradar"
+	}
+}

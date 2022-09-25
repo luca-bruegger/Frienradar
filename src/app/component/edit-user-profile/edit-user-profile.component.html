@@ -1,0 +1,37 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="closeModal()">Abbrechen</ion-button>
+    </ion-buttons>
+    <ion-title>Profil bearbeiten</ion-title>
+    <ion-buttons slot="end">
+      <ion-button strong="true">Speichern</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content fullscreen="true" color="light">
+  <div class="profile-picture ion-padding-top">
+    <div class="img-wrapper">
+      <ion-avatar>
+        <img src="{{user.photoURL}}">
+      </ion-avatar>
+    </div>
+    <ion-button fill="clear" (click)="changeProfilePicture()">
+      <ion-label color="tertiary">Profilbild ändern</ion-label>
+    </ion-button>
+  </div>
+  <div style="border-top: 1px solid #e0e0e0" class="ion-padding-top">
+    <ion-item color="light" lines="none">
+      <ion-label style="width: 80px; padding-right: 5px">Name</ion-label>
+      <ion-input style="border-bottom: 1px solid var(--ion-color-bright)" [value]="user.displayName" ></ion-input>
+    </ion-item>
+    <ion-item color="light" lines="none">
+      <ion-label style="width: 80px; padding-right: 5px">Email</ion-label>
+      <ion-input style="border-bottom: 1px solid var(--ion-color-bright)" [value]="user.email" ></ion-input>
+    </ion-item>
+    <ion-item color="light" lines="none">
+      <ion-label style="width: 80px; white-space: pre-wrap; padding-right: 5px">Beschreibung</ion-label>
+      <ion-textarea style="border-bottom: 1px solid var(--ion-color-bright)" placeholder="Deine Beschreibung..."></ion-textarea>
+    </ion-item>
+  </div>
+</ion-content>

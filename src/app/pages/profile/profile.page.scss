@@ -1,0 +1,21 @@
+.img-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+}
+
+ion-avatar, img {
+  height: 100%;
+  width: 100%;
+  max-width: 256px !important;  //any size
+  max-height: 256px !important; //any size
+}
+
+#notifications-badge {
+  background-color: red;
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  border-radius: 100%;
+}

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>689385435076-ljeufgpmvo70poepfh0v8rfhn23an0g0.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.689385435076-ljeufgpmvo70poepfh0v8rfhn23an0g0</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDvX0hH2OT4m9MpHnV4A5FRlBrqsY48MBM</string>
+	<key>GCM_SENDER_ID</key>
+	<string>689385435076</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>ch.lucabruegger.frienradar</string>
+	<key>PROJECT_ID</key>
+	<string>frienradar</string>
+	<key>STORAGE_BUCKET</key>
+	<string>frienradar.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:689385435076:ios:ee6a350792adb8ea7b7e91</string>
+</dict>
+</plist>

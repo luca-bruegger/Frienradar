@@ -1,0 +1,20 @@
+vars:
+  BUNDLE_ID:
+    default: ch.lucabruegger.frienradar
+  PACKAGE_NAME:
+    default: ch.lucabruegger.frienradar
+
+platforms:
+  ios:
+    targets:
+      Frienradar:
+        bundleId: $BUNDLE_ID
+        incrementBuild: true
+        productName: Frienradar-App
+        displayName: Frienradar
+        version: 1
+
+        entitlements:
+          - com.apple.developer.associated-domains: [ "applinks:frienradar.com" ]
+  android:
+    packageName: $PACKAGE_NAME

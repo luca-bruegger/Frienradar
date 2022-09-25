@@ -1,0 +1,22 @@
+<ion-card color="light">
+  <ion-card-content style="display: flex; flex-direction: row; gap: 15px; flex-grow: 1">
+    <div>
+      <ion-avatar style="height: 64px; width: 64px">
+        <img style="aspect-ratio: 1/1" src="{{user.photoURL}}">
+      </ion-avatar>
+    </div>
+    <div style="width: 100%">
+      <ion-label>{{user.displayName}}</ion-label>
+      <p>Keine Interessen angegeben.</p>
+    </div>
+    <div style="display: flex; align-items: center">
+      <ion-chip *ngIf="!isRequested" (click)="requestUserContact(user)">
+        Anfragen
+      </ion-chip>
+
+      <ion-chip *ngIf="isRequested" color="success">
+        Angefragt
+      </ion-chip>
+    </div>
+  </ion-card-content>
+</ion-card>

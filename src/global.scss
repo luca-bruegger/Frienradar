@@ -24,3 +24,61 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
+
+@import 'material-symbols';
+
+html {
+  --ion-background-color: var(--ion-color-vbright);
+}
+
+.icon-text {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.text-icon {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+.phone-number-input {
+  border: none;
+  height: 35px;
+  background: transparent;
+}
+
+.phone-number-input:focus {
+  outline: none;
+}
+
+.phone-number-input::placeholder {
+  color: var(--ion-color-secondary);
+}
+
+.intl-tel-input {
+  border: none;
+}
+
+.intl-tel-input .country-list {
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  box-shadow: none;
+  border-color: #c7cace;
+  font-size: 14px;
+  margin-left: 0;
+  margin-top: -1px;
+  width: 265px;
+}
+
+.dropdown-menu {
+  border: none !important;
+}
+
+.item-bottom {
+  background-color: var(--ion-color-vbright);
+}
+
+.psm__progress-bar-item {
+  border-color: var(--ion-color-vbright) !important;
+}
