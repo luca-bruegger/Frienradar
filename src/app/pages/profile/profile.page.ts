@@ -1,14 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { ImagePicker } from '@ionic-native/image-picker/ngx';
-import { first } from 'rxjs/operators';
 import { AlertController, IonRouterOutlet, ModalController } from '@ionic/angular';
-import { DocumentSnapshot } from '@angular/fire/compat/firestore';
-import { Account } from '../../model/account';
-import { BaseService } from '../../core/service/base.service';
-import { FirestoreService } from '../../core/service/firestore.service';
-import { UserService } from '../../core/service/user.service';
-import { EditUserProfileComponent } from '../../component/edit-user-profile/edit-user-profile.component';
 import { SettingsComponent } from '../../component/settings/settings.component';
+import { EditUserProfileComponent } from "../../component/edit-user-profile/edit-user-profile.component";
+import { Select, Store } from "@ngxs/store";
+import { Account, AccountState, AccountStateModel } from "../../store";
+import { Observable } from 'rxjs';
+import User from 'src/app/model/user';
+
 
 @Component({
   selector: 'app-profile',
@@ -16,70 +15,87 @@ import { SettingsComponent } from '../../component/settings/settings.component';
   styleUrls: ['profile.page.scss'],
 })
 export class ProfilePage implements OnInit {
-  user = {} as any;
-  accounts = Account.data;
+  @Select(AccountState.user) user$: Observable<Partial<AccountStateModel>>;
 
-  constructor(private baseService: BaseService,
-              private imagePicker: ImagePicker,
-              private firestoreService: FirestoreService,
-              private userService: UserService,
+  profilePicture = 'assets/images/blank.png'
+
+  constructor(private imagePicker: ImagePicker,
               private alertController: AlertController,
               private modalController: ModalController,
-              private routerOutlet: IonRouterOutlet) {
+              private routerOutlet: IonRouterOutlet,
+              private store: Store) {
+    this.store.dispatch(new Account.Fetch)
   }
 
   ngOnInit() {
-    this.loadUser();
-    this.loadAccounts();
   }
 
-  async editAccountname(key: string) {
-    const serviceName = this.accounts.get(key).name;
-    const alert = await this.alertController.create({
-      header: serviceName,
-      buttons: [
-        {
-          text: 'Abbrechen',
-          role: 'cancel'
-        },
-        {
-          text: 'Speichern',
-          role: 'save',
-        }
-      ],
-      inputs: [
-        {
-          placeholder: serviceName + ' benutzername',
-          min: 3,
-          max: 30,
-          name: 'username'
-        }
-      ]
-    });
-
-    await alert.present();
-
-    await alert.onDidDismiss().then(async (res) => {
-      if (res.data && res.data.values.username && res.role === 'save') {
-        this.userService.updateAccount(key, res.data.values.username).then(acc => {
-          this.accounts.get(key).username = res.data.values.username;
-        });
-      }
-    });
-  }
+  // async editAccountname(key: string) {
+  //   const serviceName = this.accounts.get(key).name;
+  //   const alert = await this.alertController.create({
+  //     header: serviceName,
+  //     buttons: [
+  //       {
+  //         text: 'Abbrechen',
+  //         role: 'cancel'
+  //       },
+  //       {
+  //         text: 'Speichern',
+  //         role: 'save',
+  //       }
+  //     ],
+  //     inputs: [
+  //       {
+  //         placeholder: serviceName + ' benutzername',
+  //         min: 3,
+  //         max: 30,
+  //         name: 'username'
+  //       }
+  //     ]
+  //   });
+  //
+  //   await alert.present();
+  //
+  //   await alert.onDidDismiss().then(async (res) => {
+  //     if (res.data && res.data.values.username && res.role === 'save') {
+  //     }
+  //   });
+  // }
 
   openContactRequests() {
 
   }
 
   async openEditProfile() {
+    const user = this.store.selectSnapshot(AccountState.user)
+    const userData = {
+      name: user.name,
+      email: user.email,
+      description: user.description,
+      profilePicture: user.profilePicture
+    }
+
     const modal = await this.modalController.create({
       component: EditUserProfileComponent,
       swipeToClose: true,
       presentingElement: this.routerOutlet.nativeEl,
       componentProps: {
-        user: this.user
+        userData
       }
+    });
+
+    modal.onDidDismiss().then(event => {
+      const data = event.data;
+      let updateSet: Partial<User> = {};
+
+      Object.keys(data).forEach(key => {
+        if (data[key] !== userData[key]) {
+          updateSet[key] = data[key]
+        }
+      })
+
+      if (updateSet === {}) return;
+      this.store.dispatch(new Account.Update(updateSet))
     });
 
     await modal.present();
@@ -96,21 +112,4 @@ export class ProfilePage implements OnInit {
     await modal.present();
   }
 
-  private loadUser() {
-    this.baseService.userSubject.subscribe(user => {
-      if (user) {
-        this.user = user;
-      }
-    });
-  }
-
-  private loadAccounts() {
-    this.userService.getAccounts().pipe(first()).subscribe((doc: DocumentSnapshot<any>) => {
-      if (doc.data()) {
-        Object.keys(doc.data()).forEach(key => {
-          this.accounts.get(key).username = doc.data()[key];
-        });
-      }
-    });
-  }
 }

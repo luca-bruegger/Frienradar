@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { GeolocationService } from '../../core/service/geolocation.service';
-import { UserService } from '../../core/service/user.service';
+import { UserService } from '../../core/appwrite/user.service';
 import { NotificationService } from '../../core/service/notification.service';
 
 @Component({
@@ -24,15 +24,6 @@ export class NearbyPage implements OnInit {
       }
     });
 
-    this.userService.contactRequests().subscribe((change: any) => {
-      if (change && change.users) {
-        change.users.forEach(userRequest => {
-          if (!userRequest.notificationSent === true) {
-            this.notificationService.notifyUserRequest(userRequest);
-          }
-        });
-      }
-    });
   }
 
 }

@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { BaseService } from './base.service';
 import { Geolocation, Position } from '@capacitor/geolocation';
 import { BehaviorSubject } from 'rxjs';
 import { geohashForLocation } from 'geofire-common';
-import { UserService } from './user.service';
-import { Timestamp } from 'firebase/firestore';
+import { UserService } from '../appwrite/user.service';
 import { Capacitor } from "@capacitor/core";
 
 @Injectable({
@@ -17,34 +15,13 @@ export class GeolocationService {
   geohashSubject: BehaviorSubject<string> = new BehaviorSubject<string>(null);
   private platform: string = Capacitor.getPlatform();
 
-  constructor(private angularFirestore: AngularFirestore,
-              private baseService: BaseService,
+  constructor(private baseService: BaseService,
               private userService: UserService) {
     this.watchGeolocation();
   }
 
   nearbyUsers() {
-    const timestamp = Timestamp.now().toDate();
-    timestamp.setHours(timestamp.getHours() - 3);
 
-    return this.angularFirestore.collection('users', ref => ref
-      .where('location.timestamp', '>=', timestamp)
-      .where('location.geohash', '==', this.geohashSubject.value)
-    ).valueChanges().subscribe(querySnapshot => {
-      const nearbyUsers = [];
-      querySnapshot.forEach((user: any) => {
-          const isCurrentUser = user.uid === this.baseService.userSubject.value.uid;
-          const isEmptyObject = Object.keys(user).length === 0;
-
-          if (!isCurrentUser && !isEmptyObject) {
-            nearbyUsers.push(user);
-          }
-        }
-      );
-      this.nearbyUsersSubject.next(nearbyUsers);
-      }, error => {
-        this.baseService.displayErrorMessage(error.message);
-      });
   }
 
   watchGeolocation() {
@@ -88,9 +65,6 @@ export class GeolocationService {
       return;
     }
 
-    this.userService.setLocation(geohash).then(() => {
-      this.geohashSubject.next(geohash);
-      this.nearbyUsers();
-    });
+
   }
 }

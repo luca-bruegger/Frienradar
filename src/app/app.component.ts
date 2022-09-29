@@ -1,7 +1,7 @@
 import { Component, NgZone } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
-import { LocalStorageService } from './core/service/local-storage.service';
 import { App, URLOpenListenerEvent } from '@capacitor/app';
+import { BaseService } from "./core/service/base.service";
 
 @Component({
   selector: 'app-root',
@@ -10,7 +10,7 @@ import { App, URLOpenListenerEvent } from '@capacitor/app';
 })
 export class AppComponent {
   constructor(private router: Router,
-              private localStorageService: LocalStorageService,
+              private baseService: BaseService,
               private zone: NgZone) {
     this.initializeApp();
   }
@@ -23,7 +23,7 @@ export class AppComponent {
   private jumpTo() {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
-        this.localStorageService.setJumpTo(event.url);
+        this.baseService.setJumpTo(event.url);
       }
     });
   }

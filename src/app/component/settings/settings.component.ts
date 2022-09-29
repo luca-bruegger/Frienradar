@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from '../../core/service/user.service';
 import { ModalController } from '@ionic/angular';
+import { Store } from "@ngxs/store";
+import { Account } from "../../store";
 
 @Component({
   selector: 'app-settings',
@@ -9,12 +10,12 @@ import { ModalController } from '@ionic/angular';
 })
 export class SettingsComponent implements OnInit {
 
-  constructor(private userService: UserService,
+  constructor(private store: Store,
               private modalController: ModalController) { }
 
   ngOnInit() {}
 
   logOut() {
-    this.modalController.dismiss().then(() => this.userService.signOut());
+    this.modalController.dismiss().then(() => this.store.dispatch(new Account.Logout()));
   }
 }

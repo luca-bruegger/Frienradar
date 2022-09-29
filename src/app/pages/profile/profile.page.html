@@ -16,54 +16,66 @@
     </ion-toolbar>
   </ion-header>
 
-  <ion-card color="light">
-    <ion-card-content>
-      <div style="display: flex; flex-direction: column">
-        <div style="display: flex; flex-direction: row; gap: 10px">
-          <div class="img-wrapper">
-            <ion-avatar>
-              <img src="{{user.photoURL}}">
-            </ion-avatar>
-          </div>
-          <div>
-            <h1>{{user.displayName}}</h1>
-            <ion-text color="medium">
-              <div style="display: flex;">
-                <ion-icon class="text-icon" name="mail-outline" color="medium"></ion-icon>
-                <p class="icon-text">{{user.email}}</p>
+  <ion-grid>
+    <ion-row>
+      <ion-col sizeXl="6" offsetXl="3">
+        <ion-card color="light" *ngIf="user$ | async; let user">
+          <ion-card-content>
+            <div style="display: flex; flex-direction: column">
+              <div style="display: flex; flex-direction: row; gap: 20px">
+                <div class="img-wrapper">
+                  <ion-avatar>
+                    <img src="{{user.profilePicture || profilePicture}}">
+                  </ion-avatar>
+                </div>
+                <div>
+                  <h1>{{user.name}}</h1>
+                  <ion-text color="medium">
+                    <div style="display: flex; align-items: center">
+                      <ion-icon class="text-icon" name="mail-outline" color="medium"></ion-icon>
+                      <p class="icon-text">{{user.email}}</p>
+                    </div>
+                  </ion-text>
+                  <ion-text color="medium">
+                    <div style="display: flex; align-items: center">
+                      <ion-icon class="text-icon" name="server-outline" color="medium"></ion-icon>
+                      <p class="icon-text">{{user.$id}}</p>
+                    </div>
+                  </ion-text>
+                </div>
               </div>
-            </ion-text>
-          </div>
-        </div>
-        <ion-item *ngIf="user && user.description" color="light" class="ion-margin-top ion-no-padding" lines="none">
-          <ion-textarea placeholder="Beschreibung..."></ion-textarea>
-        </ion-item>
-      </div>
-      <div class="ion-margin-top">
-        <ion-buttons>
-          <ion-button (click)="openEditProfile()" fill="outline" color="dark" style="width: 100%">
-            <ion-icon class="text-icon" name="create-outline"></ion-icon>
-            <p class="icon-text">Profil bearbeiten</p>
-          </ion-button>
-          <ion-button (click)="openContactRequests()" fill="outline" color="dark" style="width: 100%">
-            <ion-icon class="text-icon" name="mail-outline">
-              <ion-badge id="notifications-badge" color="danger">1</ion-badge>
-            </ion-icon>
-            <p class="icon-text">Anfragen</p>
-          </ion-button>
-        </ion-buttons>
-      </div>
-    </ion-card-content>
-  </ion-card>
-  <div class="ion-margin-horizontal ion-margin-bottom" style="display: flex; flex-direction: column; grid-gap: 10px">
+              <ion-item *ngIf="user.description" color="light" class="ion-margin-top ion-no-padding" lines="none">
+                <ion-textarea placeholder="Beschreibung..."></ion-textarea>
+              </ion-item>
+            </div>
+            <div class="ion-margin-top">
+              <ion-buttons>
+                <ion-button (click)="openEditProfile()" fill="outline" color="dark" style="width: 100%">
+                  <ion-icon class="text-icon" name="create-outline"></ion-icon>
+                  <p class="icon-text">Profil bearbeiten</p>
+                </ion-button>
+                <ion-button (click)="openContactRequests()" fill="outline" color="dark" style="width: 100%">
+                  <ion-icon class="text-icon" name="mail-outline">
+                    <ion-badge id="notifications-badge" color="danger">1</ion-badge>
+                  </ion-icon>
+                  <p class="icon-text">Anfragen</p>
+                </ion-button>
+              </ion-buttons>
+            </div>
+          </ion-card-content>
+        </ion-card>
+        <div class="ion-margin-horizontal ion-margin-bottom" style="display: flex; flex-direction: column; grid-gap: 10px">
 
-    <ion-card *ngFor="let accountObj of accounts | keyvalue" style="{{accountObj.value.style}} text-align: center;"
-              class="ion-no-margin">
-      <ion-card-content (click)="editAccountname(accountObj.key)">
-        <ion-icon class="text-icon" name="{{accountObj.value.icon}}"></ion-icon>
-        <span class="icon-text" *ngIf="accountObj.value.username === ''">{{accountObj.value.name}} verbinden</span>
-        <span class="icon-text" *ngIf="accountObj.value.username.length > 0">@{{accountObj.value.username}}</span>
-      </ion-card-content>
-    </ion-card>
-  </div>
+          <ion-card *ngFor="let accountObj of accounts | keyvalue" style="{{accountObj.value.style}} text-align: center;"
+                    class="ion-no-margin">
+            <ion-card-content (click)="editAccountname(accountObj.key)">
+              <ion-icon class="text-icon" name="{{accountObj.value.icon}}"></ion-icon>
+              <span class="icon-text" *ngIf="accountObj.value.username === ''">{{accountObj.value.name}} verbinden</span>
+              <span class="icon-text" *ngIf="accountObj.value.username.length > 0">@{{accountObj.value.username}}</span>
+            </ion-card-content>
+          </ion-card>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

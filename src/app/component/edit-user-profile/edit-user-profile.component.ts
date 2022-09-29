@@ -1,10 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { first } from 'rxjs/operators';
-import { Capacitor } from '@capacitor/core';
-import { ImagePicker } from '@ionic-native/image-picker/ngx';
-import { FirestoreService } from '../../core/service/firestore.service';
-import { UserService } from '../../core/service/user.service';
 import { AccountValidation } from '../../core/validation/account-validation';
 
 @Component({
@@ -13,58 +8,33 @@ import { AccountValidation } from '../../core/validation/account-validation';
   styleUrls: ['./edit-user-profile.component.scss'],
 })
 export class EditUserProfileComponent implements OnInit {
-  @Input() user: any;
+  @Input() userData: any;
 
-  private platform: string = Capacitor.getPlatform();
-  private formGroup = AccountValidation.formGroup;
+  formGroup = AccountValidation.editProfileFormGroup;
+  formMessages = AccountValidation.formMessages;
 
-  constructor(private modalController: ModalController,
-              private imagePicker: ImagePicker,
-              private firestoreService: FirestoreService,
-              private userService: UserService,) {
+  constructor(private modalController: ModalController) {
   }
 
   ngOnInit() {
     this.setInitialValues();
   }
 
-  async closeModal() {
-    await this.modalController.dismiss();
-  }
-
-  changeProfilePicture() {
-    if (this.platform === 'android' || this.platform === 'ios') {
-      this.displayImagePicker();
+  async closeModalWithSave(isSave: boolean) {
+    if (!isSave) {
+      await this.modalController.dismiss();
     }
-  }
 
-  private displayImagePicker() {
-    const imagePickerOptions = {
-      width: 220,
-      height: 220,
-      quality: 32,
-      outputType: 1,
-      maximumImagesCount: 1
-    };
-
-
-    this.imagePicker.getPictures(imagePickerOptions).then(async (res) => {
-      if (res[0] === undefined) {
-        return;
-      }
-      this.firestoreService.uploadProfilePicture(res[0], 'base64').then(() => {
-        this.firestoreService.profilePictureDownloadUrl().pipe(first()).subscribe(url => {
-          this.userService.updateUser({
-            photoURL: url
-          });
-        });
-      });
-    }, (error) => {
-      alert(error);
-    });
+    if (this.formGroup.invalid) {
+      this.formGroup.markAllAsTouched();
+      return;
+    }
+    await this.modalController.dismiss(this.formGroup.value);
   }
 
   private setInitialValues() {
-    console.log(this.user);
+    Object.keys(this.formGroup.controls).forEach(name => {
+      this.formGroup.get(name).patchValue(this.userData[name])
+    })
   }
 }

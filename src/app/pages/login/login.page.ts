@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
-import { UserService } from '../../core/service/user.service';
+import { Store } from '@ngxs/store';
+import { UserService } from '../../core/appwrite/user.service';
 import { AccountValidation } from '../../core/validation/account-validation';
+import { Account } from "../../store";
 
 @Component({
   selector: 'app-login',
@@ -10,12 +12,12 @@ import { AccountValidation } from '../../core/validation/account-validation';
 export class LoginPage {
   selectedLoginType = LoginType.login.toString();
 
-  formGroup = AccountValidation.formGroup;
+  formGroup = AccountValidation.loginFormGroup;
   formMessages = AccountValidation.formMessages;
 
   strength = 0;
 
-  constructor(private userService: UserService) {}
+  constructor(private store: Store) {}
 
   get isRegister() {
     return this.selectedLoginType === LoginType.register.toString();
@@ -23,7 +25,8 @@ export class LoginPage {
 
   segmentChanged($event: any) {
     const type = $event.detail.value;
-    const control = this.formGroup.get('name');
+    const nameControl = this.formGroup.get('name');
+    const profilePictureControl = this.formGroup.get('profilePicture');
 
     if (type === 'register') {
       AccountValidation.setLoginValidationActive(false);
@@ -31,7 +34,9 @@ export class LoginPage {
       AccountValidation.setLoginValidationActive(true);
     }
 
-    control.updateValueAndValidity();
+    this.formGroup.reset()
+    nameControl.updateValueAndValidity();
+    profilePictureControl.updateValueAndValidity();
     this.selectedLoginType = type;
   }
 
@@ -40,11 +45,10 @@ export class LoginPage {
       this.formGroup.markAllAsTouched();
       return;
     }
-
     if (this.isRegister) {
-      this.userService.createUser(this.formGroup.value);
+      this.store.dispatch(new Account.Signup(this.formGroup.value));
     } else {
-      this.userService.signInUser(this.formGroup.value);
+      this.store.dispatch(new Account.Login(this.formGroup.value))
     }
   }
 }

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ActionPerformed, PushNotifications, PushNotificationSchema, } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
 import { FCM } from '@capacitor-community/fcm';
-import { UserService } from './user.service';
+import { UserService } from '../appwrite/user.service';
 import { LocalNotifications, PermissionStatus } from '@capacitor/local-notifications';
 
 @Injectable({
@@ -56,7 +56,7 @@ export class NotificationService {
         token = fcm_token;
       }
 
-      this.userService.updateUserData({fcmToken: token});
+      // this.userService.updateUserData({fcmToken: token});
     });
 
     // Some issue with our setup and push will not work

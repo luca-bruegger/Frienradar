@@ -9,87 +9,101 @@
     <ion-toolbar>
       <ion-title size="large" style="color: var(--ion-color-primary)">Konto</ion-title>
     </ion-toolbar>
-    <ion-toolbar>
-      <ion-title size="small" style="color: var(--ion-color-secondary)">Werde ein Mitglied oder melde dich an.
-      </ion-title>
-    </ion-toolbar>
   </ion-header>
-  <div class="ion-padding">
-    <ion-segment [value]="selectedLoginType" (ionChange)="segmentChanged($event)" color="primary">
-      <ion-segment-button value="0">
-        <ion-label>Anmelden</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="1">
-        <ion-label>Registrieren</ion-label>
-      </ion-segment-button>
-    </ion-segment>
-  </div>
-  <div [formGroup]="formGroup" class="ion-margin-bottom ion-padding-horizontal">
-    <div *ngIf="isRegister">
-      <ion-item>
-        <ion-label position="floating">Name</ion-label>
-        <ion-input formControlName="name" maxlength="100" required="true" autocorrect="true"></ion-input>
-      </ion-item>
-    </div>
-    <div [hidden]="!isRegister">
-      <ng-container *ngFor="let validation of formMessages.name">
-        <div class="error-message"
-             *ngIf="formGroup.get('name').hasError(validation.type) && (formGroup.get('name').dirty || formGroup.get('name').touched)">
-          {{ validation.message }}
-        </div>
-      </ng-container>
-    </div>
-    <ion-item>
-      <ion-label position="floating">Email Adresse</ion-label>
-      <ion-input formControlName="email" type="email" email="true" maxlength="100" required="true" autocorrect="true"></ion-input>
-    </ion-item>
-    <div>
-      <ng-container *ngFor="let validation of formMessages.email">
-        <div class="error-message"
-             *ngIf="formGroup.get('email').hasError(validation.type) && (formGroup.get('email').dirty || formGroup.get('email').touched)">
-          {{ validation.message }}
-        </div>
-      </ng-container>
-    </div>
-    <ion-item>
-      <ion-label position="floating">Passwort</ion-label>
-      <ion-input formControlName="password" type="password" maxlength="100" required="true" autocorrect="true"></ion-input>
-    </ion-item>
-    <div *ngIf="isRegister" style="padding-left: 20px; width: 200px">
-      <password-strength-meter [password]="formGroup.value.password" (strengthChange)="this.strength = $event"></password-strength-meter>
-    </div>
-    <div>
-      <ng-container *ngFor="let validation of formMessages.password">
-        <div class="error-message"
-             *ngIf="formGroup.get('password').hasError(validation.type) && (formGroup.get('password').dirty || formGroup.get('password').touched)">
-          {{ validation.message }}
-        </div>
-      </ng-container>
-    </div>
-    <!--<div [hidden]="!isRegister" *ngIf="false">
-      <div class="item md item-fill-none hydrated phone-number-item">
-        <div class="ion-padding-horizontal phone-number-wrapper">
-          <ion-label position="stacked">Telefonnummer</ion-label>
-          <ngx-intl-tel-input [cssClass]="'phone-number-input'"
-                              [enableAutoCountrySelect]="true"
-                              [enablePlaceholder]="true"
-                              [searchCountryFlag]="true"
-                              [maxLength]="15"
-                              [phoneValidation]="true"
-                              name="phone"
-                              formControlName="phoneNumber"
-                              separateDialCode="true">
-          </ngx-intl-tel-input>
-        </div>
-      </div>
-    </div>-->
-  </div>
   <ion-grid>
-    <ion-row class="ion-align-items-center">
-      <ion-col size="12" class="ion-text-center">
-        <ion-button color="tertiary" fill="outline" (click)="signInUser()" (keyup.enter)="signInUser()">
-          <ion-label color="tertiary">{{isRegister ? 'Registrieren' : 'Anmelden'}}</ion-label>
-        </ion-button>
+    <ion-row>
+      <ion-col sizeXl="4" offsetXl="4">
+        <ion-card color="light">
+          <ion-card-content class="ion-no-padding">
+            <div class="ion-padding">
+              <ion-segment [value]="selectedLoginType" (ionChange)="segmentChanged($event)" color="primary">
+                <ion-segment-button value="0">
+                  <ion-label>Anmelden</ion-label>
+                </ion-segment-button>
+                <ion-segment-button value="1">
+                  <ion-label>Registrieren</ion-label>
+                </ion-segment-button>
+              </ion-segment>
+            </div>
+            <div [formGroup]="formGroup" class="ion-margin-bottom ion-padding-horizontal">
+              <div *ngIf="isRegister">
+                <app-profile-picture-select (photoURLChange)="formGroup.get('profilePicture').setValue($event)"></app-profile-picture-select>
+                <ng-container *ngFor="let validation of formMessages.profilePicture">
+                  <div class="error-message"
+                       *ngIf="formGroup.get('profilePicture').hasError(validation.type) && (formGroup.get('profilePicture').dirty || formGroup.get('profilePicture').touched)">
+                    {{ validation.message }}
+                  </div>
+                </ng-container>
+                <ion-item>
+                  <ion-label position="floating">Name</ion-label>
+                  <ion-input formControlName="name" maxlength="100" required="true" autocorrect="true"></ion-input>
+                </ion-item>
+                <ng-container *ngFor="let validation of formMessages.name">
+                  <div class="error-message"
+                       *ngIf="formGroup.get('name').hasError(validation.type) && (formGroup.get('name').dirty || formGroup.get('name').touched)">
+                    {{ validation.message }}
+                  </div>
+                </ng-container>
+              </div>
+              <ion-item>
+                <ion-label position="floating">Email Adresse</ion-label>
+                <ion-input formControlName="email" type="email" email="true" maxlength="100" required="true"
+                           autocorrect="true"></ion-input>
+              </ion-item>
+              <div>
+                <ng-container *ngFor="let validation of formMessages.email">
+                  <div class="error-message"
+                       *ngIf="formGroup.get('email').hasError(validation.type) && (formGroup.get('email').dirty || formGroup.get('email').touched)">
+                    {{ validation.message }}
+                  </div>
+                </ng-container>
+              </div>
+              <ion-item>
+                <ion-label position="floating">Passwort</ion-label>
+                <ion-input formControlName="password" type="password" maxlength="100" required="true"
+                           autocorrect="true"></ion-input>
+              </ion-item>
+              <div *ngIf="isRegister" style="padding-left: 20px; width: 200px">
+                <password-strength-meter [password]="formGroup.value.password"
+                                         (strengthChange)="this.strength = $event"></password-strength-meter>
+              </div>
+              <div>
+                <ng-container *ngFor="let validation of formMessages.password">
+                  <div class="error-message"
+                       *ngIf="formGroup.get('password').hasError(validation.type) && (formGroup.get('password').dirty || formGroup.get('password').touched)">
+                    {{ validation.message }}
+                  </div>
+                </ng-container>
+              </div>
+              <!--<div [hidden]="!isRegister" *ngIf="false">
+                <div class="item md item-fill-none hydrated phone-number-item">
+                  <div class="ion-padding-horizontal phone-number-wrapper">
+                    <ion-label position="stacked">Telefonnummer</ion-label>
+                    <ngx-intl-tel-input [cssClass]="'phone-number-input'"
+                                        [enableAutoCountrySelect]="true"
+                                        [enablePlaceholder]="true"
+                                        [searchCountryFlag]="true"
+                                        [maxLength]="15"
+                                        [phoneValidation]="true"
+                                        name="phone"
+                                        formControlName="phoneNumber"
+                                        separateDialCode="true">
+                    </ngx-intl-tel-input>
+                  </div>
+                </div>
+              </div>-->
+            </div>
+            <ion-grid>
+              <ion-row class="ion-align-items-center">
+                <ion-col size="12" class="ion-text-center">
+                  <ion-button color="tertiary" fill="outline" (click)="signInUser()" (keyup.enter)="signInUser()">
+                    <ion-label color="tertiary">{{isRegister ? 'Registrieren' : 'Anmelden'}}</ion-label>
+                  </ion-button>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-card-content>
+        </ion-card>
       </ion-col>
     </ion-row>
   </ion-grid>

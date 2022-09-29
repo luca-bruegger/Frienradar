@@ -8,6 +8,7 @@ import { LoginPageRoutingModule } from './login-routing.module';
 
 import { LoginPage } from './login.page';
 import { PasswordStrengthMeterModule } from 'angular-password-strength-meter';
+import { ProfilePictureSelectComponent } from "../../component/profile-picture-select/profile-picture-select.component";
 
 @NgModule({
   imports: [
@@ -16,8 +17,14 @@ import { PasswordStrengthMeterModule } from 'angular-password-strength-meter';
     IonicModule,
     LoginPageRoutingModule,
     ReactiveFormsModule,
-    PasswordStrengthMeterModule.forRoot(),
+    PasswordStrengthMeterModule.forRoot()
   ],
-  declarations: [LoginPage]
+  declarations: [
+    LoginPage,
+    ProfilePictureSelectComponent
+  ],
+  exports: [
+    ProfilePictureSelectComponent
+  ]
 })
 export class LoginPageModule {}

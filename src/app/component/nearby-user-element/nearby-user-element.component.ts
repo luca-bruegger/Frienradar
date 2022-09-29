@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { UserService } from "../../service/user.service";
-import { BaseService } from "../../service/base.service";
+import { UserService } from 'src/app/core/appwrite/user.service';
+import { BaseService } from "../../core/service/base.service";
 
 @Component({
   selector: 'app-nearby-user-element',
@@ -8,8 +8,8 @@ import { BaseService } from "../../service/base.service";
   styleUrls: ['./nearby-user-element.component.scss'],
 })
 export class NearbyUserElementComponent implements OnInit {
-  @Input() user: { displayName: string; photoURL: string };
-  @Input() isRequested: { displayName: string; photoURL: string };
+  @Input() user: { displayName: string; profilePicture: string };
+  @Input() isRequested: { displayName: string; profilePicture: string };
 
   constructor(private userService: UserService,
               private baseService: BaseService) { }

@@ -5,11 +5,11 @@ import { FormsModule } from '@angular/forms';
 import { TabsPage } from './tabs.page';
 
 import { TabsPageRoutingModule } from './tabs-routing.module';
-import { ProfilePageModule } from '../pages/profile/profile.module';
-import { RadarPageModule } from '../pages/radar/radar.module';
 import { NearbyPageModule } from '../pages/nearby/nearby.module';
 import { ChatPageModule } from '../pages/chat/chat.module';
 import { InterestPageModule } from '../pages/interest/interest.module';
+import { ProfilePageModule } from '../pages/profile/profile.module';
+import { RadarPageModule } from '../pages/radar/radar.module';
 
 @NgModule({
   imports: [
@@ -23,6 +23,8 @@ import { InterestPageModule } from '../pages/interest/interest.module';
     ProfilePageModule,
     RadarPageModule
   ],
-  declarations: [TabsPage],
+  declarations: [
+    TabsPage,
+  ]
 })
 export class TabsPageModule {}

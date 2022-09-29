@@ -1,37 +1,46 @@
 <ion-header translucent="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button (click)="closeModal()">Abbrechen</ion-button>
+      <ion-button (click)="closeModalWithSave(false)">Abbrechen</ion-button>
     </ion-buttons>
     <ion-title>Profil bearbeiten</ion-title>
     <ion-buttons slot="end">
-      <ion-button strong="true">Speichern</ion-button>
+      <ion-button strong="true" (click)="closeModalWithSave(true)">Speichern</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-<ion-content fullscreen="true" color="light">
-  <div class="profile-picture ion-padding-top">
-    <div class="img-wrapper">
-      <ion-avatar>
-        <img src="{{user.photoURL}}">
-      </ion-avatar>
+<ion-content fullscreen="true" color="light" [formGroup]="formGroup">
+  <app-profile-picture-select [photoURL]="this.formGroup.get('profilePicture').value" (photoURLChange)="formGroup.get('profilePicture').patchValue($event)"></app-profile-picture-select>
+  <ng-container *ngFor="let validation of formMessages.profilePicture">
+    <div class="error-message"
+         *ngIf="formGroup.get('profilePicture').hasError(validation.type) && (formGroup.get('profilePicture').dirty || formGroup.get('profilePicture').touched)">
+      {{ validation.message }}
     </div>
-    <ion-button fill="clear" (click)="changeProfilePicture()">
-      <ion-label color="tertiary">Profilbild ändern</ion-label>
-    </ion-button>
-  </div>
+  </ng-container>
   <div style="border-top: 1px solid #e0e0e0" class="ion-padding-top">
     <ion-item color="light" lines="none">
-      <ion-label style="width: 80px; padding-right: 5px">Name</ion-label>
-      <ion-input style="border-bottom: 1px solid var(--ion-color-bright)" [value]="user.displayName" ></ion-input>
+      <ion-label style="width: 110px; padding-right: 5px">Name</ion-label>
+      <ion-input style="border-bottom: 1px solid var(--ion-color-bright)" formControlName="name" ></ion-input>
+    </ion-item>
+    <ng-container *ngFor="let validation of formMessages.name">
+      <div class="error-message"
+           *ngIf="formGroup.get('name').hasError(validation.type) && (formGroup.get('name').dirty || formGroup.get('name').touched)">
+        {{ validation.message }}
+      </div>
+    </ng-container>
+    <ion-item color="light" lines="none">
+      <ion-label style="width: 110px; padding-right: 5px">Email</ion-label>
+      <ion-input style="border-bottom: 1px solid var(--ion-color-bright)" formControlName="email"></ion-input>
     </ion-item>
     <ion-item color="light" lines="none">
-      <ion-label style="width: 80px; padding-right: 5px">Email</ion-label>
-      <ion-input style="border-bottom: 1px solid var(--ion-color-bright)" [value]="user.email" ></ion-input>
+      <ion-label style="width: 110px; white-space: pre-wrap; padding-right: 5px">Beschreibung</ion-label>
+      <ion-textarea formControlName="description" style="border-bottom: 1px solid var(--ion-color-bright)" placeholder="Deine Beschreibung..."></ion-textarea>
     </ion-item>
-    <ion-item color="light" lines="none">
-      <ion-label style="width: 80px; white-space: pre-wrap; padding-right: 5px">Beschreibung</ion-label>
-      <ion-textarea style="border-bottom: 1px solid var(--ion-color-bright)" placeholder="Deine Beschreibung..."></ion-textarea>
-    </ion-item>
+    <ng-container *ngFor="let validation of formMessages.description">
+      <div class="error-message"
+           *ngIf="formGroup.get('description').hasError(validation.type) && (formGroup.get('description').dirty || formGroup.get('description').touched)">
+        {{ validation.message }}
+      </div>
+    </ng-container>
   </div>
 </ion-content>
