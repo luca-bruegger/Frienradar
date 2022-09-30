@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ImagePicker } from '@ionic-native/image-picker/ngx';
 import { AlertController, IonRouterOutlet, ModalController } from '@ionic/angular';
 import { SettingsComponent } from '../../component/settings/settings.component';
 import { EditUserProfileComponent } from "../../component/edit-user-profile/edit-user-profile.component";
 import { Select, Store } from "@ngxs/store";
-import { Account, AccountState, AccountStateModel } from "../../store";
+import { Account, AccountState } from "../../store";
 import { Observable } from 'rxjs';
 import User from 'src/app/model/user';
 
@@ -14,8 +14,8 @@ import User from 'src/app/model/user';
   templateUrl: 'profile.page.html',
   styleUrls: ['profile.page.scss'],
 })
-export class ProfilePage implements OnInit {
-  @Select(AccountState.user) user$: Observable<Partial<AccountStateModel>>;
+export class ProfilePage {
+  @Select(AccountState.user) user$: Observable<Partial<User>>;
 
   profilePicture = 'assets/images/blank.png'
 
@@ -25,9 +25,6 @@ export class ProfilePage implements OnInit {
               private routerOutlet: IonRouterOutlet,
               private store: Store) {
     this.store.dispatch(new Account.Fetch)
-  }
-
-  ngOnInit() {
   }
 
   // async editAccountname(key: string) {
@@ -111,5 +108,4 @@ export class ProfilePage implements OnInit {
 
     await modal.present();
   }
-
 }

@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { ImagePicker } from "@ionic-native/image-picker/ngx";
 import { Capacitor } from "@capacitor/core";
 
@@ -7,20 +7,16 @@ import { Capacitor } from "@capacitor/core";
   templateUrl: './profile-picture-select.component.html',
   styleUrls: ['./profile-picture-select.component.scss'],
 })
-export class ProfilePictureSelectComponent implements OnInit {
+export class ProfilePictureSelectComponent {
   private platform: string = Capacitor.getPlatform();
+  @Input() displayOnly: boolean = false;
 
-  @Input() photoURL: string = 'assets/images/blank.png';
-  @Output() photoURLChange = new EventEmitter<string>();
-
+  @Input() profilePicture: string = 'assets/images/blank.png';
+  @Output() profilePictureChange = new EventEmitter<string>();
 
   @ViewChild('profilePictureInput') profilePictureInput: ElementRef;
 
   constructor(private imagePicker: ImagePicker) {
-
-  }
-
-  ngOnInit() {
 
   }
 
@@ -33,8 +29,9 @@ export class ProfilePictureSelectComponent implements OnInit {
 
       reader.addEventListener("load", () => {
         const image = reader.result as string;
-        this.photoURLChange.emit(image);
-        this.photoURL = image;
+        console.log(image)
+        this.profilePictureChange.emit(image);
+        this.profilePicture = image;
       }, false);
     }
   }
@@ -62,9 +59,9 @@ export class ProfilePictureSelectComponent implements OnInit {
         return;
       }
 
-      const image = res[0] as string;
-      this.photoURLChange.emit(image);
-      this.photoURL = image;
+      const image = 'data:image/png;base64,' + (res[0] as string);
+      this.profilePictureChange.emit(image);
+      this.profilePicture = image;
     });
   }
 

@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { UserService } from '../../core/appwrite/user.service';
 import { AccountValidation } from '../../core/validation/account-validation';
 import { Account } from "../../store";
 

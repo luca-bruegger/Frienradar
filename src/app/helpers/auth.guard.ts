@@ -3,7 +3,6 @@ import { CanLoad, Route, UrlSegment, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
 import { LoadingController, NavController } from '@ionic/angular';
 import { BaseService } from '../core/service/base.service';
-import { UserService } from "../core/appwrite/user.service";
 import { Appwrite } from "./appwrite";
 import { Path } from './path';
 
@@ -15,8 +14,7 @@ export class AuthGuard implements CanLoad {
 
   constructor(private baseService: BaseService,
               private navController: NavController,
-              private loadingController: LoadingController,
-              private userService: UserService) {
+              private loadingController: LoadingController) {
   }
 
   canLoad(route: Route,

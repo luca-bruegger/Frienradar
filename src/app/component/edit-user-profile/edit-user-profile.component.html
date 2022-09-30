@@ -10,7 +10,7 @@
   </ion-toolbar>
 </ion-header>
 <ion-content fullscreen="true" color="light" [formGroup]="formGroup">
-  <app-profile-picture-select [photoURL]="this.formGroup.get('profilePicture').value" (photoURLChange)="formGroup.get('profilePicture').patchValue($event)"></app-profile-picture-select>
+  <app-profile-picture-select [profilePicture]="this.formGroup.get('profilePicture').value" (profilePictureChange)="formGroup.get('profilePicture').patchValue($event)"></app-profile-picture-select>
   <ng-container *ngFor="let validation of formMessages.profilePicture">
     <div class="error-message"
          *ngIf="formGroup.get('profilePicture').hasError(validation.type) && (formGroup.get('profilePicture').dirty || formGroup.get('profilePicture').touched)">

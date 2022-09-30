@@ -4,10 +4,10 @@
 
 export const environment = {
   production: false,
-  // endpoint: 'https://api.frienradar.com/v1',
-  // project: '633467240f7db9ae07d7',
-  endpoint: 'http://localhost/v1',
-  project: '6332cb416c6ae5f7c8c4'
+  endpoint: 'https://api.frienradar.com/v1',
+  project: '633467240f7db9ae07d7',
+  // endpoint: 'http://localhost/v1',
+  // project: '6332cb416c6ae5f7c8c4'
 };
 
 /*

@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { GeolocationService } from '../../core/service/geolocation.service';
-import { UserService } from '../../core/appwrite/user.service';
 import { NotificationService } from '../../core/service/notification.service';
 
 @Component({
@@ -13,7 +12,6 @@ export class NearbyPage implements OnInit {
   nearbyUsers = null;
 
   constructor(private geolocationService: GeolocationService,
-              private userService: UserService,
               private notificationService: NotificationService) {
   }
 

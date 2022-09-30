@@ -21,14 +21,10 @@
       <ion-col sizeXl="6" offsetXl="3">
         <ion-card color="light" *ngIf="user$ | async; let user">
           <ion-card-content>
-            <div style="display: flex; flex-direction: column">
+            <div style="display: flex; flex-direction: column" class="ion-padding-bottom">
               <div style="display: flex; flex-direction: row; gap: 20px">
-                <div class="img-wrapper">
-                  <ion-avatar>
-                    <img src="{{user.profilePicture || profilePicture}}">
-                  </ion-avatar>
-                </div>
-                <div>
+                <app-profile-picture-select [displayOnly]="true" [profilePicture]="user.profilePicture || profilePicture"></app-profile-picture-select>
+                <div class="ion-padding-top">
                   <h1>{{user.name}}</h1>
                   <ion-text color="medium">
                     <div style="display: flex; align-items: center">

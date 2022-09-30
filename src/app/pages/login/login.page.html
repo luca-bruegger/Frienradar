@@ -27,14 +27,14 @@
             </div>
             <div [formGroup]="formGroup" class="ion-margin-bottom ion-padding-horizontal">
               <div *ngIf="isRegister">
-                <app-profile-picture-select (photoURLChange)="formGroup.get('profilePicture').setValue($event)"></app-profile-picture-select>
+                <app-profile-picture-select (profilePictureChange)="formGroup.get('profilePicture').setValue($event)"></app-profile-picture-select>
                 <ng-container *ngFor="let validation of formMessages.profilePicture">
                   <div class="error-message"
                        *ngIf="formGroup.get('profilePicture').hasError(validation.type) && (formGroup.get('profilePicture').dirty || formGroup.get('profilePicture').touched)">
                     {{ validation.message }}
                   </div>
                 </ng-container>
-                <ion-item>
+                <ion-item color="light">
                   <ion-label position="floating">Name</ion-label>
                   <ion-input formControlName="name" maxlength="100" required="true" autocorrect="true"></ion-input>
                 </ion-item>
@@ -45,7 +45,7 @@
                   </div>
                 </ng-container>
               </div>
-              <ion-item>
+              <ion-item color="light">
                 <ion-label position="floating">Email Adresse</ion-label>
                 <ion-input formControlName="email" type="email" email="true" maxlength="100" required="true"
                            autocorrect="true"></ion-input>
@@ -58,7 +58,7 @@
                   </div>
                 </ng-container>
               </div>
-              <ion-item>
+              <ion-item color="light">
                 <ion-label position="floating">Passwort</ion-label>
                 <ion-input formControlName="password" type="password" maxlength="100" required="true"
                            autocorrect="true"></ion-input>

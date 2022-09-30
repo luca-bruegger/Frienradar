@@ -21,7 +21,7 @@ export namespace Account {
   export class Signup {
     static readonly type = '[Auth] Signup';
     constructor(
-      public payload: { email: string; password: string; name: string }
+      public payload: { email: string; password: string; name: string, profilePicture: string }
     ) {}
   }
 
@@ -107,20 +107,21 @@ export class AccountState {
     { patchState, dispatch }: StateContext<AccountStateModel>,
     action: Account.Signup
   ) {
-    let { email, password, name } = action.payload;
+    let { email, password, name, profilePicture } = action.payload;
     try {
-      let account = await Appwrite.accountProvider().create(
+      let user = await Appwrite.accountProvider().create(
         'unique()',
         email,
         password,
         name
-      );
+      ) as User;
       let session = await Appwrite.accountProvider().createEmailSession(email, password);
+      user.profilePicture = await this.updateProfilePicture(profilePicture, user, dispatch);
       patchState({
-        user: account as User,
+        user,
         session,
       });
-      dispatch(new Account.Redirect({ path: 'todos' }));
+      dispatch(new Account.Redirect({ path: Path.default }));
     } catch (e: any) {
       console.log('Error creating Account');
       dispatch(
@@ -174,9 +175,7 @@ export class AccountState {
     }
 
     if (!!profilePicture) {
-      const profilePictureUrl = await this.updateProfilePicture(profilePicture, user, patchState, dispatch)
-      updated_user.profilePicture = profilePictureUrl;
-      console.log(profilePictureUrl)
+      updated_user.profilePicture = await this.updateProfilePicture(profilePicture, user, dispatch);
       user = { ...user, ...updated_user }
     }
 
@@ -192,11 +191,11 @@ export class AccountState {
   ) {
     try {
       await Appwrite.accountProvider().deleteSession('current');
-      patchState({
-        user: null,
-        session: null,
-      });
-      dispatch(new Account.Redirect({ path: Path.login }));
+      // patchState({
+      //   user: null,
+      //   session: null,
+      // });
+      // dispatch(new Account.Redirect({ path: Path.login }));
     } catch (e: any) {
       dispatch(
         new GlobalActions.showToast({
@@ -229,7 +228,7 @@ export class AccountState {
     }
   }
 
-  private async updateProfilePicture(profilePictureString: string, user: Partial<User>, patchState, dispatch: (actions: any) => Observable<void>) {
+  private async updateProfilePicture(profilePictureString: string, user: Partial<User>, dispatch: (actions: any) => Observable<void>) {
     try {
       const picture = await Picture.convertToPicture(profilePictureString) as unknown as File;
       const profilePicture = await Appwrite.storageProvider().createFile('profile-picture', user.$id, picture) as Models.File;

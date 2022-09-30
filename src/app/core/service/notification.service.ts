@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { ActionPerformed, PushNotifications, PushNotificationSchema, } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
 import { FCM } from '@capacitor-community/fcm';
-import { UserService } from '../appwrite/user.service';
-import { LocalNotifications, PermissionStatus } from '@capacitor/local-notifications';
+import { LocalNotifications } from '@capacitor/local-notifications';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +10,7 @@ import { LocalNotifications, PermissionStatus } from '@capacitor/local-notificat
 export class NotificationService {
   platform: string = Capacitor.getPlatform();
 
-  constructor(private userService: UserService) {
+  constructor() {
     if (this.platform === 'ios' || this.platform === 'android') {
       this.setupPushNotifications();
     }

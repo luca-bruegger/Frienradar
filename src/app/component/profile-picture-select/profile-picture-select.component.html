@@ -1,11 +1,11 @@
 <div class="profile-picture ion-padding-top">
   <div class="img-wrapper">
     <ion-avatar>
-      <img src="{{photoURL}}">
+      <img src="{{profilePicture}}">
     </ion-avatar>
   </div>
-  <ion-button fill="clear" (click)="displayImagePicker()">
+  <ion-button *ngIf="!displayOnly" fill="clear" (click)="displayImagePicker()">
     <ion-label color="tertiary">Profilbild ändern</ion-label>
   </ion-button>
 </div>
-<input #profilePictureInput type="file" [hidden]="true" accept="image/png, image/jpeg, image/jpg" (change)="fileUpload($event)"/>
+<input *ngIf="!displayOnly" #profilePictureInput type="file" [hidden]="true" accept="image/png, image/jpeg, image/jpg" (change)="fileUpload($event)"/>

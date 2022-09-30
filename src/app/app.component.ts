@@ -1,7 +1,7 @@
 import { Component, NgZone } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { App, URLOpenListenerEvent } from '@capacitor/app';
-import { BaseService } from "./core/service/base.service";
+import { Path } from "./helpers/path";
 
 @Component({
   selector: 'app-root',
@@ -10,7 +10,6 @@ import { BaseService } from "./core/service/base.service";
 })
 export class AppComponent {
   constructor(private router: Router,
-              private baseService: BaseService,
               private zone: NgZone) {
     this.initializeApp();
   }
@@ -23,7 +22,7 @@ export class AppComponent {
   private jumpTo() {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
-        this.baseService.setJumpTo(event.url);
+        Path.setJumpTo(event.url)
       }
     });
   }

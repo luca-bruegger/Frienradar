@@ -3,7 +3,6 @@ import { BaseService } from './base.service';
 import { Geolocation, Position } from '@capacitor/geolocation';
 import { BehaviorSubject } from 'rxjs';
 import { geohashForLocation } from 'geofire-common';
-import { UserService } from '../appwrite/user.service';
 import { Capacitor } from "@capacitor/core";
 
 @Injectable({
@@ -15,8 +14,7 @@ export class GeolocationService {
   geohashSubject: BehaviorSubject<string> = new BehaviorSubject<string>(null);
   private platform: string = Capacitor.getPlatform();
 
-  constructor(private baseService: BaseService,
-              private userService: UserService) {
+  constructor(private baseService: BaseService) {
     this.watchGeolocation();
   }
 
