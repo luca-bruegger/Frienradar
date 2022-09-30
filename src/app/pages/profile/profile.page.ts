@@ -7,6 +7,8 @@ import { Select, Store } from "@ngxs/store";
 import { Account, AccountState } from "../../store";
 import { Observable } from 'rxjs';
 import User from 'src/app/model/user';
+import { Appwrite } from "../../helpers/appwrite";
+import { Path } from "../../helpers/path";
 
 
 @Component({
@@ -25,6 +27,10 @@ export class ProfilePage {
               private routerOutlet: IonRouterOutlet,
               private store: Store) {
     this.store.dispatch(new Account.Fetch)
+
+    Appwrite.accountProvider().getSession('current').then((isAuthenticated) => {
+      alert(!!isAuthenticated)
+    });
   }
 
   // async editAccountname(key: string) {

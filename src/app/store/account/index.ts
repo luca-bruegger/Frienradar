@@ -123,7 +123,7 @@ export class AccountState {
       });
       dispatch(new Account.Redirect({ path: Path.default }));
     } catch (e: any) {
-      console.log('Error creating Account');
+      alert(JSON.stringify(e));
       dispatch(
         new GlobalActions.showToast({
           message: e.message,

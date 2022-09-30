@@ -21,7 +21,7 @@ export class AuthGuard implements CanLoad {
           segments: UrlSegment[]): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     const segment = segments[0]?.path;
 
-    return  Appwrite.accountProvider().getSession('current').then((isAuthenticated) => {
+    return Appwrite.accountProvider().getSession('current').then((isAuthenticated) => {
       if (!isAuthenticated) {
         this.navController.navigateBack([Path.login]);
         return false;
