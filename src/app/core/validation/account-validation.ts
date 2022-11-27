@@ -55,11 +55,14 @@ export class AccountValidation {
       {type: 'required', message: 'Email ist notwendig.'},
       {type: 'pattern', message: 'Email ist nicht gültig.'},
     ],
-    password: [
+    passwordRegister: [
       {type: 'required', message: 'Passwort ist notwendig.'},
       {type: 'minLength', message: 'Passwort ist zu kurz.'},
       {type: 'maxLength', message: 'Passwort ist zu lang.'},
       {type: 'pattern', message: 'Passwort muss Gross- und Kleinbuchstaben Nummern enthalten.'},
+    ],
+    passwordLogin: [
+      {type: 'required', message: 'Passwort ist notwendig.'},
     ],
     name: [
       {type: 'required', message: 'Name ist notwendig.'},

@@ -34,7 +34,7 @@
     </ion-item>
     <ion-item color="light" lines="none">
       <ion-label style="width: 110px; white-space: pre-wrap; padding-right: 5px">Beschreibung</ion-label>
-      <ion-textarea formControlName="description" style="border-bottom: 1px solid var(--ion-color-bright)" placeholder="Deine Beschreibung..."></ion-textarea>
+      <ion-textarea auto-grow="true" formControlName="description" style="border-bottom: 1px solid var(--ion-color-bright)" placeholder="Deine Beschreibung..."></ion-textarea>
     </ion-item>
     <ng-container *ngFor="let validation of formMessages.description">
       <div class="error-message"

@@ -16,61 +16,74 @@
     </ion-toolbar>
   </ion-header>
 
-  <ion-grid>
+  <ion-grid class="ion-no-padding">
     <ion-row>
-      <ion-col sizeXl="6" offsetXl="3">
-        <ion-card color="light" *ngIf="user$ | async; let user">
+      <ion-col sizeXl="6" offsetXl="3" class="ion-padding">
+        <ng-template #loading style="display: flex; align-items: center; justify-content: center; gap: 10px">
+          <ion-spinner name="crescent" style="vertical-align: center"></ion-spinner>
+          <p>Profil wird geladen...</p>
+        </ng-template>
+        <ion-card color="light" *ngIf="user$ | async; let user; else loading" class="ion-no-margin">
           <ion-card-content>
             <div style="display: flex; flex-direction: column" class="ion-padding-bottom">
               <div style="display: flex; flex-direction: row; gap: 20px">
-                <app-profile-picture-select [displayOnly]="true" [profilePicture]="user.profilePicture || profilePicture"></app-profile-picture-select>
+                <app-profile-picture-select [displayOnly]="true"
+                                            [profilePicture]="user.profilePicture || profilePicture"></app-profile-picture-select>
                 <div class="ion-padding-top">
-                  <h1>{{user.name}}</h1>
-                  <ion-text color="medium">
-                    <div style="display: flex; align-items: center">
-                      <ion-icon class="text-icon" name="mail-outline" color="medium"></ion-icon>
-                      <p class="icon-text">{{user.email}}</p>
-                    </div>
+                  <ion-text color="primary">
+                    <h1>{{user.name}}</h1>
                   </ion-text>
-                  <ion-text color="medium">
-                    <div style="display: flex; align-items: center">
-                      <ion-icon class="text-icon" name="server-outline" color="medium"></ion-icon>
-                      <p class="icon-text">{{user.$id}}</p>
-                    </div>
-                  </ion-text>
+                  <div>
+                    <ion-text color="medium">
+                      <div style="display: flex; align-items: center">
+                        <ion-icon class="text-icon" name="mail-outline" color="medium"></ion-icon>
+                        <p class="icon-text">{{user.email}}</p>
+                      </div>
+                    </ion-text>
+                    <ion-text color="medium">
+                      <div style="display: flex; align-items: center">
+                        <ion-icon class="text-icon" name="server-outline" color="medium"></ion-icon>
+                        <p class="icon-text">{{user.$id}}</p>
+                      </div>
+                    </ion-text>
+                  </div>
                 </div>
               </div>
-              <ion-item *ngIf="user.description" color="light" class="ion-margin-top ion-no-padding" lines="none">
-                <ion-textarea placeholder="Beschreibung..."></ion-textarea>
+              <ion-item *ngIf="user.prefs.description" color="light" class="ion-margin-top ion-no-padding" lines="none">
+                <ion-textarea auto-grow="true" readonly="true" placeholder="Beschreibung..."
+                              [value]="user.prefs.description"></ion-textarea>
               </ion-item>
             </div>
-            <div class="ion-margin-top">
+            <div>
               <ion-buttons>
-                <ion-button (click)="openEditProfile()" fill="outline" color="dark" style="width: 100%">
+                <ion-button (click)="openEditProfile()" fill="outline" style="width: 100%" shape="round"
+                            color="primary">
                   <ion-icon class="text-icon" name="create-outline"></ion-icon>
                   <p class="icon-text">Profil bearbeiten</p>
-                </ion-button>
-                <ion-button (click)="openContactRequests()" fill="outline" color="dark" style="width: 100%">
-                  <ion-icon class="text-icon" name="mail-outline">
-                    <ion-badge id="notifications-badge" color="danger">1</ion-badge>
-                  </ion-icon>
-                  <p class="icon-text">Anfragen</p>
                 </ion-button>
               </ion-buttons>
             </div>
           </ion-card-content>
         </ion-card>
-        <div class="ion-margin-horizontal ion-margin-bottom" style="display: flex; flex-direction: column; grid-gap: 10px">
+        <ion-grid class="ion-margin-vertical ion-no-padding">
+          <ion-row style="gap: 10px">
+            <ion-col size="12" *ngFor="let accountObj of accounts | keyvalue">
+              <a *ngIf="accountObj.value.name == 'Instagram'" href="#" onclick="window.open('https://www.twitter.com/luca_bruegger', '_system', 'location=yes');">
 
-          <ion-card *ngFor="let accountObj of accounts | keyvalue" style="{{accountObj.value.style}} text-align: center;"
-                    class="ion-no-margin">
-            <ion-card-content (click)="editAccountname(accountObj.key)">
-              <ion-icon class="text-icon" name="{{accountObj.value.icon}}"></ion-icon>
-              <span class="icon-text" *ngIf="accountObj.value.username === ''">{{accountObj.value.name}} verbinden</span>
-              <span class="icon-text" *ngIf="accountObj.value.username.length > 0">@{{accountObj.value.username}}</span>
-            </ion-card-content>
-          </ion-card>
-        </div>
+              <ion-card style="{{accountObj.value.style}} text-align: center;" class="ion-no-margin">
+                <ion-card-content (click)="editAccountname(accountObj.key)">
+                  <ion-icon class="text-icon" name="{{accountObj.value.icon}}"></ion-icon>
+                  <span class="icon-text" *ngIf="accountObj.value.username === ''">{{accountObj.value.name}}</span>
+                  <span class="icon-text"
+                        *ngIf="accountObj.value.username.length > 0">@{{accountObj.value.username}}</span>
+                </ion-card-content>
+              </ion-card>
+              </a>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
+
       </ion-col>
     </ion-row>
   </ion-grid>

@@ -5,10 +5,9 @@ import { SettingsComponent } from '../../component/settings/settings.component';
 import { EditUserProfileComponent } from "../../component/edit-user-profile/edit-user-profile.component";
 import { Select, Store } from "@ngxs/store";
 import { Account, AccountState } from "../../store";
+import { Account as AccountModel } from "../../model/account";
 import { Observable } from 'rxjs';
-import User from 'src/app/model/user';
-import { Appwrite } from "../../helpers/appwrite";
-import { Path } from "../../helpers/path";
+import { Providers } from '../../helpers/providers';
 
 
 @Component({
@@ -17,20 +16,16 @@ import { Path } from "../../helpers/path";
   styleUrls: ['profile.page.scss'],
 })
 export class ProfilePage {
-  @Select(AccountState.user) user$: Observable<Partial<User>>;
+  @Select(AccountState.user) user$: Observable<Partial<AccountModel.User>>;
 
   profilePicture = 'assets/images/blank.png'
+  accounts = Providers.data;
 
   constructor(private imagePicker: ImagePicker,
               private alertController: AlertController,
               private modalController: ModalController,
               private routerOutlet: IonRouterOutlet,
               private store: Store) {
-    this.store.dispatch(new Account.Fetch)
-
-    Appwrite.accountProvider().getSession('current').then((isAuthenticated) => {
-      alert(!!isAuthenticated)
-    });
   }
 
   // async editAccountname(key: string) {
@@ -65,40 +60,32 @@ export class ProfilePage {
   //   });
   // }
 
-  openContactRequests() {
-
-  }
-
   async openEditProfile() {
     const user = this.store.selectSnapshot(AccountState.user)
-    const userData = {
-      name: user.name,
-      email: user.email,
-      description: user.description,
-      profilePicture: user.profilePicture
-    }
 
     const modal = await this.modalController.create({
       component: EditUserProfileComponent,
       swipeToClose: true,
       presentingElement: this.routerOutlet.nativeEl,
       componentProps: {
-        userData
+        user
       }
     });
 
     modal.onDidDismiss().then(event => {
-      const data = event.data;
-      let updateSet: Partial<User> = {};
+      if (event.data) {
+        const data = event.data;
+        let updateSet: Partial<AccountModel.User> = {};
 
-      Object.keys(data).forEach(key => {
-        if (data[key] !== userData[key]) {
-          updateSet[key] = data[key]
-        }
-      })
+        Object.keys(data).forEach(key => {
+          if (data[key] !== user[key]) {
+            updateSet[key] = data[key]
+          }
+        })
 
-      if (updateSet === {}) return;
-      this.store.dispatch(new Account.Update(updateSet))
+        if (updateSet === {}) return;
+        this.store.dispatch(new Account.Update(updateSet))
+      }
     });
 
     await modal.present();

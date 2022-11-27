@@ -1,18 +1,9 @@
-<ion-card color="light" style="height: 100%; display: flex; justify-content: center">
-  <div class="user-icon-wrapper ion-text-center">
-    <h1 class="user-icon-header">Du</h1>
-    <ion-icon name="person" class="user-icon"></ion-icon>
+<ion-card color="light" class="ion-no-margin radar-card">
+  <div class="map-canvas">
+    <google-map *ngIf="(mapApiLoaded | async) && geohash" #map height="100%" width="100%" [options]="mapOptions" [zoom]="mapZoom" (mapInitialized)="setupZoomListener($event)"></google-map>
+    <div *ngIf="!geohash"
+         style="position:absolute; top: 50%; left: 50%; display: flex; flex-direction: row; text-align: center; align-items: center; transform: translate(-50%, -50%); gap: 10px">
+      <p>Karte kann nicht geladen werden, deine position konnte nicht erfasst werden.</p>
+    </div>
   </div>
-
-
-<!--
-  <ng-template #nearbyUser>
--->
-<!--    <div class="nearby-user-icon-wrapper ion-text-center">
-      <h4 class="nearbyuser-icon-header">Andere Person</h4>
-      <ion-icon name="person" class="user-icon"></ion-icon>
-    </div>-->
-<!--
-  </ng-template>
--->
 </ion-card>

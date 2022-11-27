@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { ImagePicker } from "@ionic-native/image-picker/ngx";
 import { Capacitor } from "@capacitor/core";
 
@@ -7,7 +7,7 @@ import { Capacitor } from "@capacitor/core";
   templateUrl: './profile-picture-select.component.html',
   styleUrls: ['./profile-picture-select.component.scss'],
 })
-export class ProfilePictureSelectComponent {
+export class ProfilePictureSelectComponent implements OnInit {
   private platform: string = Capacitor.getPlatform();
   @Input() displayOnly: boolean = false;
 
@@ -17,7 +17,9 @@ export class ProfilePictureSelectComponent {
   @ViewChild('profilePictureInput') profilePictureInput: ElementRef;
 
   constructor(private imagePicker: ImagePicker) {
+  }
 
+  ngOnInit() {
   }
 
   fileUpload($event: Event) {
@@ -29,7 +31,6 @@ export class ProfilePictureSelectComponent {
 
       reader.addEventListener("load", () => {
         const image = reader.result as string;
-        console.log(image)
         this.profilePictureChange.emit(image);
         this.profilePicture = image;
       }, false);

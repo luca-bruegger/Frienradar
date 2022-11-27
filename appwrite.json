@@ -1,0 +1,21 @@
+{
+    "projectId": "633467240f7db9ae07d7",
+    "projectName": "Frienradar dev",
+    "functions": [
+        {
+            "$id": "update-user-location",
+            "name": "Update User location",
+            "runtime": "node-16.0",
+            "path": "functions/Update User location",
+            "entrypoint": "src/index.js",
+            "ignore": [
+                "node_modules",
+                ".npm"
+            ],
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
+        }
+    ]
+}

@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { AccountValidation } from '../../core/validation/account-validation';
+import { Account as AccountModel } from '../../model/account';
 
 @Component({
   selector: 'app-edit-user-profile',
@@ -8,7 +9,7 @@ import { AccountValidation } from '../../core/validation/account-validation';
   styleUrls: ['./edit-user-profile.component.scss'],
 })
 export class EditUserProfileComponent implements OnInit {
-  @Input() userData: any;
+  @Input() user: AccountModel.User;
 
   formGroup = AccountValidation.editProfileFormGroup;
   formMessages = AccountValidation.formMessages;
@@ -29,12 +30,20 @@ export class EditUserProfileComponent implements OnInit {
       this.formGroup.markAllAsTouched();
       return;
     }
-    await this.modalController.dismiss(this.formGroup.value);
+    await this.modalController.dismiss({
+      name: this.formGroup.get('name').value,
+      email: this.formGroup.get('email').value,
+      profilePicture: this.formGroup.get('profilePicture').value,
+      prefs: {
+        description: this.formGroup.get('description').value
+      }
+    });
   }
 
   private setInitialValues() {
-    Object.keys(this.formGroup.controls).forEach(name => {
-      this.formGroup.get(name).patchValue(this.userData[name])
-    })
+    this.formGroup.get('name').patchValue(this.user.name);
+    this.formGroup.get('email').patchValue(this.user.email);
+    this.formGroup.get('profilePicture').patchValue(this.user.profilePicture);
+    this.formGroup.get('description').patchValue(this.user.prefs.description);
   }
 }

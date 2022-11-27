@@ -2,6 +2,10 @@ import { Component, NgZone } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { App, URLOpenListenerEvent } from '@capacitor/app';
 import { Path } from "./helpers/path";
+import { Store } from '@ngxs/store';
+import { AppInitService } from './core/service/app-init.service';
+import { LocationService } from './core/service/location.service';
+import { RealtimeService } from './core/service/realtime.service';
 
 @Component({
   selector: 'app-root',
@@ -9,14 +13,22 @@ import { Path } from "./helpers/path";
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
-  constructor(private router: Router,
-              private zone: NgZone) {
-    this.initializeApp();
-  }
+  hasInitialized = false;
 
-  private initializeApp() {
-    this.jumpTo();
-    this.initializeDeeplinks();
+  constructor(private router: Router,
+              private zone: NgZone,
+              private store: Store,
+              private appInitService: AppInitService,
+              private locationService: LocationService,
+              private realtimeService: RealtimeService) {
+
+    appInitService.init().then(async () => {
+      this.hasInitialized = true;
+      this.jumpTo();
+      this.initializeDeeplinks();
+      await locationService.watchGeolocation();
+      await realtimeService.watchRealtime();
+    });
   }
 
   private jumpTo() {

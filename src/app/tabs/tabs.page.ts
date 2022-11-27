@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { GeolocationService } from '../core/service/geolocation.service';
+import { LocationService } from '../core/service/location.service';
 
 @Component({
   selector: 'app-tabs',
@@ -7,9 +7,5 @@ import { GeolocationService } from '../core/service/geolocation.service';
   styleUrls: ['tabs.page.scss'],
 })
 export class TabsPage {
-
-  constructor(private geolocationService: GeolocationService) {
-    geolocationService.watchGeolocation();
-  }
 
 }

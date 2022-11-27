@@ -7,14 +7,17 @@ import { IonicModule } from '@ionic/angular';
 import { NearbyPageRoutingModule } from './nearby-routing.module';
 
 import { NearbyPage } from './nearby.page';
+import { NearbyUserElementComponent } from '../../component/nearby-user-element/nearby-user-element.component';
+import { SharedModule } from '../../shared.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    NearbyPageRoutingModule
+    NearbyPageRoutingModule,
+    SharedModule
   ],
-  declarations: [NearbyPage]
+  declarations: [NearbyPage, NearbyUserElementComponent]
 })
 export class NearbyPageModule {}

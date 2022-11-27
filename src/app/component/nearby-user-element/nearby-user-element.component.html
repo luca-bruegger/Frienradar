@@ -1,4 +1,4 @@
-<ion-card color="light">
+<ion-card color="light" class="ion-no-margin">
   <ion-card-content style="display: flex; flex-direction: row; gap: 15px; flex-grow: 1">
     <div>
       <ion-avatar style="height: 64px; width: 64px">
@@ -6,11 +6,11 @@
       </ion-avatar>
     </div>
     <div style="width: 100%">
-      <ion-label>{{user.displayName}}</ion-label>
-      <p>Keine Interessen angegeben.</p>
+      <ion-label color="primary"><strong>{{user.name}}</strong></ion-label>
+      <p>Gesehen um: <br> <samp>{{lastSeen}}</samp></p>
     </div>
     <div style="display: flex; align-items: center">
-      <ion-chip *ngIf="!isRequested" (click)="requestUserContact(user)">
+      <ion-chip *ngIf="!isRequested" (click)="requestUserContact()" color="secondary">
         Anfragen
       </ion-chip>
 

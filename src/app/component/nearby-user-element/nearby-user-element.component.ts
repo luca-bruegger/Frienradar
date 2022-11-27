@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { UserService } from 'src/app/core/appwrite/user.service';
-import { BaseService } from "../../core/service/base.service";
+import { Store } from '@ngxs/store';
+import { Contact } from '../../store';
+import { Account as AccountModel } from '../../model/account';
 
 @Component({
   selector: 'app-nearby-user-element',
@@ -8,16 +9,19 @@ import { BaseService } from "../../core/service/base.service";
   styleUrls: ['./nearby-user-element.component.scss'],
 })
 export class NearbyUserElementComponent implements OnInit {
-  @Input() user: { displayName: string; profilePicture: string };
+  @Input() user: AccountModel.User;
   @Input() isRequested: { displayName: string; profilePicture: string };
 
-  constructor(private userService: UserService,
-              private baseService: BaseService) { }
+  constructor(private store: Store) { }
 
   ngOnInit() {
   }
 
-  requestUserContact(user: { displayName: string; photoURL: string }) {
-    this.userService.setContactRequest(user);
+  requestUserContact() {
+    this.store.dispatch(new Contact.Request({ requestUserId: this.user.$id }));
+  }
+
+  get lastSeen() {
+    return new Date(this.user.$updatedAt).toLocaleTimeString();
   }
 }

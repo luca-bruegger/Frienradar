@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ActionPerformed, PushNotifications, PushNotificationSchema, } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
-import { FCM } from '@capacitor-community/fcm';
 import { LocalNotifications } from '@capacitor/local-notifications';
 
 @Injectable({
@@ -51,8 +50,8 @@ export class NotificationService {
 
       // Get FCM token instead the APN one returned by Capacitor
       if (this.platform === 'ios') {
-        const {token: fcm_token} = await FCM.getToken();
-        token = fcm_token;
+        // const {token: fcm_token} = await FCM.getToken();
+        // token = fcm_token;
       }
 
       // this.userService.updateUserData({fcmToken: token});

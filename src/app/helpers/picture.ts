@@ -4,7 +4,6 @@ export class Picture {
   static convertToBase64(picture: File) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      console.log(picture)
       reader.onload = async () => {
         try {
           resolve(reader.result);
@@ -31,7 +30,7 @@ export class Picture {
     });
   }
 
-  static viewURL(fileId: string) {
+  static profilePictureViewURL(fileId: string) {
     return `${environment.endpoint}/storage/buckets/profile-picture/files/${fileId}/view?project=${environment.project}&breaker=${this.cacheBreaker()}`;
   }
 

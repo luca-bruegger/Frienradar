@@ -16,7 +16,6 @@
 		"scheme": "Frienradar"
 	},
 	"server": {
-		"url": "http://172.28.218.185:8100",
-		"cleartext": true
+		"url": "http://172.20.10.2:8100"
 	}
 }

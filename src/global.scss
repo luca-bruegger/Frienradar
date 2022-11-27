@@ -31,6 +31,8 @@ html {
   --ion-background-color: var(--ion-color-vbright);
 }
 
+//
+
 .icon-text {
   display: inline-block;
   vertical-align: middle;
@@ -83,6 +85,6 @@ html {
   border-color: var(--ion-color-vbright) !important;
 }
 
-.ios ion-item ion-input{
-
+.material-symbols-rounded {
+  font-weight: 500;
 }

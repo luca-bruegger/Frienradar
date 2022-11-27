@@ -24,7 +24,8 @@ import { RadarPageModule } from '../pages/radar/radar.module';
     RadarPageModule
   ],
   declarations: [
-    TabsPage,
-  ]
+    TabsPage
+  ],
+  providers: []
 })
 export class TabsPageModule {}

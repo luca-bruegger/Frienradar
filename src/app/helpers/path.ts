@@ -1,5 +1,5 @@
 export class Path {
-  static default = this.getJumpTo() || '/tabs/profile';
+  static default = this.getJumpTo() || '/tabs/radar';
   static login = '/login';
 
   static setJumpTo(url: string) {

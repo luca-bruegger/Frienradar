@@ -18,6 +18,7 @@ import { NgxsModule } from "@ngxs/store";
 import { environment } from "../environments/environment";
 import { AppState } from "./store";
 import { NgxsReduxDevtoolsPluginModule } from "@ngxs/devtools-plugin";
+import { HttpClientJsonpModule, HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -37,11 +38,23 @@ import { NgxsReduxDevtoolsPluginModule } from "@ngxs/devtools-plugin";
     NgxsModule.forRoot(AppState, {
       developmentMode: !environment.production
     }),
+    HttpClientModule,
+    HttpClientJsonpModule,
     environment.production ? [] : NgxsReduxDevtoolsPluginModule.forRoot()
   ],
-  providers: [ImagePicker, {provide: RouteReuseStrategy, useClass: IonicRouteStrategy}],
+  providers: [ImagePicker,
+    {provide: RouteReuseStrategy, useClass: IonicRouteStrategy},
+/*    {
+      provide: APP_INITIALIZER,
+      useFactory: appConfigFactory,
+      deps: [AppInitService],
+      multi: true
+    }*/
+  ],
   bootstrap: [AppComponent],
-  exports: []
+  exports: [],
+  schemas: [
+  ]
 })
-export class AppModule {
-}
+
+export class AppModule {}

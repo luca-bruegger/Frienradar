@@ -10,24 +10,15 @@
       <ion-title size="large" style="color: var(--ion-color-primary)">Konto</ion-title>
     </ion-toolbar>
   </ion-header>
-  <ion-grid>
-    <ion-row>
-      <ion-col sizeXl="4" offsetXl="4">
+  <ion-grid class="container-grid">
+    <ion-row style="flex: 1; align-content: center">
+      <ion-col sizeXl="4" offsetXl="4" >
         <ion-card color="light">
-          <ion-card-content class="ion-no-padding">
-            <div class="ion-padding">
-              <ion-segment [value]="selectedLoginType" (ionChange)="segmentChanged($event)" color="primary">
-                <ion-segment-button value="0">
-                  <ion-label>Anmelden</ion-label>
-                </ion-segment-button>
-                <ion-segment-button value="1">
-                  <ion-label>Registrieren</ion-label>
-                </ion-segment-button>
-              </ion-segment>
-            </div>
+          <ion-card-content class="ion-no-padding" *ngIf="!loginInProgress">
             <div [formGroup]="formGroup" class="ion-margin-bottom ion-padding-horizontal">
               <div *ngIf="isRegister">
-                <app-profile-picture-select (profilePictureChange)="formGroup.get('profilePicture').setValue($event)"></app-profile-picture-select>
+                <app-profile-picture-select
+                  (profilePictureChange)="formGroup.get('profilePicture').setValue($event)"></app-profile-picture-select>
                 <ng-container *ngFor="let validation of formMessages.profilePicture">
                   <div class="error-message"
                        *ngIf="formGroup.get('profilePicture').hasError(validation.type) && (formGroup.get('profilePicture').dirty || formGroup.get('profilePicture').touched)">
@@ -35,7 +26,7 @@
                   </div>
                 </ng-container>
                 <ion-item color="light">
-                  <ion-label position="floating">Name</ion-label>
+                  <ion-label position="floating">Benutzername</ion-label>
                   <ion-input formControlName="name" maxlength="100" required="true" autocorrect="true"></ion-input>
                 </ion-item>
                 <ng-container *ngFor="let validation of formMessages.name">
@@ -68,7 +59,7 @@
                                          (strengthChange)="this.strength = $event"></password-strength-meter>
               </div>
               <div>
-                <ng-container *ngFor="let validation of formMessages.password">
+                <ng-container *ngFor="let validation of isRegister ? formMessages.passwordRegister : formMessages.passwordLogin">
                   <div class="error-message"
                        *ngIf="formGroup.get('password').hasError(validation.type) && (formGroup.get('password').dirty || formGroup.get('password').touched)">
                     {{ validation.message }}
@@ -96,14 +87,35 @@
             <ion-grid>
               <ion-row class="ion-align-items-center">
                 <ion-col size="12" class="ion-text-center">
-                  <ion-button color="tertiary" fill="outline" (click)="signInUser()" (keyup.enter)="signInUser()">
-                    <ion-label color="tertiary">{{isRegister ? 'Registrieren' : 'Anmelden'}}</ion-label>
+                  <ion-button color="secondary" (click)="signInUser()" (keyup.enter)="signInUser()">
+                    {{isRegister ? 'Registrieren' : 'Anmelden'}}
                   </ion-button>
                 </ion-col>
               </ion-row>
             </ion-grid>
           </ion-card-content>
+          <ion-card-content *ngIf="loginInProgress">
+            <div style="display: flex; flex-direction: row; text-align: center; align-items: center; gap: 10px; justify-content: center; height: 70px">
+              <ion-spinner name="crescent" style="vertical-align: center"></ion-spinner>
+              <p>Du wirst angemeldet...</p>
+            </div>
+          </ion-card-content>
         </ion-card>
+      </ion-col>
+      <ion-col size="12" class="ion-text-center ion-no-padding">
+        <ion-button *ngIf="isRegister" color="tertiary" fill="clear" (click)="changeLoginType(false)">
+          <small>Hast du bereits ein Konto?</small>
+        </ion-button>
+        <ion-button *ngIf="!isRegister" color="tertiary" fill="clear" (click)="changeLoginType(true)">
+          <small>Noch kein Konto?</small>
+        </ion-button>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col *ngIf="!isRegister" size="12" class="ion-text-center">
+        <ion-button color="secondary" fill="clear">
+          <small>Passwort zurücksetzen</small>
+        </ion-button>
       </ion-col>
     </ion-row>
   </ion-grid>
