@@ -9,6 +9,7 @@ import { Appwrite } from '../../helpers/appwrite';
 import { AccountState } from '../account';
 import { Permission, Role } from 'appwrite';
 import { Md5 } from 'ts-md5';
+import { environment } from '../../../environments/environment';
 
 /* State Model */
 @Injectable()
@@ -61,14 +62,14 @@ export class ContactState {
     try {
       // If session is already fetched, don't fetch again
       if (!contacts) {
-        const loaded_contacts = await Appwrite.databasesProvider().getDocument('radar', 'contacts', userId);
+        const loaded_contacts = await Appwrite.databasesProvider().getDocument(environment.radarDatabaseId, 'contacts', userId);
         patchState({
           contacts: loaded_contacts as unknown as ContactModel
         });
       }
     } catch (e: any) {
       if (e.type == 'document_not_found') {
-        await Appwrite.databasesProvider().createDocument('radar', 'contacts', userId, {
+        await Appwrite.databasesProvider().createDocument(environment.radarDatabaseId, environment.contactsCollectionId, userId, {
           accepted: [],
           requested: []
         }, [

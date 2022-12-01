@@ -7,6 +7,7 @@ import { Account as AccountModel } from '../../model/account';
 import { Permission, Query, Role } from 'appwrite';
 import { GeohashLength } from '../../component/radar-display/radar-display.component';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 interface LocationData {
   geohash: string;
@@ -114,7 +115,7 @@ export class LocationState {
   ) {
     let {user} = action.payload;
     try {
-      const location = await Appwrite.databasesProvider().getDocument('radar', 'geolocations', `${user.$id}_${GeohashLength.close}`);
+      const location = await Appwrite.databasesProvider().getDocument(environment.radarDatabaseId, environment.geolocationsCollectionId, `${user.$id}_${GeohashLength.close}`);
       patchState({
         location: {
           geohash: location.geohash,
@@ -125,7 +126,7 @@ export class LocationState {
     } catch (e: any) {
       try {
         // Create new document if not exists
-        await Appwrite.databasesProvider().createDocument('radar', 'geolocations', `${user.$id}_${GeohashLength.close}`, {
+        await Appwrite.databasesProvider().createDocument(environment.radarDatabaseId, environment.geolocationsCollectionId, `${user.$id}_${GeohashLength.close}`, {
           geohash: "",
           name: "",
           pictureBreaker: ""
@@ -189,7 +190,7 @@ export class LocationState {
     for (const length of geohashLengths) {
       data.geohash = geohash.substring(0, length);
       try {
-        await Appwrite.databasesProvider().updateDocument('radar', 'geolocations', `${$id}_${length}`, data, [
+        await Appwrite.databasesProvider().updateDocument(environment.radarDatabaseId, environment.geolocationsCollectionId, `${$id}_${length}`, data, [
           Permission.read(Role.users()),
           Permission.delete(Role.user($id)),
           Permission.write(Role.user($id))
@@ -197,7 +198,7 @@ export class LocationState {
       } catch (e: any) {
         if (e.code === 404) {
           try {
-            await Appwrite.databasesProvider().createDocument('radar', 'geolocations', `${$id}_${length}`, data, [
+            await Appwrite.databasesProvider().createDocument(environment.radarDatabaseId, environment.geolocationsCollectionId, `${$id}_${length}`, data, [
               Permission.read(Role.users()),
               Permission.delete(Role.user($id)),
               Permission.write(Role.user($id))
@@ -252,7 +253,7 @@ export class LocationState {
 
     try {
       let users = [];
-      await Appwrite.databasesProvider().listDocuments('radar', 'geolocations', [
+      await Appwrite.databasesProvider().listDocuments(environment.radarDatabaseId, environment.geolocationsCollectionId, [
         Query.equal('geohash', [geohash.substring(0, distance)]),
         Query.greaterThan('$updatedAt', eightHoursAgo),
       ]).then(response => {
