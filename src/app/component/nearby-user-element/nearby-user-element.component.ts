@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { Contact } from '../../store';
 import { Account as AccountModel } from '../../model/account';
+import { Picture } from '../../helpers/picture';
 
 @Component({
   selector: 'app-nearby-user-element',
@@ -23,5 +24,9 @@ export class NearbyUserElementComponent implements OnInit {
 
   get lastSeen() {
     return new Date(this.user.$updatedAt).toLocaleTimeString();
+  }
+
+  profilePicture() {
+    return Picture.profilePictureViewURL(this.user.$id, this.user.pictureBreaker);
   }
 }

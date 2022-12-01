@@ -9,11 +9,15 @@ import { Store } from '@ngxs/store';
   styleUrls: ['./distance-change.component.scss'],
 })
 export class DistanceChangeComponent implements OnInit {
-  currentDistance = this.store.selectSnapshot(AccountState.distance);
+  currentDistance;
 
   @Output('distanceChange') distance = new EventEmitter<string>();
 
-  constructor(private store: Store) { }
+  constructor(private store: Store) {
+    this.store.select(AccountState.distance).subscribe(state => {
+      this.currentDistance = state;
+    })
+  }
 
   ngOnInit() {
     this.distance.emit(this.currentDistance)
@@ -21,7 +25,7 @@ export class DistanceChangeComponent implements OnInit {
 
   changeDistance($event: any) {
     const distance = $event.detail.value;
-    this.store.dispatch(new Account.Update({ prefs: { distance } } as Partial<AccountModel.User>));
+    this.store.dispatch(new Account.Update({ prefs: { distance } }));
     this.distance.emit(distance);
   }
 }

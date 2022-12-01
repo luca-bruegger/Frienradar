@@ -30,11 +30,11 @@ export class Picture {
     });
   }
 
-  static profilePictureViewURL(fileId: string) {
-    return `${environment.endpoint}/storage/buckets/profile-picture/files/${fileId}/view?project=${environment.project}&breaker=${this.cacheBreaker()}`;
+  static profilePictureViewURL(userId: string, cacheBreaker: string = this.cacheBreaker()): string {
+    return `${environment.endpoint}/storage/buckets/profile-picture/files/${userId}/view?project=${environment.project}&breaker=${cacheBreaker}`;
   }
 
-  private static cacheBreaker() {
-    return new Date().getTime();
+  static cacheBreaker(): string {
+    return new Date().getTime().toString();
   }
 }

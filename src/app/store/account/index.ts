@@ -34,7 +34,7 @@ export namespace Account {
   export class Update {
     static readonly type = '[User] Update';
     constructor(
-      public payload: Partial<AccountModel.User>
+      public payload: { prefs?: AccountModel.UserPrefs, name?: string, profilePicture?: string }
     ) {}
   }
 
@@ -129,7 +129,7 @@ export class AccountState {
       ) as AccountModel.User;
       let session = await Appwrite.accountProvider().createEmailSession(email, password);
       await Appwrite.accountProvider().updatePrefs(prefs);
-      user.profilePicture = await this.updateProfilePicture(profilePicture, user, dispatch);
+      user.pictureBreaker = await this.updateProfilePicture(profilePicture, user.$id, dispatch);
       patchState({
         user,
         session,
@@ -162,9 +162,9 @@ export class AccountState {
         user = await Appwrite.accountProvider().get() as AccountModel.User;
       }
 
-      // Load profile picture if not already loaded
-      if (!user.profilePicture) {
-        user.profilePicture = Picture.profilePictureViewURL(user.$id);
+      // Set cacheBreaker to force image reload if not set
+      if (!user.pictureBreaker) {
+        user.pictureBreaker = Picture.cacheBreaker();
       }
 
       await dispatch(new Location.FetchLastLocation({ user }));
@@ -197,7 +197,7 @@ export class AccountState {
     }
 
     if (!!profilePicture) {
-      updated_user.profilePicture = await this.updateProfilePicture(profilePicture, user, dispatch);
+      updated_user.pictureBreaker = await this.updateProfilePicture(profilePicture, user.$id, dispatch);
       user = { ...user, ...updated_user } as AccountModel.User;
     }
 
@@ -252,11 +252,11 @@ export class AccountState {
     }
   }
 
-  private async updateProfilePicture(profilePictureString: string, user: Partial<AccountModel.User>, dispatch: (actions: any) => Observable<void>) {
+  private async updateProfilePicture(profilePictureString: string, userId, dispatch: (actions: any) => Observable<void>) {
     try {
       const picture = await Picture.convertToPicture(profilePictureString) as unknown as File;
-      await Appwrite.storageProvider().createFile('profile-picture', user.$id, picture);
-      return Picture.profilePictureViewURL(user.$id);
+      await Appwrite.storageProvider().createFile('profile-picture', userId, picture);
+      return Picture.cacheBreaker();
     } catch (e: any) {
       this.handleError(e, dispatch);
     }

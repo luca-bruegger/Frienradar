@@ -8,6 +8,7 @@ import { Account, AccountState } from "../../store";
 import { Account as AccountModel } from "../../model/account";
 import { Observable } from 'rxjs';
 import { Providers } from '../../helpers/providers';
+import { Picture } from '../../helpers/picture';
 
 
 @Component({
@@ -18,7 +19,6 @@ import { Providers } from '../../helpers/providers';
 export class ProfilePage {
   @Select(AccountState.user) user$: Observable<Partial<AccountModel.User>>;
 
-  profilePicture = 'assets/images/blank.png'
   accounts = Providers.data;
 
   constructor(private imagePicker: ImagePicker,
@@ -101,4 +101,5 @@ export class ProfilePage {
 
     await modal.present();
   }
+
 }

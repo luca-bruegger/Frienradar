@@ -10,12 +10,8 @@ export class MapsHelper {
     ];
   }
 
-  static getOptions(lat: number, lng: number) {
+  static getOptions() {
     return {
-      center: {
-        lat,
-        lng
-      },
       disableDefaultUI: true,
       gestureHandling: 'none',
       mapTypeId: 'roadmap',

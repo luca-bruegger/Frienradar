@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnChanges, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, ViewChild } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
@@ -18,7 +18,8 @@ export class RadarDisplayComponent implements OnInit, OnChanges {
 
   mapApiLoaded: Observable<boolean>;
 
-  mapOptions: google.maps.MapOptions;
+  mapOptions: google.maps.MapOptions = MapsHelper.getOptions();
+  center: google.maps.LatLngLiteral;
   bounds: google.maps.LatLngLiteral[];
   locationPolygon: google.maps.Polygon;
 
@@ -30,33 +31,38 @@ export class RadarDisplayComponent implements OnInit, OnChanges {
     fillOpacity: 0.2
   };
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient) {
+  }
 
-  ngOnInit() {
-    this.mapApiLoaded = this.httpClient.jsonp(`https://maps.googleapis.com/maps/api/js?key=${environment.mapsKey}`, 'callback')
-      .pipe(map(() => true), catchError(() => of(false)));
+  async ngOnInit() {
+    if (!this.mapApiLoaded) {
+      this.mapApiLoaded = await this.httpClient.jsonp(`https://maps.googleapis.com/maps/api/js?key=${environment.mapsKey}`, 'callback')
+        .pipe(map(() => true), catchError(() => of(false)));
+    }
 
     if (this.geohash) {
-      this.updateLocationBox();
+      this.updateLocationBox(this.geohash);
     }
   }
 
   ngOnChanges(simpleChanges) {
-    if (simpleChanges.currentDistance || simpleChanges.geohash) {
-      if (this.locationPolygon && this.locationPolygon.getMap()) {
-        this.locationPolygon.setMap(null);
-      }
+    const changedGeohash = simpleChanges.geohash;
+    const changedDistance = simpleChanges.currentDistance;
 
-      if (this.geohash) {
+    if (changedDistance || changedGeohash) {
+      const geohash = changedGeohash ? changedGeohash.currentValue : this.geohash;
+      const distance = changedDistance ? changedDistance.currentValue : this.currentDistance;
 
-        this.updateLocationBox();
-      }
+      this.geohash = geohash;
+      this.currentDistance = distance;
+      this.updateLocationBox(this.geohash);
+      this.resetLocationBox();
     }
   }
 
-  private updateLocationBox() {
-    const {lat, lng, boundaries} = MapsHelper.getLocationData(this.mapGeohashDistance, this.geohash);
-    this.mapOptions = MapsHelper.getOptions(lat, lng);
+  private updateLocationBox(geohash) {
+    const {lat, lng, boundaries} = MapsHelper.getLocationData(this.mapGeohashDistance, geohash);
+    this.center = {lat, lng};
     this.bounds = MapsHelper.getBounds(boundaries);
   }
 
@@ -67,30 +73,37 @@ export class RadarDisplayComponent implements OnInit, OnChanges {
   }
 
   get mapZoom() {
-    return Number(Distance[this.currentDistance]) || Distance.close;
+    return Number(MapZoom[this.currentDistance]) || MapZoom.close;
   }
 
   get mapGeohashDistance() {
-    return Number(GeohashDistance[this.currentDistance]) || GeohashDistance.close;
+    return Number(GeohashLength[this.currentDistance]) || GeohashLength.close;
   }
 
   private resetLocationBox() {
+    if (this.locationPolygon && this.locationPolygon.getMap()) {
+      this.locationPolygon.setMap(null);
+    }
+
+    if (!this.map)
+      return;
+
     this.locationPolygon = new google.maps.Polygon({
       map: this.map.googleMap,
       paths: this.bounds,
       ...this.locationBoxOptions
-    })
+    });
   }
 }
 
-enum Distance {
+enum MapZoom {
   close = 17,
   nearby = 12,
   remote = 7,
   farAway = 5
 }
 
-export enum GeohashDistance {
+export enum GeohashLength {
   close = 7,
   nearby = 5,
   remote = 3,

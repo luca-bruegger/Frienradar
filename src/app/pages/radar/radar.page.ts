@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { Account, AccountState, LocationState } from '../../store';
-import { Account as AccountModel } from '../../model/account';
+import { AccountState, LocationState } from '../../store';
+import { LocationService } from '../../core/service/location.service';
 
 @Component({
   selector: 'app-radar',
@@ -11,11 +11,11 @@ import { Account as AccountModel } from '../../model/account';
 export class RadarPage implements OnInit {
   geohash = null;
 
-  constructor(private store: Store) {
-    this.store.select(LocationState).subscribe(state => {
-      if (state.geohash) {
-        this.geohash = state.geohash.substring(0,7);
-        this.geohash = state.geohash;
+  constructor(private store: Store,
+              private locationService: LocationService) {
+    this.store.select(LocationState.geohash).subscribe(state => {
+      if (state) {
+        this.geohash = state;
       }
     })
   }
@@ -28,8 +28,7 @@ export class RadarPage implements OnInit {
     return this.store.selectSnapshot(AccountState.distance);
   }
 
-  changeDistance($event: any) {
-    const distance = $event.detail.value;
-    this.store.dispatch(new Account.Update({ prefs: { distance } } as Partial<AccountModel.User>));
+  updateLocation($event: any) {
+    this.locationService.randomPosition($event.detail.value);
   }
 }

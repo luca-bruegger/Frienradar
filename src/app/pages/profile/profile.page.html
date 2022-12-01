@@ -28,7 +28,7 @@
             <div style="display: flex; flex-direction: column" class="ion-padding-bottom">
               <div style="display: flex; flex-direction: row; gap: 20px">
                 <app-profile-picture-select [displayOnly]="true"
-                                            [profilePicture]="user.profilePicture || profilePicture"></app-profile-picture-select>
+                                            [profilePicture]="user.pictureBreaker"></app-profile-picture-select>
                 <div class="ion-padding-top">
                   <ion-text color="primary">
                     <h1>{{user.name}}</h1>
@@ -38,12 +38,6 @@
                       <div style="display: flex; align-items: center">
                         <ion-icon class="text-icon" name="mail-outline" color="medium"></ion-icon>
                         <p class="icon-text">{{user.email}}</p>
-                      </div>
-                    </ion-text>
-                    <ion-text color="medium">
-                      <div style="display: flex; align-items: center">
-                        <ion-icon class="text-icon" name="server-outline" color="medium"></ion-icon>
-                        <p class="icon-text">{{user.$id}}</p>
                       </div>
                     </ion-text>
                   </div>

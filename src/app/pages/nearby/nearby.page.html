@@ -19,23 +19,27 @@
     </ion-toolbar>
   </ion-header>
 
+  <div style="height: 40px; display: flex; align-items: center; justify-content: center">
+    <div>
+      <ion-badge>Current geohash: {{geohash}}</ion-badge>
+    </div>
+  </div>
   <app-distance-change (distanceChange)="distanceChanged($event)"></app-distance-change>
 
-  <div *ngIf="false">
-       style="position:absolute; top: 50%; left: 50%; display: flex; flex-direction: row; text-align: center; align-items: center; transform: translate(-50%, -50%); gap: 10px">
+  <div *ngIf="nearbyUsersAmount === 0 && !nearbyUsers" style="position:absolute; top: 50%; left: 50%; display: flex; flex-direction: row; text-align: center; align-items: center; transform: translate(-50%, -50%); gap: 10px">
     <ion-spinner name="crescent" style="vertical-align: center"></ion-spinner>
     <p>Personen in der Nähe werden gesucht...</p>
   </div>
 
-  <div *ngIf="nearbyUsersAmount === 0"
-       style="position:absolute; top: 50%; left: 50%; display: flex; flex-direction: row; text-align: center; align-items: center; transform: translate(-50%, -50%); gap: 10px">
+  <div *ngIf="nearbyUsersAmount === 0 && nearbyUsers"
+       style="position:absolute; top: 50%; left: 50%; display: flex; flex-direction: column; text-align: center; align-items: center; transform: translate(-50%, -50%);">
     <p>Keine Personen in der Nähe gefunden. Bitte bewege dich an einen anderen Ort oder erhöhe die Distanz.</p>
   </div>
 
   <div *ngIf="nearbyUsersAmount > 0" class="ion-padding-horizontal ion-padding-top">
     <ion-grid class="ion-no-padding">
         <ion-row style="gap: 10px">
-          <ion-col size="12" size-lg="6" size-xl="4" *ngFor="let user of nearbyUsers; trackBy:identify">
+          <ion-col size="12" size-lg="6" size-xl="4" *ngFor="let user of nearbyUsers; trackBy:identifyNearbyUser">
             <app-nearby-user-element [user]="user"></app-nearby-user-element>
           </ion-col>
         </ion-row>

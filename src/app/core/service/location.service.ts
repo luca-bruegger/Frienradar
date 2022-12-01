@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Geolocation } from '@capacitor/geolocation';
-import { Location } from "../../store";
+import { Location, LocationState } from "../../store";
 import { Platform } from '@ionic/angular';
 import { Store } from '@ngxs/store';
 import Geohash from 'latlon-geohash';
@@ -15,7 +15,6 @@ export class LocationService implements OnDestroy {
     timeout: 10000
   };
   private locationDelayedJobId: number;
-  private geohash: string = null;
 
 
   constructor(private platform: Platform, private store: Store) {}
@@ -39,18 +38,16 @@ export class LocationService implements OnDestroy {
   private async watchPosition() {
     await Geolocation.watchPosition(this.geolocationOptions, (position) => {
       if (position) {
-        this.geohash = Geohash.encode(position.coords.latitude, position.coords.longitude, 10);
-        this.store.dispatch(new Location.UpdatePosition(this.geohash));
+        const geohash = Geohash.encode(position.coords.latitude, position.coords.longitude, 7);
+        this.store.dispatch(new Location.UpdatePosition(geohash));
       }
     });
   }
 
-  // private locationDelayedJob() {
-  //   // update Location every 15 seconds
-  //   this.locationDelayedJobId = setInterval(() => {
-  //     if (this.position == null) return;
-  //     console.log('Location Update');
-  //     this.store.dispatch(new Location.UpdatePosition(this.position));
-  //   }, 15 * 1000);
-  // }
+  randomPosition(value) {
+    let geohash = this.store.selectSnapshot(LocationState.geohash);
+    geohash = geohash.slice(0, -1) + value;
+    this.store.dispatch(new Location.UpdatePosition(geohash));
+  }
+
 }

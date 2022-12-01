@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { AccountValidation } from '../../core/validation/account-validation';
 import { Account as AccountModel } from '../../model/account';
+import { Picture } from '../../helpers/picture';
 
 @Component({
   selector: 'app-edit-user-profile',
@@ -43,7 +44,7 @@ export class EditUserProfileComponent implements OnInit {
   private setInitialValues() {
     this.formGroup.get('name').patchValue(this.user.name);
     this.formGroup.get('email').patchValue(this.user.email);
-    this.formGroup.get('profilePicture').patchValue(this.user.profilePicture);
+    this.formGroup.get('profilePicture').patchValue(Picture.profilePictureViewURL(this.user.$id, this.user.pictureBreaker));
     this.formGroup.get('description').patchValue(this.user.prefs.description);
   }
 }
