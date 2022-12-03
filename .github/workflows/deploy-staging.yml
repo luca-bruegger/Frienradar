@@ -16,7 +16,6 @@ jobs:
             ${{ runner.os }}-node-
       - name: build
         run: |
-          cd Frienradar
           npm ci
           npx ionic build -c=staging
       - uses: ./
