@@ -41,6 +41,7 @@ export class RadarDisplayComponent implements OnInit, OnChanges {
     }
 
     if (this.geohash) {
+      console.warn('geohash', this.geohash);
       this.updateLocationBox(this.geohash);
     }
   }
@@ -50,12 +51,13 @@ export class RadarDisplayComponent implements OnInit, OnChanges {
     const changedDistance = simpleChanges.currentDistance;
 
     if (changedDistance || changedGeohash) {
+      console.log(simpleChanges);
       const geohash = changedGeohash ? changedGeohash.currentValue : this.geohash;
       const distance = changedDistance ? changedDistance.currentValue : this.currentDistance;
 
       this.geohash = geohash;
       this.currentDistance = distance;
-      this.updateLocationBox(this.geohash);
+      this.updateLocationBox(geohash);
       this.resetLocationBox();
     }
   }

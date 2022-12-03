@@ -66,7 +66,7 @@ export namespace Account {
   /** Events */
   export class Redirect {
     static readonly type = '[Auth] AccountRedirect';
-    constructor(public payload: { path: string; forward: boolean }) {}
+    constructor(public payload: { path: string; forward: boolean; navigateRoot: boolean }) {}
   }
 }
 
@@ -124,7 +124,7 @@ export class AccountState {
     try {
       await Appwrite.accountProvider().createEmailSession(email, password);
       await dispatch(new Account.Fetch());
-      dispatch(new Account.Redirect({ path: Path.default, forward: true }));
+      dispatch(new Account.Redirect({ path: Path.default, forward: true, navigateRoot: false }));
     } catch (e: any) {
       this.handleError(e, dispatch);
     }
@@ -150,7 +150,7 @@ export class AccountState {
         user,
         session,
       });
-      dispatch(new Account.Redirect({ path: Path.default, forward: true }));
+      dispatch(new Account.Redirect({ path: Path.default, forward: true, navigateRoot: false }));
     } catch (e: any) {
       this.handleError(e, dispatch);
     }
@@ -242,7 +242,7 @@ export class AccountState {
         } as unknown as AccountModel.User,
         session: null,
       });
-      dispatch(new Account.Redirect({ path: Path.login, forward: false }));
+      dispatch(new Account.Redirect({ path: Path.login, forward: false, navigateRoot: true }));
     } catch (e: any) {
       this.handleError(e, dispatch);
     }
@@ -279,7 +279,7 @@ export class AccountState {
       toastData.message = 'Passwort erfolgreich zurückgesetzt. Bitte melde dich an.';
 
       await this.store.dispatch(new GlobalActions.ShowToast({ error: toastData as Error, color: 'success' } ));
-      this.store.dispatch(new Account.Redirect({path: Path.login, forward: false}));
+      this.store.dispatch(new Account.Redirect({path: Path.login, forward: false, navigateRoot: false}));
     } catch (e: any) {
       this.handleError(e, dispatch);
     }
@@ -287,7 +287,7 @@ export class AccountState {
 
   @Action(Account.Redirect)
   redirect(ctx: StateContext<AccountStateModel>, action: Account.Redirect) {
-    const { path, forward } = action.payload;
+    const { path, forward, navigateRoot } = action.payload;
     const currentUrl = this.router.url;
 
     if (currentUrl.includes(path)) {
@@ -295,6 +295,10 @@ export class AccountState {
     }
 
     this.ngZone.run(() => {
+      if (navigateRoot) {
+        this.navController.navigateRoot([path]);
+      }
+
       if (forward) {
         this.navController.navigateForward([path]);
       } else {
@@ -309,7 +313,7 @@ export class AccountState {
     toastData.message = 'Passwort zurücksetzen ist abgelaufen. Bitte versuche es erneut.';
 
     this.store.dispatch(new GlobalActions.ShowToast({ error: toastData as Error, color: 'danger' } ));
-    this.store.dispatch(new Account.Redirect({ path: Path.login, forward: false } ));
+    this.store.dispatch(new Account.Redirect({ path: Path.login, forward: false, navigateRoot: false } ));
   }
 
   private async updateUserName(name: string, dispatch: (actions: any) => Observable<void>) {
@@ -346,7 +350,7 @@ export class AccountState {
 
   private handleError(e: any, dispatch: (actions: any) => Observable<void>) {
     if (e.type === 'general_unauthorized_scope') {
-      dispatch(new Account.Redirect({ path: Path.login, forward: true }));
+      dispatch(new Account.Redirect({ path: Path.login, forward: true, navigateRoot: false }));
       return;
     }
 

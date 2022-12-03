@@ -18,7 +18,9 @@
             <div [formGroup]="formGroup" class="ion-margin-bottom ion-padding-horizontal">
               <div *ngIf="isRegister">
                 <app-profile-picture-select
-                  (profilePictureChange)="formGroup.get('profilePicture').setValue($event)"></app-profile-picture-select>
+                  (profilePictureChange)="formGroup.get('profilePicture').setValue($event)">
+
+                </app-profile-picture-select>
                 <ng-container *ngFor="let validation of formMessages.profilePicture">
                   <div class="error-message"
                        *ngIf="formGroup.get('profilePicture').hasError(validation.type) && (formGroup.get('profilePicture').dirty || formGroup.get('profilePicture').touched)">
@@ -26,7 +28,7 @@
                   </div>
                 </ng-container>
                 <ion-item color="light">
-                  <ion-label position="floating">Benutzername</ion-label>
+                  <ion-label position="floating">Name</ion-label>
                   <ion-input formControlName="name" maxlength="100" required="true" autocorrect="true"></ion-input>
                 </ion-item>
                 <ng-container *ngFor="let validation of formMessages.name">
