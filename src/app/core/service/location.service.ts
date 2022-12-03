@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Geolocation } from '@capacitor/geolocation';
-import { Location, LocationState } from "../../store";
+import { Location, LocationState } from '../../store';
 import { Platform } from '@ionic/angular';
 import { Store } from '@ngxs/store';
 import Geohash from 'latlon-geohash';

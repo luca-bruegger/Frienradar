@@ -1,6 +1,6 @@
 import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { ImagePicker } from "@ionic-native/image-picker/ngx";
-import { Capacitor } from "@capacitor/core";
+import { ImagePicker } from '@ionic-native/image-picker/ngx';
+import { Capacitor } from '@capacitor/core';
 import { Picture } from '../../helpers/picture';
 import { Store } from '@ngxs/store';
 import { AccountState } from '../../store';
@@ -17,9 +17,9 @@ interface IResizeImageOptions {
 })
 export class ProfilePictureSelectComponent implements OnChanges {
   private platform: string = Capacitor.getPlatform();
-  @Input() displayOnly: boolean = false;
+  @Input() displayOnly = false;
 
-  @Input() profilePicture: string = 'assets/images/blank.png';
+  @Input() profilePicture = 'assets/images/blank.png';
   @Output() profilePictureChange = new EventEmitter<string>();
 
   @ViewChild('profilePictureInput') profilePictureInput: ElementRef;
@@ -52,7 +52,7 @@ export class ProfilePictureSelectComponent implements OnChanges {
       const resizedImage = await this.resizeImage({file: picture, maxSize: 220});
       reader.readAsDataURL(resizedImage as Blob);
 
-      reader.addEventListener("load", () => {
+      reader.addEventListener('load', () => {
         const image = reader.result as string;
         this.profilePictureChange.emit(image);
         this.profilePicture = image;
@@ -108,7 +108,7 @@ export class ProfilePictureSelectComponent implements OnChanges {
       const mime = dataURI.split(',')[0].split(':')[1].split(';')[0];
       const max = bytes.length;
       const ia = new Uint8Array(max);
-      for (var i = 0; i < max; i++) ia[i] = bytes.charCodeAt(i);
+      for (let i = 0; i < max; i++) {ia[i] = bytes.charCodeAt(i);}
       return new Blob([ia], {type: mime});
     };
     const resize = () => {
@@ -130,13 +130,13 @@ export class ProfilePictureSelectComponent implements OnChanges {
       canvas.width = width;
       canvas.height = height;
       canvas.getContext('2d').drawImage(image, 0, 0, width, height);
-      let dataUrl = canvas.toDataURL('image/jpeg');
+      const dataUrl = canvas.toDataURL('image/jpeg');
       return dataURItoBlob(dataUrl);
     };
 
     return new Promise((ok, no) => {
       if (!file.type.match(/image.*/)) {
-        no(new Error("Not an image"));
+        no(new Error('Not an image'));
         return;
       }
 

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { Store } from "@ngxs/store";
-import { Account } from "../../store";
+import { Store } from '@ngxs/store';
+import { Account } from '../../store';
 
 @Component({
   selector: 'app-settings',

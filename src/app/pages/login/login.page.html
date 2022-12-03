@@ -103,17 +103,17 @@
         </ion-card>
       </ion-col>
       <ion-col size="12" class="ion-text-center ion-no-padding">
-        <ion-button *ngIf="isRegister" color="tertiary" fill="clear" (click)="changeLoginType(false)">
+        <ion-button *ngIf="isRegister" [disabled]="loginInProgress" color="tertiary" fill="clear" (click)="changeLoginType(false)">
           <small>Hast du bereits ein Konto?</small>
         </ion-button>
-        <ion-button *ngIf="!isRegister" color="tertiary" fill="clear" (click)="changeLoginType(true)">
+        <ion-button *ngIf="!isRegister" [disabled]="loginInProgress" color="tertiary" fill="clear" (click)="changeLoginType(true)">
           <small>Noch kein Konto?</small>
         </ion-button>
       </ion-col>
     </ion-row>
     <ion-row>
       <ion-col *ngIf="!isRegister" size="12" class="ion-text-center">
-        <ion-button color="secondary" fill="clear">
+        <ion-button color="secondary" fill="clear" [disabled]="loginInProgress" (click)="resetPassword()">
           <small>Passwort zurücksetzen</small>
         </ion-button>
       </ion-col>

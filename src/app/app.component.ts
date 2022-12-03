@@ -1,7 +1,7 @@
 import { Component, NgZone } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { App, URLOpenListenerEvent } from '@capacitor/app';
-import { Path } from "./helpers/path";
+import { Path } from './helpers/path';
 import { Store } from '@ngxs/store';
 import { AppInitService } from './core/service/app-init.service';
 import { LocationService } from './core/service/location.service';
@@ -34,7 +34,7 @@ export class AppComponent {
   private jumpTo() {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
-        Path.setJumpTo(event.url)
+        Path.setJumpTo(event.url);
       }
     });
   }
@@ -42,12 +42,15 @@ export class AppComponent {
   private initializeDeeplinks() {
     App.addListener('appUrlOpen', (event: URLOpenListenerEvent) => {
       this.zone.run(() => {
-        // Example url: https://beerswift.app/tabs/tab2
-        // slug = /tabs/tab2
-        alert(event.url);
+        const domain = 'frienradar.com';
+        const pathArray = event.url.split(domain);
+        // The pathArray is now like ['https://devdactic.com', '/details/42']
 
-        // If no match, do nothing - let regular routing
-        // logic take over
+        // Get the last element with pop()
+        const appPath = pathArray.pop();
+        if (appPath) {
+          this.router.navigateByUrl(appPath);
+        }
       });
     });
   }

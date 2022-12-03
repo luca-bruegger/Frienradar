@@ -10,7 +10,7 @@ import {
 } from '@angular/router';
 import { Observable } from 'rxjs';
 import { NavController } from '@ionic/angular';
-import { Appwrite } from "./appwrite";
+import { Appwrite } from './appwrite';
 import { Path } from './path';
 import { Store } from '@ngxs/store';
 import { AccountState } from '../store';
@@ -31,7 +31,7 @@ export class AuthGuard implements CanLoad {
 
     const isAuthenticated = !this.store.selectSnapshot(AccountState.session);
     if (!isAuthenticated) {
-      debugger;
+      console.log('not authenticated');
       this.navController.navigateBack([Path.login]);
       return false;
     } else {

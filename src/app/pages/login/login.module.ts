@@ -8,7 +8,8 @@ import { LoginPageRoutingModule } from './login-routing.module';
 
 import { LoginPage } from './login.page';
 import { PasswordStrengthMeterModule } from 'angular-password-strength-meter';
-import { ProfilePictureSelectComponent } from "../../component/profile-picture-select/profile-picture-select.component";
+import { ProfilePictureSelectComponent } from '../../component/profile-picture-select/profile-picture-select.component';
+import { ResetPasswordComponent } from '../../component/reset-password/reset-password.component';
 
 @NgModule({
   imports: [
@@ -21,7 +22,8 @@ import { ProfilePictureSelectComponent } from "../../component/profile-picture-s
   ],
   declarations: [
     LoginPage,
-    ProfilePictureSelectComponent
+    ProfilePictureSelectComponent,
+    ResetPasswordComponent
   ],
   exports: [
     ProfilePictureSelectComponent

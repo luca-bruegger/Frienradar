@@ -62,7 +62,7 @@
         <ion-grid class="ion-margin-vertical ion-no-padding">
           <ion-row style="gap: 10px">
             <ion-col size="12" *ngFor="let accountObj of accounts | keyvalue">
-              <a *ngIf="accountObj.value.name == 'Instagram'" href="#" onclick="window.open('https://www.twitter.com/luca_bruegger', '_system', 'location=yes');">
+              <a *ngIf="accountObj.value.name === 'Instagram'" href="#" onclick="window.open('https://www.twitter.com/luca_bruegger', '_system', 'location=yes');">
 
               <ion-card style="{{accountObj.value.style}} text-align: center;" class="ion-no-margin">
                 <ion-card-content (click)="editAccountname(accountObj.key)">

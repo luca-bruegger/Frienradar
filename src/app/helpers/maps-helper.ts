@@ -17,176 +17,176 @@ export class MapsHelper {
       mapTypeId: 'roadmap',
       styles: [
         {
-          "featureType": "water",
-          "elementType": "geometry",
-          "stylers": [
+          featureType: 'water',
+          elementType: 'geometry',
+          stylers: [
             {
-              "color": "#e9e9e9"
+              color: '#e9e9e9'
             },
             {
-              "lightness": 17
+              lightness: 17
             }
           ]
         },
         {
-          "featureType": "landscape",
-          "elementType": "geometry",
-          "stylers": [
+          featureType: 'landscape',
+          elementType: 'geometry',
+          stylers: [
             {
-              "color": "#f5f5f5"
+              color: '#f5f5f5'
             },
             {
-              "lightness": 20
+              lightness: 20
             }
           ]
         },
         {
-          "featureType": "road.highway",
-          "elementType": "geometry.fill",
-          "stylers": [
+          featureType: 'road.highway',
+          elementType: 'geometry.fill',
+          stylers: [
             {
-              "color": "#ffffff"
+              color: '#ffffff'
             },
             {
-              "lightness": 17
+              lightness: 17
             }
           ]
         },
         {
-          "featureType": "road.highway",
-          "elementType": "geometry.stroke",
-          "stylers": [
+          featureType: 'road.highway',
+          elementType: 'geometry.stroke',
+          stylers: [
             {
-              "color": "#ffffff"
+              color: '#ffffff'
             },
             {
-              "lightness": 29
+              lightness: 29
             },
             {
-              "weight": 0.2
+              weight: 0.2
             }
           ]
         },
         {
-          "featureType": "road.arterial",
-          "elementType": "geometry",
-          "stylers": [
+          featureType: 'road.arterial',
+          elementType: 'geometry',
+          stylers: [
             {
-              "color": "#ffffff"
+              color: '#ffffff'
             },
             {
-              "lightness": 18
+              lightness: 18
             }
           ]
         },
         {
-          "featureType": "road.local",
-          "elementType": "geometry",
-          "stylers": [
+          featureType: 'road.local',
+          elementType: 'geometry',
+          stylers: [
             {
-              "color": "#ffffff"
+              color: '#ffffff'
             },
             {
-              "lightness": 16
+              lightness: 16
             }
           ]
         },
         {
-          "featureType": "poi",
-          "elementType": "geometry",
-          "stylers": [
+          featureType: 'poi',
+          elementType: 'geometry',
+          stylers: [
             {
-              "color": "#f5f5f5"
+              color: '#f5f5f5'
             },
             {
-              "lightness": 21
+              lightness: 21
             }
           ]
         },
         {
-          "featureType": "poi.park",
-          "elementType": "geometry",
-          "stylers": [
+          featureType: 'poi.park',
+          elementType: 'geometry',
+          stylers: [
             {
-              "color": "#dedede"
+              color: '#dedede'
             },
             {
-              "lightness": 21
+              lightness: 21
             }
           ]
         },
         {
-          "elementType": "labels.text.stroke",
-          "stylers": [
+          elementType: 'labels.text.stroke',
+          stylers: [
             {
-              "visibility": "on"
+              visibility: 'on'
             },
             {
-              "color": "#ffffff"
+              color: '#ffffff'
             },
             {
-              "lightness": 16
+              lightness: 16
             }
           ]
         },
         {
-          "elementType": "labels.text.fill",
-          "stylers": [
+          elementType: 'labels.text.fill',
+          stylers: [
             {
-              "saturation": 36
+              saturation: 36
             },
             {
-              "color": "#333333"
+              color: '#333333'
             },
             {
-              "lightness": 40
+              lightness: 40
             }
           ]
         },
         {
-          "elementType": "labels.icon",
-          "stylers": [
+          elementType: 'labels.icon',
+          stylers: [
             {
-              "visibility": "off"
+              visibility: 'off'
             }
           ]
         },
         {
-          "featureType": "transit",
-          "elementType": "geometry",
-          "stylers": [
+          featureType: 'transit',
+          elementType: 'geometry',
+          stylers: [
             {
-              "color": "#f2f2f2"
+              color: '#f2f2f2'
             },
             {
-              "lightness": 19
+              lightness: 19
             }
           ]
         },
         {
-          "featureType": "administrative",
-          "elementType": "geometry.fill",
-          "stylers": [
+          featureType: 'administrative',
+          elementType: 'geometry.fill',
+          stylers: [
             {
-              "color": "#fefefe"
+              color: '#fefefe'
             },
             {
-              "lightness": 20
+              lightness: 20
             }
           ]
         },
         {
-          "featureType": "administrative",
-          "elementType": "geometry.stroke",
-          "stylers": [
+          featureType: 'administrative',
+          elementType: 'geometry.stroke',
+          stylers: [
             {
-              "color": "#b8b8b8"
+              color: '#b8b8b8'
             },
             {
-              "lightness": 17
+              lightness: 17
             },
             {
-              "weight": 1.2
+              weight: 1.2
             }
           ]
         }
@@ -195,7 +195,7 @@ export class MapsHelper {
   }
 
   static getLocationData(geohashPrecision: number, geohash: string) {
-    let {sw, ne} = Geohash.bounds(geohash.substring(0, geohashPrecision));
+    const {sw, ne} = Geohash.bounds(geohash.substring(0, geohashPrecision));
     const lng = (sw.lon + ne.lon) / 2;
     const lat = (sw.lat + ne.lat) / 2;
 

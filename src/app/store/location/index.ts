@@ -44,7 +44,7 @@ export namespace Location {
     static readonly type = '[Location] FetchLastLocation';
 
     constructor(
-      public payload: { user: AccountModel.User; }
+      public payload: { user: AccountModel.User }
     ) {
     }
   }
@@ -113,9 +113,12 @@ export class LocationState {
     {patchState, dispatch}: StateContext<LocationStateModel>,
     action: Location.FetchLastLocation
   ) {
-    let {user} = action.payload;
+    const {user} = action.payload;
     try {
-      const location = await Appwrite.databasesProvider().getDocument(environment.radarDatabaseId, environment.geolocationsCollectionId, `${user.$id}_${GeohashLength.close}`);
+      const location = await Appwrite.databasesProvider().getDocument(
+        environment.radarDatabaseId,
+        environment.geolocationsCollectionId,
+        `${user.$id}_${GeohashLength.close}`);
       patchState({
         location: {
           geohash: location.geohash,
@@ -126,10 +129,14 @@ export class LocationState {
     } catch (e: any) {
       try {
         // Create new document if not exists
-        await Appwrite.databasesProvider().createDocument(environment.radarDatabaseId, environment.geolocationsCollectionId, `${user.$id}_${GeohashLength.close}`, {
-          geohash: "",
-          name: "",
-          pictureBreaker: ""
+        await Appwrite.databasesProvider().createDocument(
+          environment.radarDatabaseId,
+          environment.geolocationsCollectionId,
+          `${user.$id}_${GeohashLength.close}`,
+          {
+          geohash: '',
+          name: '',
+          pictureBreaker: ''
         }, [
           Permission.read(Role.users()),
           Permission.delete(Role.user(user.$id)),
@@ -137,7 +144,7 @@ export class LocationState {
         ]);
       } catch (e: any) {
         dispatch(
-          new GlobalActions.showToast({
+          new GlobalActions.ShowToast({
             error: e,
             color: 'danger',
           })
@@ -151,7 +158,7 @@ export class LocationState {
     {patchState, dispatch}: StateContext<LocationStateModel>,
     action: Location.UpdatePosition
   ) {
-    let geohash = action.geohash;
+    const geohash = action.geohash;
     const currentGeohash = this.store.selectSnapshot(LocationState.geohash);
 
     // Only update if geohash changed
@@ -165,7 +172,7 @@ export class LocationState {
     }
 
     const data = {
-      geohash: geohash,
+      geohash,
       name: user.name,
       pictureBreaker: user.pictureBreaker
     };
@@ -179,7 +186,7 @@ export class LocationState {
     });
   }
 
-  private async setGeohashesForUser($id: string, geohash: string, data: { pictureBreaker: string; geohash: string; name: string }, dispatch: (actions: any) => Observable<void>) {
+  private async setGeohashesForUser($id: string, geohash: string, data: LocationData, dispatch: (actions: any) => Observable<void>) {
     const geohashLengths = [
       GeohashLength.close,
       GeohashLength.nearby,
@@ -205,7 +212,7 @@ export class LocationState {
             ]);
           } catch (e: any) {
             dispatch(
-              new GlobalActions.showToast({
+              new GlobalActions.ShowToast({
                 error: e,
                 color: 'danger',
               })
@@ -213,7 +220,7 @@ export class LocationState {
           }
         } else {
           dispatch(
-            new GlobalActions.showToast({
+            new GlobalActions.ShowToast({
               error: e,
               color: 'danger',
             })
@@ -252,7 +259,7 @@ export class LocationState {
     }
 
     try {
-      let users = [];
+      const users = [];
       await Appwrite.databasesProvider().listDocuments(environment.radarDatabaseId, environment.geolocationsCollectionId, [
         Query.equal('geohash', [geohash.substring(0, distance)]),
         Query.greaterThan('$updatedAt', eightHoursAgo),
@@ -276,7 +283,7 @@ export class LocationState {
       });
     } catch (e: any) {
       dispatch(
-        new GlobalActions.showToast({
+        new GlobalActions.ShowToast({
           error: e,
           color: 'danger',
         })
