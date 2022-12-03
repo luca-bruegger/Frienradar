@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Appwrite } from '../../helpers/appwrite';
-import { AccountState, LocationState } from '../../store';
+import { AccountState } from '../../store';
 import { Store } from '@ngxs/store';
-import { GeohashLength } from '../../component/radar-display/radar-display.component';
 
 @Injectable({
   providedIn: 'root'
@@ -31,9 +30,6 @@ export class RealtimeService {
       const payload = response.payload as any;
       const selectedDistance = this.store.selectSnapshot(AccountState.distance);
       const distance = payload.$id.slice(-1);
-      console.log('payload geohash', payload.geohash);
-      console.log('stored geohash', this.store.selectSnapshot(LocationState.geohash));
-      console.log(selectedDistance == GeohashLength[distance]);
 /*      const geohash = payload.geohash;
 
       const selectedDistance = this.store.selectSnapshot(AccountState.distance);

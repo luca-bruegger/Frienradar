@@ -11,7 +11,7 @@ import { Store } from '@ngxs/store';
 export class DistanceChangeComponent implements OnInit {
   currentDistance;
 
-  @Output('distanceChange') distance = new EventEmitter<string>();
+  @Output() distanceChange = new EventEmitter<string>();
 
   constructor(private store: Store) {
     this.store.select(AccountState.distance).subscribe(state => {
@@ -20,12 +20,12 @@ export class DistanceChangeComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.distance.emit(this.currentDistance);
+    this.distanceChange.emit(this.currentDistance);
   }
 
   changeDistance($event: any) {
     const distance = $event.detail.value;
     this.store.dispatch(new Account.Update({ prefs: { distance } }));
-    this.distance.emit(distance);
+    this.distanceChange.emit(distance);
   }
 }

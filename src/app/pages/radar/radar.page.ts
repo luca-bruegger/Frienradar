@@ -9,7 +9,7 @@ import { LocationService } from '../../core/service/location.service';
   styleUrls: ['radar.page.scss'],
 })
 export class RadarPage implements OnInit {
-  geohash = null;
+  geohash: string;
 
   constructor(private store: Store,
               private locationService: LocationService) {

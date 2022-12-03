@@ -160,14 +160,10 @@ export class LocationState {
   ) {
     const geohash = action.geohash;
     const currentGeohash = this.store.selectSnapshot(LocationState.geohash);
+    const user = this.store.selectSnapshot(AccountState.user);
 
     // Only update if geohash changed
     if (currentGeohash === geohash) {
-      return;
-    }
-
-    const user = this.store.selectSnapshot(AccountState.user);
-    if (user && !user.$id) {
       return;
     }
 
@@ -176,9 +172,11 @@ export class LocationState {
       name: user.name,
       pictureBreaker: user.pictureBreaker
     };
-    console.log('updatePosition', data);
 
-    await this.setGeohashesForUser(user.$id, geohash, data, dispatch);
+    if (user && user.$id) {
+      console.warn('User', user);
+      await this.setGeohashesForUser(user.$id, geohash, data, dispatch);
+    }
 
     data.geohash = geohash;
     patchState({

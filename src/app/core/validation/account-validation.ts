@@ -2,20 +2,20 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 export class AccountValidation {
 
-  // --- VALIDATORS ---
+  // --- CONTROLS ---
 
-  static get nameValidators() {
-    return [
+  static get nameControl() {
+    return new FormControl('', [
       Validators.required,
       Validators.minLength(3),
       Validators.maxLength(128)
-    ];
+    ]);
   }
 
-  static get profilePictureValidators() {
-    return [
+  static get profilePictureControl() {
+    return new FormControl('', [
       Validators.required
-    ];
+    ]);
   }
 
   // --- FORM GROUPS ---
@@ -40,8 +40,8 @@ export class AccountValidation {
       Validators.required,
       Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')
     ]),
-    name: new FormControl('', AccountValidation.nameValidators),
-    profilePicture: new FormControl('', AccountValidation.profilePictureValidators),
+    name: AccountValidation.nameControl,
+    profilePicture: AccountValidation.profilePictureControl,
     description: new FormControl('', [
       Validators.minLength(2),
       Validators.maxLength(200)
@@ -77,21 +77,4 @@ export class AccountValidation {
       {type: 'required', message: 'Profilbild ist notwendig.'}
     ]
   };
-
-  // --- FORM HELPERS ---
-
-  static setLoginValidationActive(active: boolean) {
-    const nameControl = AccountValidation.loginFormGroup.get('name');
-    const profilePictureControl = AccountValidation.loginFormGroup.get('profilePicture');
-
-    if (active) {
-      nameControl.setValidators(AccountValidation.nameValidators);
-      profilePictureControl.setValidators(AccountValidation.profilePictureValidators);
-    } else {
-      nameControl.clearValidators();
-      profilePictureControl.clearValidators();
-    }
-    nameControl.updateValueAndValidity();
-    profilePictureControl.updateValueAndValidity();
-  }
 }

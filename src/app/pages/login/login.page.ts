@@ -21,26 +21,24 @@ export class LoginPage {
   loginInProgress = false;
 
   constructor(private store: Store,
-              private modalController: ModalController) {}
+              private modalController: ModalController) {
+  }
 
   changeLoginType(isRegister: boolean) {
-    const nameControl = this.formGroup.get('name');
-    const profilePictureControl = this.formGroup.get('profilePicture');
-
     if (isRegister) {
-      AccountValidation.setLoginValidationActive(false);
+      this.formGroup.addControl('name', AccountValidation.nameControl);
+      this.formGroup.addControl('profilePicture', AccountValidation.profilePictureControl);
     } else {
-      AccountValidation.setLoginValidationActive(true);
+      this.formGroup.removeControl('name');
+      this.formGroup.removeControl('profilePicture');
     }
 
-    this.formGroup.reset();
-    nameControl.updateValueAndValidity();
-    profilePictureControl.updateValueAndValidity();
     this.isRegister = isRegister;
   }
 
   signInUser() {
     if (this.formGroup.invalid) {
+      console.log(this.formGroup.controls);
       this.formGroup.markAllAsTouched();
       return;
     }
@@ -65,9 +63,4 @@ export class LoginPage {
 
     await modal.present();
   }
-}
-
-export enum LoginType {
-  login,
-  register
 }

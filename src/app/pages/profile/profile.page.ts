@@ -102,4 +102,7 @@ export class ProfilePage {
     await modal.present();
   }
 
+  editAccountname(key) {
+
+  }
 }
