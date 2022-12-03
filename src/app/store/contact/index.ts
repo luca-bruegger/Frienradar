@@ -1,7 +1,7 @@
 import { Injectable, NgZone } from '@angular/core';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { GlobalActions } from '../global';
-import { Observable } from "rxjs";
+import { Observable } from 'rxjs';
 import { NavController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Contact as ContactModel } from '../../model/contact';
@@ -56,7 +56,7 @@ export class ContactState {
     {patchState, dispatch}: StateContext<ContactStateModel>,
     action: Contact.Fetch
   ) {
-    let contacts = this.store.selectSnapshot(ContactState.contacts);
+    const contacts = this.store.selectSnapshot(ContactState.contacts);
     const userId = this.store.selectSnapshot(AccountState.user).$id;
 
     try {
@@ -88,14 +88,14 @@ export class ContactState {
     {patchState, dispatch}: StateContext<ContactStateModel>,
     action: Contact.Request
   ) {
-    let { requestUserId } = action.payload;
+    const { requestUserId } = action.payload;
     const userId = this.store.selectSnapshot(AccountState.user).$id;
     const contacts = this.store.selectSnapshot(ContactState.contacts);
 
 
     try {
       if (!contacts.requested.includes(requestUserId)) {
-        let hash = Md5.hashStr("password");
+        const hash = Md5.hashStr('password');
         console.log(hash);
 
 
@@ -129,7 +129,7 @@ export class ContactState {
         });
       } else {
         dispatch(
-          new GlobalActions.showToast({
+          new GlobalActions.ShowToast({
             error: {message: 'Already requested'} as Error,
             color: 'danger',
           })
@@ -142,7 +142,7 @@ export class ContactState {
 
   private handleError(e: any, dispatch: (actions: any) => Observable<void>) {
     dispatch(
-      new GlobalActions.showToast({
+      new GlobalActions.ShowToast({
         error: e,
         color: 'danger',
       })

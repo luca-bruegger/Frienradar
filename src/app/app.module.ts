@@ -14,10 +14,10 @@ import { ImagePicker } from '@ionic-native/image-picker/ngx';
 import { NgxIntlTelInputModule } from 'ngx-intl-tel-input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LoginPageModule } from './pages/login/login.module';
-import { NgxsModule } from "@ngxs/store";
-import { environment } from "../environments/environment";
-import { AppState } from "./store";
-import { NgxsReduxDevtoolsPluginModule } from "@ngxs/devtools-plugin";
+import { NgxsModule } from '@ngxs/store';
+import { environment } from '../environments/environment';
+import { AppState } from './store';
+import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 import { HttpClientJsonpModule, HttpClientModule } from '@angular/common/http';
 
 @NgModule({

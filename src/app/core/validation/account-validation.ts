@@ -29,7 +29,7 @@ export class AccountValidation {
       Validators.required,
       Validators.minLength(8),
       Validators.maxLength(100),
-      Validators.pattern('((?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,30})')
+      Validators.pattern('((?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,})')
     ]),
     name: new FormControl('', []),
     profilePicture: new FormControl('', [])
@@ -59,7 +59,7 @@ export class AccountValidation {
       {type: 'required', message: 'Passwort ist notwendig.'},
       {type: 'minLength', message: 'Passwort ist zu kurz.'},
       {type: 'maxLength', message: 'Passwort ist zu lang.'},
-      {type: 'pattern', message: 'Passwort muss Gross- und Kleinbuchstaben Nummern enthalten.'},
+      {type: 'pattern', message: 'Passwort muss Gross- und Kleinbuchstaben und Nummern enthalten. (min. 8 Zeichen)'},
     ],
     passwordLogin: [
       {type: 'required', message: 'Passwort ist notwendig.'},
@@ -81,8 +81,8 @@ export class AccountValidation {
   // --- FORM HELPERS ---
 
   static setLoginValidationActive(active: boolean) {
-    const nameControl = AccountValidation.loginFormGroup.get('name')
-    const profilePictureControl = AccountValidation.loginFormGroup.get('profilePicture')
+    const nameControl = AccountValidation.loginFormGroup.get('name');
+    const profilePictureControl = AccountValidation.loginFormGroup.get('profilePicture');
 
     if (active) {
       nameControl.setValidators(AccountValidation.nameValidators);

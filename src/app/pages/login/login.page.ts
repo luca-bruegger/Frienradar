@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { AccountValidation } from '../../core/validation/account-validation';
-import { Account } from "../../store";
-import { map } from 'rxjs/operators';
+import { Account } from '../../store';
+import { ModalController } from '@ionic/angular';
+import { ResetPasswordComponent } from '../../component/reset-password/reset-password.component';
 
 @Component({
   selector: 'app-login',
@@ -10,7 +11,6 @@ import { map } from 'rxjs/operators';
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage {
-  selectedLoginType = LoginType.login.toString();
   isRegister = false;
 
   formGroup = AccountValidation.loginFormGroup;
@@ -20,7 +20,8 @@ export class LoginPage {
 
   loginInProgress = false;
 
-  constructor(private store: Store) {}
+  constructor(private store: Store,
+              private modalController: ModalController) {}
 
   changeLoginType(isRegister: boolean) {
     const nameControl = this.formGroup.get('name');
@@ -32,7 +33,7 @@ export class LoginPage {
       AccountValidation.setLoginValidationActive(true);
     }
 
-    this.formGroup.reset()
+    this.formGroup.reset();
     nameControl.updateValueAndValidity();
     profilePictureControl.updateValueAndValidity();
     this.isRegister = isRegister;
@@ -49,12 +50,20 @@ export class LoginPage {
     if (this.isRegister) {
       this.store.dispatch(new Account.Signup(this.formGroup.value)).subscribe(data => {
         this.loginInProgress = false;
-      })
+      });
     } else {
       this.store.dispatch(new Account.Login(this.formGroup.value)).subscribe(data => {
         this.loginInProgress = false;
-      })
+      });
     }
+  }
+
+  async resetPassword() {
+    const modal = await this.modalController.create({
+      component: ResetPasswordComponent
+    });
+
+    await modal.present();
   }
 }
 

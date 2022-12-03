@@ -17,7 +17,7 @@ export class RadarPage implements OnInit {
       if (state) {
         this.geohash = state;
       }
-    })
+    });
   }
 
   ngOnInit() {

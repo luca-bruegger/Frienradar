@@ -16,11 +16,11 @@ export class DistanceChangeComponent implements OnInit {
   constructor(private store: Store) {
     this.store.select(AccountState.distance).subscribe(state => {
       this.currentDistance = state;
-    })
+    });
   }
 
   ngOnInit() {
-    this.distance.emit(this.currentDistance)
+    this.distance.emit(this.currentDistance);
   }
 
   changeDistance($event: any) {

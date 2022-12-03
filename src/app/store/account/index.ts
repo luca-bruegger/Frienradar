@@ -1,12 +1,12 @@
 import { Injectable, NgZone } from '@angular/core';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
-import { Models } from 'appwrite';
+import { Models, Permission, Role } from 'appwrite';
 import { Appwrite } from 'src/app/helpers/appwrite';
 import { GlobalActions } from '../global';
-import { Path } from "../../helpers/path";
-import { Account as AccountModel } from "../../model/account";
-import { Observable } from "rxjs";
-import { Picture } from "../../helpers/picture";
+import { Path } from '../../helpers/path';
+import { Account as AccountModel } from '../../model/account';
+import { Observable } from 'rxjs';
+import { Picture } from '../../helpers/picture';
 import { NavController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Location } from '../location';
@@ -23,7 +23,7 @@ export namespace Account {
   export class Signup {
     static readonly type = '[Auth] Signup';
     constructor(
-      public payload: { email: string; password: string; name: string, profilePicture: string }
+      public payload: { email: string; password: string; name: string; profilePicture: string }
     ) {}
   }
 
@@ -34,13 +34,29 @@ export namespace Account {
   export class Update {
     static readonly type = '[User] Update';
     constructor(
-      public payload: { prefs?: AccountModel.UserPrefs, name?: string, profilePicture?: string }
+      public payload: { prefs?: AccountModel.UserPrefs; name?: string; profilePicture?: string }
     ) {}
   }
 
   export class Login {
     static readonly type = '[Auth] Login';
     constructor(public payload: { email: string; password: string }) {}
+  }
+
+  export class SendResetEmail {
+    static readonly type = '[Auth] Reset Password Email';
+
+    constructor(public payload: string) {}
+  }
+
+  export class ResetPassword {
+    static readonly type = '[Auth] Reset Password';
+
+    constructor(public payload: { userId: string; secret: string; password: string; confirmPassword: string }) {}
+  }
+
+  export class ResetPasswordExpired {
+    static readonly type = '[Auth] Reset Password expired';
   }
 
   export class Logout {
@@ -50,7 +66,7 @@ export namespace Account {
   /** Events */
   export class Redirect {
     static readonly type = '[Auth] AccountRedirect';
-    constructor(public payload: { path: string, forward: boolean }) {}
+    constructor(public payload: { path: string; forward: boolean }) {}
   }
 }
 
@@ -60,7 +76,7 @@ const prefs = {
   accounts: {
     instagram: ''
   }
-}
+};
 
 @State<AccountStateModel>({
   name: 'auth',
@@ -104,10 +120,10 @@ export class AccountState {
     { patchState, dispatch }: StateContext<AccountStateModel>,
     action: Account.Login
   ) {
-    let { email, password } = action.payload;
+    const { email, password } = action.payload;
     try {
       await Appwrite.accountProvider().createEmailSession(email, password);
-      await dispatch(new Account.Fetch);
+      await dispatch(new Account.Fetch());
       dispatch(new Account.Redirect({ path: Path.default, forward: true }));
     } catch (e: any) {
       this.handleError(e, dispatch);
@@ -119,15 +135,15 @@ export class AccountState {
     { patchState, dispatch }: StateContext<AccountStateModel>,
     action: Account.Signup
   ) {
-    let { email, password, name, profilePicture } = action.payload;
+    const { email, password, name, profilePicture } = action.payload;
     try {
-      let user = await Appwrite.accountProvider().create(
+      const user = await Appwrite.accountProvider().create(
         'unique()',
         email,
         password,
         name
       ) as AccountModel.User;
-      let session = await Appwrite.accountProvider().createEmailSession(email, password);
+      const session = await Appwrite.accountProvider().createEmailSession(email, password);
       await Appwrite.accountProvider().updatePrefs(prefs);
       user.pictureBreaker = await this.updateProfilePicture(profilePicture, user.$id, dispatch);
       patchState({
@@ -172,6 +188,13 @@ export class AccountState {
         user
       });
     } catch (e: any) {
+      // Ignore if route is reset password
+      const isResetPassword = new RegExp('^(\\/reset-password\\?)').test(this.router.url);
+      if (isResetPassword) {
+        console.warn('Reset password. Skip login redirect.');
+        return;
+      }
+
       this.handleError(e, dispatch);
     }
   }
@@ -192,7 +215,7 @@ export class AccountState {
 
     if (!!prefs) {
       const updated_prefs = { ...user.prefs, ...prefs };
-      updated_user = await this.updateUserPrefs(updated_prefs, patchState, dispatch)
+      updated_user = await this.updateUserPrefs(updated_prefs, patchState, dispatch);
       user = { ...user, ...updated_user } as AccountModel.User;
     }
 
@@ -225,6 +248,43 @@ export class AccountState {
     }
   }
 
+  @Action(Account.SendResetEmail)
+  async sendResetEmail(
+    { patchState, dispatch }: StateContext<AccountStateModel>,
+    action: Account.SendResetEmail
+  ) {
+    const email = action.payload;
+    try {
+      await Appwrite.accountProvider().createRecovery(email, 'https://frienradar.com/reset-password');
+
+      const toastData = {} as any;
+      toastData.message = 'Mail gesendet. Bitte prüfe deine E-Mails.';
+
+      await this.store.dispatch(new GlobalActions.ShowToast({ error: toastData as Error, color: 'success' } ));
+    } catch (e: any) {
+      this.handleError(e, dispatch);
+    }
+  }
+
+  @Action(Account.ResetPassword)
+  async resetPassword(
+    { patchState, dispatch }: StateContext<AccountStateModel>,
+    action: Account.ResetPassword
+  ) {
+    const { secret, userId, password, confirmPassword } = action.payload;
+    try {
+      await Appwrite.accountProvider().updateRecovery(userId, secret, password, confirmPassword);
+
+      const toastData = {} as any;
+      toastData.message = 'Passwort erfolgreich zurückgesetzt. Bitte melde dich an.';
+
+      await this.store.dispatch(new GlobalActions.ShowToast({ error: toastData as Error, color: 'success' } ));
+      this.store.dispatch(new Account.Redirect({path: Path.login, forward: false}));
+    } catch (e: any) {
+      this.handleError(e, dispatch);
+    }
+  }
+
   @Action(Account.Redirect)
   redirect(ctx: StateContext<AccountStateModel>, action: Account.Redirect) {
     const { path, forward } = action.payload;
@@ -243,9 +303,18 @@ export class AccountState {
     });
   }
 
+  @Action(Account.ResetPasswordExpired)
+  resetPasswordExpired(ctx: StateContext<AccountStateModel>, action: Account.ResetPasswordExpired) {
+    const toastData = {} as any;
+    toastData.message = 'Passwort zurücksetzen ist abgelaufen. Bitte versuche es erneut.';
+
+    this.store.dispatch(new GlobalActions.ShowToast({ error: toastData as Error, color: 'danger' } ));
+    this.store.dispatch(new Account.Redirect({ path: Path.login, forward: false } ));
+  }
+
   private async updateUserName(name: string, dispatch: (actions: any) => Observable<void>) {
     try {
-      let user = await Appwrite.accountProvider().updateName(name) as AccountModel.User;
+      const user = await Appwrite.accountProvider().updateName(name) as AccountModel.User;
       return user;
     } catch (e: any) {
       this.handleError(e, dispatch);
@@ -255,7 +324,12 @@ export class AccountState {
   private async updateProfilePicture(profilePictureString: string, userId, dispatch: (actions: any) => Observable<void>) {
     try {
       const picture = await Picture.convertToPicture(profilePictureString) as unknown as File;
-      await Appwrite.storageProvider().createFile('profile-picture', userId, picture);
+      await Appwrite.storageProvider().createFile('profile-picture', userId, picture,
+       [
+         Permission.read(Role.users()),
+         Permission.delete(Role.user(userId)),
+         Permission.write(Role.user(userId)),
+       ]);
       return Picture.cacheBreaker();
     } catch (e: any) {
       this.handleError(e, dispatch);
@@ -271,13 +345,13 @@ export class AccountState {
   }
 
   private handleError(e: any, dispatch: (actions: any) => Observable<void>) {
-    if (e.type == 'general_unauthorized_scope') {
+    if (e.type === 'general_unauthorized_scope') {
       dispatch(new Account.Redirect({ path: Path.login, forward: true }));
       return;
     }
 
     dispatch(
-      new GlobalActions.showToast({
+      new GlobalActions.ShowToast({
         error: e,
         color: 'danger',
       })

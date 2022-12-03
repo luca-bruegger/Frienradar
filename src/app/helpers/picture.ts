@@ -1,4 +1,4 @@
-import { environment } from "../../environments/environment";
+import { environment } from '../../environments/environment';
 
 export class Picture {
   static convertToBase64(picture: File) {
@@ -21,9 +21,7 @@ export class Picture {
   static async convertToPicture(base64: string) {
     const blob = await fetch(base64)
       .then(res => res.blob())
-      .then(file => {
-        return file
-      });
+      .then(file => file);
 
     return new File([blob], 'profile_picture.png', {
       type: 'image/png'

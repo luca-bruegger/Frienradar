@@ -86,7 +86,7 @@ export class RadarDisplayComponent implements OnInit, OnChanges {
     }
 
     if (!this.map)
-      return;
+      {return;}
 
     this.locationPolygon = new google.maps.Polygon({
       map: this.map.googleMap,

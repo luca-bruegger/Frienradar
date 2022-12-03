@@ -23,7 +23,7 @@ export class RealtimeService {
         this.getNearbyUsers(user.$id);
         this.alive = true;
       }
-    })
+    });
   }
 
   private getNearbyUsers(userId) {
@@ -40,12 +40,12 @@ export class RealtimeService {
       console.log(selectedDistance);
       const payloadUserId = payload.$id.substring(0, payload.$id.indexOf('_'));*/
 
-    })
+    });
   }
 
   private getContacts(userId) {
     this.provider.subscribe(`databases.radar.collections.contacts.documents.${userId}`, (response) => {
       console.log('realtime Response');
-    })
+    });
   }
 }

@@ -46,7 +46,7 @@ export class NotificationService {
 
     // On success, we should be able to receive notifications
     PushNotifications.addListener('registration', async ({value}) => {
-      let token = value;
+      const token = value;
 
       // Get FCM token instead the APN one returned by Capacitor
       if (this.platform === 'ios') {

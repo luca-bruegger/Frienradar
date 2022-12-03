@@ -7,7 +7,7 @@ import { ProfilePage } from './profile.page';
 import { ProfilePageRoutingModule } from './profile-routing.module';
 import { EditUserProfileComponent } from '../../component/edit-user-profile/edit-user-profile.component';
 import { SettingsComponent } from '../../component/settings/settings.component';
-import { LoginPageModule } from "../login/login.module";
+import { LoginPageModule } from '../login/login.module';
 
 
 @NgModule({

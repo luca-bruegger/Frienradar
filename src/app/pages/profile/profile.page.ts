@@ -2,10 +2,10 @@ import { Component } from '@angular/core';
 import { ImagePicker } from '@ionic-native/image-picker/ngx';
 import { AlertController, IonRouterOutlet, ModalController } from '@ionic/angular';
 import { SettingsComponent } from '../../component/settings/settings.component';
-import { EditUserProfileComponent } from "../../component/edit-user-profile/edit-user-profile.component";
-import { Select, Store } from "@ngxs/store";
-import { Account, AccountState } from "../../store";
-import { Account as AccountModel } from "../../model/account";
+import { EditUserProfileComponent } from '../../component/edit-user-profile/edit-user-profile.component';
+import { Select, Store } from '@ngxs/store';
+import { Account, AccountState } from '../../store';
+import { Account as AccountModel } from '../../model/account';
 import { Observable } from 'rxjs';
 import { Providers } from '../../helpers/providers';
 import { Picture } from '../../helpers/picture';
@@ -61,7 +61,7 @@ export class ProfilePage {
   // }
 
   async openEditProfile() {
-    const user = this.store.selectSnapshot(AccountState.user)
+    const user = this.store.selectSnapshot(AccountState.user);
 
     const modal = await this.modalController.create({
       component: EditUserProfileComponent,
@@ -75,16 +75,16 @@ export class ProfilePage {
     modal.onDidDismiss().then(event => {
       if (event.data) {
         const data = event.data;
-        let updateSet: Partial<AccountModel.User> = {};
+        const updateSet: Partial<AccountModel.User> = {};
 
         Object.keys(data).forEach(key => {
           if (data[key] !== user[key]) {
-            updateSet[key] = data[key]
+            updateSet[key] = data[key];
           }
-        })
+        });
 
-        if (updateSet === {}) return;
-        this.store.dispatch(new Account.Update(updateSet))
+        if (updateSet === {}) {return;}
+        this.store.dispatch(new Account.Update(updateSet));
       }
     });
 
