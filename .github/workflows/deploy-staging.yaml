@@ -1,0 +1,19 @@
+name: 'Deploy Staging'
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  deploy:
+    name: 'Deploy staging to Netlify'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: jsmrcaga/action-netlify-deploy@v1.1.0
+        with:
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_DEPLOY_TO_PROD: true
+          build_command: 'npx ionic build -c=staging'
+          build_directory: 'www'
