@@ -4,12 +4,13 @@
 
 export const environment = {
   production: false,
-  endpoint: 'https://api.frienradar.com/v1',
+  endpoint: 'https://beta.api.frienradar.com/v1',
   project: 'frienradar-test',
   mapsKey: 'AIzaSyBI6AT9M_Nz_Y-_Xpql_Q28twKOO0jzu_8',
   radarDatabaseId: 'radar',
   geolocationsCollectionId: 'geolocations',
-  contactsCollectionId: 'contacts'
+  contactsCollectionId: 'contacts',
+  appUrl: 'https://beta.frienradar.com'
 };
 
 /*
