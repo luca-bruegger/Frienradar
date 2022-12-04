@@ -4,8 +4,8 @@
 
 export const environment = {
   production: false,
-  endpoint: 'https://beta.api.frienradar.com/v1',
-  project: 'frienradar-test',
+  endpoint: 'https://api.frienradar.com/v1',
+  project: '638b8a8bda11a2ebe8fc',
   mapsKey: 'AIzaSyBI6AT9M_Nz_Y-_Xpql_Q28twKOO0jzu_8',
   radarDatabaseId: 'radar',
   geolocationsCollectionId: 'geolocations',
