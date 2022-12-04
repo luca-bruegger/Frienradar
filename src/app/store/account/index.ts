@@ -7,10 +7,12 @@ import { Path } from '../../helpers/path';
 import { Account as AccountModel } from '../../model/account';
 import { Observable } from 'rxjs';
 import { Picture } from '../../helpers/picture';
-import { NavController } from '@ionic/angular';
+import { ModalController, NavController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Location } from '../location';
 import { environment } from '../../../environments/environment';
+import { SettingsComponent } from '../../component/settings/settings.component';
+import { BackendUnderMaintenanceComponent } from '../../component/backend-under-maintenance/backend-under-maintenance.component';
 
 /* State Model */
 @Injectable()
@@ -48,6 +50,12 @@ export namespace Account {
     static readonly type = '[Auth] Reset Password Email';
 
     constructor(public payload: string) {}
+  }
+
+  export class ResetBackendUnderMaintenance {
+    static readonly type = '[Auth] Reset Backend Under Maintenance';
+
+    constructor() {}
   }
 
   export class ResetPassword {
@@ -91,10 +99,13 @@ const prefs = {
 
 @Injectable()
 export class AccountState {
+  backendUnderMaintenanceModal: HTMLIonModalElement;
+
   constructor(private navController: NavController,
               private ngZone: NgZone,
               private store: Store,
-              private router: Router) {}
+              private router: Router,
+              private modalController: ModalController) {}
 
   @Selector()
   static user(state: AccountStateModel) {
@@ -317,6 +328,15 @@ export class AccountState {
     this.store.dispatch(new Account.Redirect({ path: Path.login, forward: false, navigateRoot: false } ));
   }
 
+  @Action(Account.ResetBackendUnderMaintenance)
+  resetBackendUnderMaintenance(ctx: StateContext<AccountStateModel>, action: Account.ResetBackendUnderMaintenance) {
+    const toastData = {} as any;
+    toastData.message = 'Verbindung wiederhergestellt.';
+
+    this.store.dispatch(new GlobalActions.ShowToast({ error: toastData as Error, color: 'success' } ));
+    this.backendUnderMaintenanceModal = null;
+  }
+
   private async updateUserName(name: string, dispatch: (actions: any) => Observable<void>) {
     try {
       const user = await Appwrite.accountProvider().updateName(name) as AccountModel.User;
@@ -349,9 +369,23 @@ export class AccountState {
     }
   }
 
-  private handleError(e: any, dispatch: (actions: any) => Observable<void>) {
+  private async handleError(e: any, dispatch: (actions: any) => Observable<void>) {
+    if (this.backendUnderMaintenanceModal) {
+      return;
+    }
+
     if (e.type === 'general_unauthorized_scope') {
-      dispatch(new Account.Redirect({ path: Path.login, forward: true, navigateRoot: false }));
+      dispatch(new Account.Redirect({path: Path.login, forward: true, navigateRoot: false}));
+      return;
+    }
+
+    if (e.name === 'AppwriteException' && e.code === 0) {
+      this.backendUnderMaintenanceModal = await this.modalController.create({
+        component: BackendUnderMaintenanceComponent,
+        cssClass: 'fullscreen',
+      });
+
+      await this.backendUnderMaintenanceModal.present();
       return;
     }
 

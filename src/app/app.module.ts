@@ -19,10 +19,12 @@ import { environment } from '../environments/environment';
 import { AppState } from './store';
 import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 import { HttpClientJsonpModule, HttpClientModule } from '@angular/common/http';
+import { BackendUnderMaintenanceComponent } from './component/backend-under-maintenance/backend-under-maintenance.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    BackendUnderMaintenanceComponent
   ],
   imports: [
     BrowserModule,
