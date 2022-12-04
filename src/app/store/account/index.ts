@@ -10,6 +10,7 @@ import { Picture } from '../../helpers/picture';
 import { NavController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Location } from '../location';
+import { environment } from '../../../environments/environment';
 
 /* State Model */
 @Injectable()
@@ -255,7 +256,7 @@ export class AccountState {
   ) {
     const email = action.payload;
     try {
-      await Appwrite.accountProvider().createRecovery(email, 'https://frienradar.com/reset-password');
+      await Appwrite.accountProvider().createRecovery(email,  `${environment.appUrl}/reset-password'`);
 
       const toastData = {} as any;
       toastData.message = 'Mail gesendet. Bitte prüfe deine E-Mails.';

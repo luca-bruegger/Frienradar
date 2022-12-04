@@ -6,6 +6,7 @@ import { Store } from '@ngxs/store';
 import { AppInitService } from './core/service/app-init.service';
 import { LocationService } from './core/service/location.service';
 import { RealtimeService } from './core/service/realtime.service';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -42,11 +43,10 @@ export class AppComponent {
   private initializeDeeplinks() {
     App.addListener('appUrlOpen', (event: URLOpenListenerEvent) => {
       this.zone.run(() => {
-        const domain = 'frienradar.com';
+        const domain = environment.appUrl;
+        // The pathArray is now like ['https://frienradar.com', '/login']
         const pathArray = event.url.split(domain);
-        // The pathArray is now like ['https://devdactic.com', '/details/42']
 
-        // Get the last element with pop()
         const appPath = pathArray.pop();
         if (appPath) {
           this.router.navigateByUrl(appPath);
