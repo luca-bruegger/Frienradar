@@ -11,7 +11,7 @@ import { ResetPasswordComponent } from '../../component/reset-password/reset-pas
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage {
-  isRegister = false;
+  isRegister = true;
 
   formGroup = AccountValidation.loginFormGroup;
   formMessages = AccountValidation.formMessages;
@@ -28,9 +28,11 @@ export class LoginPage {
     if (isRegister) {
       this.formGroup.addControl('name', AccountValidation.nameControl);
       this.formGroup.addControl('profilePicture', AccountValidation.profilePictureControl);
+      this.formGroup.addControl('acceptTerms', AccountValidation.acceptTermsControl);
     } else {
       this.formGroup.removeControl('name');
       this.formGroup.removeControl('profilePicture');
+      this.formGroup.removeControl('acceptTerms');
     }
 
     this.isRegister = isRegister;
@@ -38,7 +40,6 @@ export class LoginPage {
 
   signInUser() {
     if (this.formGroup.invalid) {
-      console.log(this.formGroup.controls);
       this.formGroup.markAllAsTouched();
       return;
     }
@@ -62,5 +63,9 @@ export class LoginPage {
     });
 
     await modal.present();
+  }
+
+  openTermsConditions() {
+    window.open('https://frienradar.com/terms-conditions/', '_system');
   }
 }

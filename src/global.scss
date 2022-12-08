@@ -83,7 +83,23 @@ html {
 }
 
 .psm__progress-bar-item {
-  border-color: var(--ion-color-vbright) !important;
+  border-color: transparent !important;
+  background-color: transparent !important;
+}
+
+.psm__progress-bar {
+  background-color: transparent !important;
+  height: 10px !important;
+}
+
+.psm__progress-bar-items {
+  background-color: transparent !important;
+  border-radius: 15px !important;
+}
+
+.psm__progress-bar-overlay {
+  height: 10px !important;
+  border-radius: 15px !important;
 }
 
 .material-symbols-rounded {

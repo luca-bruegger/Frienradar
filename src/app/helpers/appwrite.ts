@@ -16,6 +16,8 @@ export class Appwrite {
       .setProject(environment.project)
       .setLocale(navigator.language);
 
+    console.warn('Appwrite is in development mode. Please set the environment variables in the environment.ts file.');
+
     return this.client;
   }
 

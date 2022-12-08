@@ -11,7 +11,6 @@ import { ModalController, NavController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Location } from '../location';
 import { environment } from '../../../environments/environment';
-import { SettingsComponent } from '../../component/settings/settings.component';
 import { BackendUnderMaintenanceComponent } from '../../component/backend-under-maintenance/backend-under-maintenance.component';
 
 /* State Model */
@@ -25,9 +24,11 @@ export namespace Account {
   /** Actions */
   export class Signup {
     static readonly type = '[Auth] Signup';
+
     constructor(
       public payload: { email: string; password: string; name: string; profilePicture: string }
-    ) {}
+    ) {
+    }
   }
 
   export class Fetch {
@@ -36,32 +37,39 @@ export namespace Account {
 
   export class Update {
     static readonly type = '[User] Update';
+
     constructor(
       public payload: { prefs?: AccountModel.UserPrefs; name?: string; profilePicture?: string }
-    ) {}
+    ) {
+    }
   }
 
   export class Login {
     static readonly type = '[Auth] Login';
-    constructor(public payload: { email: string; password: string }) {}
+
+    constructor(public payload: { email: string; password: string }) {
+    }
   }
 
   export class SendResetEmail {
     static readonly type = '[Auth] Reset Password Email';
 
-    constructor(public payload: string) {}
+    constructor(public payload: string) {
+    }
   }
 
   export class ResetBackendUnderMaintenance {
     static readonly type = '[Auth] Reset Backend Under Maintenance';
 
-    constructor() {}
+    constructor() {
+    }
   }
 
   export class ResetPassword {
     static readonly type = '[Auth] Reset Password';
 
-    constructor(public payload: { userId: string; secret: string; password: string; confirmPassword: string }) {}
+    constructor(public payload: { userId: string; secret: string; password: string; confirmPassword: string }) {
+    }
   }
 
   export class ResetPasswordExpired {
@@ -75,7 +83,9 @@ export namespace Account {
   /** Events */
   export class Redirect {
     static readonly type = '[Auth] AccountRedirect';
-    constructor(public payload: { path: string; forward: boolean; navigateRoot: boolean }) {}
+
+    constructor(public payload: { path: string; forward: boolean; navigateRoot: boolean }) {
+    }
   }
 }
 
@@ -105,7 +115,8 @@ export class AccountState {
               private ngZone: NgZone,
               private store: Store,
               private router: Router,
-              private modalController: ModalController) {}
+              private modalController: ModalController) {
+  }
 
   @Selector()
   static user(state: AccountStateModel) {
@@ -129,14 +140,14 @@ export class AccountState {
 
   @Action(Account.Login)
   async login(
-    { patchState, dispatch }: StateContext<AccountStateModel>,
+    {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.Login
   ) {
-    const { email, password } = action.payload;
+    const {email, password} = action.payload;
     try {
       await Appwrite.accountProvider().createEmailSession(email, password);
       await dispatch(new Account.Fetch());
-      dispatch(new Account.Redirect({ path: Path.default, forward: true, navigateRoot: false }));
+      dispatch(new Account.Redirect({path: Path.default, forward: true, navigateRoot: false}));
     } catch (e: any) {
       this.handleError(e, dispatch);
     }
@@ -144,10 +155,10 @@ export class AccountState {
 
   @Action(Account.Signup)
   async signup(
-    { patchState, dispatch }: StateContext<AccountStateModel>,
+    {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.Signup
   ) {
-    const { email, password, name, profilePicture } = action.payload;
+    const {email, password, name, profilePicture} = action.payload;
     try {
       const user = await Appwrite.accountProvider().create(
         'unique()',
@@ -162,15 +173,15 @@ export class AccountState {
         user,
         session,
       });
-      dispatch(new Account.Redirect({ path: Path.default, forward: true, navigateRoot: false }));
+      dispatch(new Account.Redirect({path: Path.default, forward: true, navigateRoot: false}));
     } catch (e: any) {
-      this.handleError(e, dispatch);
+      await this.handleError(e, dispatch);
     }
   }
 
   @Action(Account.Fetch)
   async fetch(
-    { patchState, dispatch }: StateContext<AccountStateModel>,
+    {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.Fetch
   ) {
     let user = this.store.selectSnapshot(AccountState.user);
@@ -195,7 +206,7 @@ export class AccountState {
         user.pictureBreaker = Picture.cacheBreaker();
       }
 
-      await dispatch(new Location.FetchLastLocation({ user }));
+      await dispatch(new Location.FetchLastLocation({user}));
       patchState({
         user
       });
@@ -213,27 +224,27 @@ export class AccountState {
 
   @Action(Account.Update)
   async update(
-    { patchState, dispatch }: StateContext<AccountStateModel>,
+    {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.Update
   ) {
-    const { prefs, profilePicture, name } = action.payload;
+    const {prefs, profilePicture, name} = action.payload;
     let user: AccountModel.User = this.store.selectSnapshot(AccountState.user);
     let updated_user = {} as AccountModel.User;
 
     if (!!name) {
       updated_user = await this.updateUserName(name, dispatch);
-      user = { ...user, ...updated_user } as AccountModel.User;
+      user = {...user, ...updated_user} as AccountModel.User;
     }
 
     if (!!prefs) {
-      const updated_prefs = { ...user.prefs, ...prefs };
+      const updated_prefs = {...user.prefs, ...prefs};
       updated_user = await this.updateUserPrefs(updated_prefs, patchState, dispatch);
-      user = { ...user, ...updated_user } as AccountModel.User;
+      user = {...user, ...updated_user} as AccountModel.User;
     }
 
     if (!!profilePicture) {
       updated_user.pictureBreaker = await this.updateProfilePicture(profilePicture, user.$id, dispatch);
-      user = { ...user, ...updated_user } as AccountModel.User;
+      user = {...user, ...updated_user} as AccountModel.User;
     }
 
     patchState({
@@ -243,7 +254,7 @@ export class AccountState {
 
   @Action(Account.Logout)
   async logout(
-    { patchState, dispatch }: StateContext<AccountStateModel>,
+    {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.Logout
   ) {
     try {
@@ -254,7 +265,7 @@ export class AccountState {
         } as unknown as AccountModel.User,
         session: null,
       });
-      dispatch(new Account.Redirect({ path: Path.login, forward: false, navigateRoot: true }));
+      dispatch(new Account.Redirect({path: Path.login, forward: false, navigateRoot: true}));
     } catch (e: any) {
       this.handleError(e, dispatch);
     }
@@ -262,17 +273,17 @@ export class AccountState {
 
   @Action(Account.SendResetEmail)
   async sendResetEmail(
-    { patchState, dispatch }: StateContext<AccountStateModel>,
+    {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.SendResetEmail
   ) {
     const email = action.payload;
     try {
-      await Appwrite.accountProvider().createRecovery(email,  `${environment.appUrl}/reset-password'`);
+      await Appwrite.accountProvider().createRecovery(email, `${environment.appUrl}/reset-password'`);
 
       const toastData = {} as any;
       toastData.message = 'Mail gesendet. Bitte prüfe deine E-Mails.';
 
-      await this.store.dispatch(new GlobalActions.ShowToast({ error: toastData as Error, color: 'success' } ));
+      await this.store.dispatch(new GlobalActions.ShowToast({error: toastData as Error, color: 'success'}));
     } catch (e: any) {
       this.handleError(e, dispatch);
     }
@@ -280,17 +291,17 @@ export class AccountState {
 
   @Action(Account.ResetPassword)
   async resetPassword(
-    { patchState, dispatch }: StateContext<AccountStateModel>,
+    {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.ResetPassword
   ) {
-    const { secret, userId, password, confirmPassword } = action.payload;
+    const {secret, userId, password, confirmPassword} = action.payload;
     try {
       await Appwrite.accountProvider().updateRecovery(userId, secret, password, confirmPassword);
 
       const toastData = {} as any;
       toastData.message = 'Passwort erfolgreich zurückgesetzt. Bitte melde dich an.';
 
-      await this.store.dispatch(new GlobalActions.ShowToast({ error: toastData as Error, color: 'success' } ));
+      await this.store.dispatch(new GlobalActions.ShowToast({error: toastData as Error, color: 'success'}));
       this.store.dispatch(new Account.Redirect({path: Path.login, forward: false, navigateRoot: false}));
     } catch (e: any) {
       this.handleError(e, dispatch);
@@ -299,7 +310,7 @@ export class AccountState {
 
   @Action(Account.Redirect)
   redirect(ctx: StateContext<AccountStateModel>, action: Account.Redirect) {
-    const { path, forward, navigateRoot } = action.payload;
+    const {path, forward, navigateRoot} = action.payload;
     const currentUrl = this.router.url;
 
     if (currentUrl.includes(path)) {
@@ -324,8 +335,8 @@ export class AccountState {
     const toastData = {} as any;
     toastData.message = 'Passwort zurücksetzen ist abgelaufen. Bitte versuche es erneut.';
 
-    this.store.dispatch(new GlobalActions.ShowToast({ error: toastData as Error, color: 'danger' } ));
-    this.store.dispatch(new Account.Redirect({ path: Path.login, forward: false, navigateRoot: false } ));
+    this.store.dispatch(new GlobalActions.ShowToast({error: toastData as Error, color: 'danger'}));
+    this.store.dispatch(new Account.Redirect({path: Path.login, forward: false, navigateRoot: false}));
   }
 
   @Action(Account.ResetBackendUnderMaintenance)
@@ -333,7 +344,7 @@ export class AccountState {
     const toastData = {} as any;
     toastData.message = 'Verbindung wiederhergestellt.';
 
-    this.store.dispatch(new GlobalActions.ShowToast({ error: toastData as Error, color: 'success' } ));
+    this.store.dispatch(new GlobalActions.ShowToast({error: toastData as Error, color: 'success'}));
     this.backendUnderMaintenanceModal = null;
   }
 
@@ -350,11 +361,11 @@ export class AccountState {
     try {
       const picture = await Picture.convertToPicture(profilePictureString) as unknown as File;
       await Appwrite.storageProvider().createFile('profile-picture', userId, picture,
-       [
-         Permission.read(Role.users()),
-         Permission.delete(Role.user(userId)),
-         Permission.write(Role.user(userId)),
-       ]);
+        [
+          Permission.read(Role.users()),
+          Permission.delete(Role.user(userId)),
+          Permission.write(Role.user(userId)),
+        ]);
       return Picture.cacheBreaker();
     } catch (e: any) {
       this.handleError(e, dispatch);

@@ -15,11 +15,13 @@ export class BackendUnderMaintenanceComponent implements OnInit, OnDestroy {
   constructor(private store: Store) { }
 
   ngOnInit() {
+    // check every 5 seconds if the backend is up again
     const source = interval(5000);
     this.subscription = source.subscribe(val => {
       Appwrite.accountProvider().getSession('current').then(data => {
         this.store.dispatch(new Account.ResetBackendUnderMaintenance());
       }).catch(e => {
+        console.log(e);
         return;
       });
     });

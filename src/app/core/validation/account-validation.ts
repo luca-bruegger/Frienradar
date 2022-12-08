@@ -12,6 +12,12 @@ export class AccountValidation {
     ]);
   }
 
+  static get acceptTermsControl() {
+    return new FormControl(false, [
+      Validators.requiredTrue
+    ]);
+  }
+
   static get profilePictureControl() {
     return new FormControl('', [
       Validators.required
@@ -31,8 +37,9 @@ export class AccountValidation {
       Validators.maxLength(100),
       Validators.pattern('((?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,})')
     ]),
-    name: new FormControl('', []),
-    profilePicture: new FormControl('', [])
+    name: AccountValidation.nameControl,
+    profilePicture: AccountValidation.profilePictureControl,
+    acceptTerms: AccountValidation.acceptTermsControl
   });
 
   static editProfileFormGroup: FormGroup = new FormGroup({
@@ -75,6 +82,9 @@ export class AccountValidation {
     ],
     profilePicture: [
       {type: 'required', message: 'Profilbild ist notwendig.'}
+    ],
+    acceptTerms: [
+      {type: 'required', message: 'Bitte akzeptiere die Datenschutz- und Nutzungsbedingungen.'}
     ]
   };
 }

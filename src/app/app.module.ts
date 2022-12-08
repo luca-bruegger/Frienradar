@@ -20,11 +20,13 @@ import { AppState } from './store';
 import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 import { HttpClientJsonpModule, HttpClientModule } from '@angular/common/http';
 import { BackendUnderMaintenanceComponent } from './component/backend-under-maintenance/backend-under-maintenance.component';
+import { RequestPermissionsComponent } from './component/request-permissions/request-permissions.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    BackendUnderMaintenanceComponent
+    BackendUnderMaintenanceComponent,
+    RequestPermissionsComponent
   ],
   imports: [
     BrowserModule,
