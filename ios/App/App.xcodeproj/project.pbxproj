@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2A28E1AA2C432D36761D9E2C /* Pods_Frienradar.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D7468583C93678D2A3DF9FE3 /* Pods_Frienradar.framework */; };
 		2FAD9763203C412B000D30F8 /* config.xml in Resources */ = {isa = PBXBuildFile; fileRef = 2FAD9762203C412B000D30F8 /* config.xml */; };
 		50379B232058CBB4000EE86E /* capacitor.config.json in Resources */ = {isa = PBXBuildFile; fileRef = 50379B222058CBB4000EE86E /* capacitor.config.json */; };
 		504EC3081FED79650016851F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504EC3071FED79650016851F /* AppDelegate.swift */; };
@@ -14,12 +15,9 @@
 		504EC30F1FED79650016851F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30E1FED79650016851F /* Assets.xcassets */; };
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
-		673757EEC26B293D49285765 /* Pods_Frienradar.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 14F2A2125E9246F3CAD71C4E /* Pods_Frienradar.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1489FC9FAC1EC9CCA23E78C6 /* Pods-Frienradar.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Frienradar.debug.xcconfig"; path = "Target Support Files/Pods-Frienradar/Pods-Frienradar.debug.xcconfig"; sourceTree = "<group>"; };
-		14F2A2125E9246F3CAD71C4E /* Pods_Frienradar.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Frienradar.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FAD9762203C412B000D30F8 /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = config.xml; sourceTree = "<group>"; };
 		445ED27F288D7AE1009C303D /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
 		50379B222058CBB4000EE86E /* capacitor.config.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = capacitor.config.json; sourceTree = "<group>"; };
@@ -30,9 +28,9 @@
 		504EC3111FED79650016851F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		504EC3131FED79650016851F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50B271D01FEDC1A000F3C39B /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
-		9759E9A8F6C47734B4B2AC12 /* Pods-Frienradar.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Frienradar.release.xcconfig"; path = "Target Support Files/Pods-Frienradar/Pods-Frienradar.release.xcconfig"; sourceTree = "<group>"; };
-		B48E5E7130F15CBDA9DA736F /* Pods-App.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.debug.xcconfig"; path = "Target Support Files/Pods-App/Pods-App.debug.xcconfig"; sourceTree = "<group>"; };
-		C59194EC86E3BC7102B9EE6C /* Pods-App.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.release.xcconfig"; path = "Target Support Files/Pods-App/Pods-App.release.xcconfig"; sourceTree = "<group>"; };
+		93351FED616B16C00AD87E00 /* Pods-Frienradar.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Frienradar.debug.xcconfig"; path = "Target Support Files/Pods-Frienradar/Pods-Frienradar.debug.xcconfig"; sourceTree = "<group>"; };
+		A571C3ED6F3ED3AEDFA157BC /* Pods-Frienradar.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Frienradar.release.xcconfig"; path = "Target Support Files/Pods-Frienradar/Pods-Frienradar.release.xcconfig"; sourceTree = "<group>"; };
+		D7468583C93678D2A3DF9FE3 /* Pods_Frienradar.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Frienradar.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -40,28 +38,20 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				673757EEC26B293D49285765 /* Pods_Frienradar.framework in Frameworks */,
+				2A28E1AA2C432D36761D9E2C /* Pods_Frienradar.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		28C257E7D4FA6F882E7DA4CD /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				14F2A2125E9246F3CAD71C4E /* Pods_Frienradar.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		504EC2FB1FED79650016851F = {
 			isa = PBXGroup;
 			children = (
 				504EC3061FED79650016851F /* App */,
 				504EC3051FED79650016851F /* Products */,
 				680F52094453AD274C287B76 /* Pods */,
-				28C257E7D4FA6F882E7DA4CD /* Frameworks */,
+				A8E81ED0945A26F8F88A83D1 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -92,12 +82,18 @@
 		680F52094453AD274C287B76 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				B48E5E7130F15CBDA9DA736F /* Pods-App.debug.xcconfig */,
-				C59194EC86E3BC7102B9EE6C /* Pods-App.release.xcconfig */,
-				1489FC9FAC1EC9CCA23E78C6 /* Pods-Frienradar.debug.xcconfig */,
-				9759E9A8F6C47734B4B2AC12 /* Pods-Frienradar.release.xcconfig */,
+				93351FED616B16C00AD87E00 /* Pods-Frienradar.debug.xcconfig */,
+				A571C3ED6F3ED3AEDFA157BC /* Pods-Frienradar.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		A8E81ED0945A26F8F88A83D1 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D7468583C93678D2A3DF9FE3 /* Pods_Frienradar.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -107,12 +103,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 504EC3161FED79650016851F /* Build configuration list for PBXNativeTarget "Frienradar" */;
 			buildPhases = (
-				250060C7436060C98922A438 /* [CP] Check Pods Manifest.lock */,
+				2005842345F110B517ECEA46 /* [CP] Check Pods Manifest.lock */,
 				504EC3001FED79650016851F /* Sources */,
 				504EC3011FED79650016851F /* Frameworks */,
 				504EC3021FED79650016851F /* Resources */,
-				927AE38D63A33F8C39BE9E4E /* [CP] Embed Pods Frameworks */,
-				05C00693D59F99F54C3FF109 /* [CP] Copy Pods Resources */,
+				55F1F21243F01BC724EC0C70 /* [CP] Embed Pods Frameworks */,
+				454525A469CF6B5B5797251C /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -174,22 +170,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		05C00693D59F99F54C3FF109 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Frienradar/Pods-Frienradar-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		250060C7436060C98922A438 /* [CP] Check Pods Manifest.lock */ = {
+		2005842345F110B517ECEA46 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -211,7 +192,22 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		927AE38D63A33F8C39BE9E4E /* [CP] Embed Pods Frameworks */ = {
+		454525A469CF6B5B5797251C /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Frienradar/Pods-Frienradar-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		55F1F21243F01BC724EC0C70 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -368,7 +364,7 @@
 		};
 		504EC3171FED79650016851F /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1489FC9FAC1EC9CCA23E78C6 /* Pods-Frienradar.debug.xcconfig */;
+			baseConfigurationReference = 93351FED616B16C00AD87E00 /* Pods-Frienradar.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
@@ -392,7 +388,7 @@
 		};
 		504EC3181FED79650016851F /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9759E9A8F6C47734B4B2AC12 /* Pods-Frienradar.release.xcconfig */;
+			baseConfigurationReference = A571C3ED6F3ED3AEDFA157BC /* Pods-Frienradar.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;

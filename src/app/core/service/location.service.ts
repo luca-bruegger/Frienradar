@@ -17,20 +17,14 @@ export class LocationService implements OnDestroy {
   private locationDelayedJobId: number;
 
 
-  constructor(private platform: Platform, private store: Store) {}
+  constructor(private store: Store) {}
 
   ngOnDestroy() {
     clearInterval(this.locationDelayedJobId);
   }
 
   async watchGeolocation() {
-    if (this.platform.is('android') || this.platform.is('ios')) {
-      await Geolocation.requestPermissions().then(data => {
-        if (data.location === 'denied') {
-          alert('Aktivere den Standortzugriff in den Einstellungen damit die App ordnungsgemäss funktioniert.');
-        }
-      });
-    }
+
 
     await this.watchPosition();
   }
