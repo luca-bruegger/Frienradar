@@ -1,0 +1,63 @@
+ion-input {
+  color: var(--ion-color-secondary);
+}
+
+ion-label {
+  color: var(--ion-color-primary) !important;
+}
+
+.phone-number-item {
+  background-color: var(--ion-item-background, var(--ion-background-color, #fff));
+}
+
+/*
+.phone-number-wrapper {
+  border-bottom: 1px solid;
+  border-color: var(--ion-item-border-color, var(--ion-border-color, var(--ion-color-step-150, rgba(0, 0, 0, 0.13))))
+}
+*/
+
+.error-message {
+  font-size: smaller;
+  padding-left: 15px;
+  color: rgb(241, 1, 1);
+  margin-top: 4px;
+}
+
+.ios ion-item {
+  background-color: transparent;
+}
+
+.ios .container-grid {
+  height: calc(100% - 70px);
+}
+
+.container-grid {
+  height: 100%;
+  display: flex;
+  flex-flow: column;
+}
+
+.checkbox-wrapper {
+  margin: 5px 25px 5px 5px;
+  align-content: center;
+  display: flex;
+}
+
+.terms-checkbox {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+
+.ios {
+  .checkbox-wrapper {
+    margin: 0
+  }
+
+  .terms-checkbox {
+    display: flex;
+    gap: 15px;
+  }
+}

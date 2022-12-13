@@ -1,12 +1,14 @@
 import { Component, NgZone } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { App, URLOpenListenerEvent } from '@capacitor/app';
-import { Path } from './helpers/path';
+import { Path } from './helper/path';
 import { Store } from '@ngxs/store';
 import { AppInitService } from './core/service/app-init.service';
 import { LocationService } from './core/service/location.service';
 import { RealtimeService } from './core/service/realtime.service';
 import { environment } from '../environments/environment';
+import { Account } from './store';
+import { NavController } from '@ionic/angular';
 
 @Component({
   selector: 'app-root',
@@ -17,6 +19,7 @@ export class AppComponent {
   hasInitialized = false;
 
   constructor(private router: Router,
+              private navController: NavController,
               private zone: NgZone,
               private store: Store,
               private appInitService: AppInitService,
@@ -26,7 +29,8 @@ export class AppComponent {
     appInitService.init().then(async () => {
       this.hasInitialized = true;
       this.jumpTo();
-      this.initializeDeeplinks();
+      this.initializeDeeplinking();
+      this.initializeGoogleAnalytics();
       await locationService.watchGeolocation();
       await realtimeService.watchRealtime();
     });
@@ -40,18 +44,28 @@ export class AppComponent {
     });
   }
 
-  private initializeDeeplinks() {
+  private initializeDeeplinking() {
     App.addListener('appUrlOpen', (event: URLOpenListenerEvent) => {
       this.zone.run(() => {
         const domain = environment.appUrl;
-        // The pathArray is now like ['https://frienradar.com', '/login']
         const pathArray = event.url.split(domain);
 
         const appPath = pathArray.pop();
         if (appPath) {
-          this.router.navigateByUrl(appPath);
+          this.navController.navigateRoot(appPath);
         }
       });
     });
+  }
+
+  private initializeGoogleAnalytics() {
+    // this.ga.startTrackerWithId(environment.googleAnalyticsId)
+    //   .then(() => {
+    //     console.log('Google analytics is ready now');
+    //     this.ga.trackView('test');
+    //     // Tracker is ready
+    //     // You can now track pages or set additional information such as AppVersion or UserId
+    //   })
+    //   .catch(e => console.log('Error starting GoogleAnalytics', e));
   }
 }

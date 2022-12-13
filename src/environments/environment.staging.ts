@@ -10,7 +10,9 @@ export const environment = {
   radarDatabaseId: 'radar',
   geolocationsCollectionId: 'geolocations',
   contactsCollectionId: 'contacts',
-  appUrl: 'https://beta.frienradar.com'
+  appUrl: 'https://beta.frienradar.com',
+  googleAnalyticsId: 'G-G2452L0H7H',
+  usernameCollectionId: 'usernames'
 };
 
 /*

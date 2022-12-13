@@ -10,11 +10,14 @@ platforms:
       Frienradar:
         bundleId: $BUNDLE_ID
         incrementBuild: true
-        productName: Frienradar-App
+        productName: Frienradar
         displayName: Frienradar
         version: 1
 
         entitlements:
-          - com.apple.developer.associated-domains: [ "applinks:frienradar.com", "webcredentials:frienradar.com", "applinks:app.frienradar.com", "webcredentials:app.frienradar.com" ]
+          - com.apple.developer.associated-domains: [
+              "applinks:app.frienradar.com",
+              "webcredentials:app.frienradar.com"
+          ionic ]
   android:
     packageName: $PACKAGE_NAME

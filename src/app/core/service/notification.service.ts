@@ -35,14 +35,6 @@ export class NotificationService {
     // Request permission to use push notifications
     // iOS will prompt user and return if they granted permission or not
     // Android will just grant without prompting
-    PushNotifications.requestPermissions().then(result => {
-      if (result.receive === 'granted') {
-        // Register with Apple / Google to receive push via APNS/FCM
-        PushNotifications.register();
-      } else {
-        alert('Bitte aktiviere Push-Benachrichtigungen in den Einstellungen, damit die volle App-Funktionalität gewährleistet ist.');
-      }
-    });
 
     // On success, we should be able to receive notifications
     PushNotifications.addListener('registration', async ({value}) => {

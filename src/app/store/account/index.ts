@@ -1,23 +1,24 @@
 import { Injectable, NgZone } from '@angular/core';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { Models, Permission, Role } from 'appwrite';
-import { Appwrite } from 'src/app/helpers/appwrite';
+import { Appwrite } from 'src/app/helper/appwrite';
 import { GlobalActions } from '../global';
-import { Path } from '../../helpers/path';
+import { Path } from '../../helper/path';
 import { Account as AccountModel } from '../../model/account';
 import { Observable } from 'rxjs';
-import { Picture } from '../../helpers/picture';
-import { ModalController, NavController } from '@ionic/angular';
+import { Picture } from '../../helper/picture';
+import { NavController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Location } from '../location';
 import { environment } from '../../../environments/environment';
-import { BackendUnderMaintenanceComponent } from '../../component/backend-under-maintenance/backend-under-maintenance.component';
+import UserPrefs = AccountModel.UserPrefs;
 
 /* State Model */
 @Injectable()
 export class AccountStateModel {
   user: AccountModel.User;
   session: Models.Session;
+  username: string;
 }
 
 export namespace Account {
@@ -58,10 +59,21 @@ export namespace Account {
     }
   }
 
-  export class ResetBackendUnderMaintenance {
-    static readonly type = '[Auth] Reset Backend Under Maintenance';
+  export class VerifyEmail {
+    static readonly type = '[Auth] Verify Email';
+  }
 
-    constructor() {
+  export class UpdateVerification {
+    static readonly type = '[Auth] Update Verification';
+
+    constructor(public payload: { userId: string; secret: string }) {
+    }
+  }
+
+  export class UpdateUsername {
+    static readonly type = '[Auth] Update Username';
+
+    constructor(public payload: { username: string; userId: string }) {
     }
   }
 
@@ -72,8 +84,11 @@ export namespace Account {
     }
   }
 
-  export class ResetPasswordExpired {
+  export class VerificationExpired {
     static readonly type = '[Auth] Reset Password expired';
+
+    constructor(public payload: { message: string }) {
+    }
   }
 
   export class Logout {
@@ -100,22 +115,18 @@ const prefs = {
 @State<AccountStateModel>({
   name: 'auth',
   defaults: {
-    user: {
-      prefs
-    } as unknown as AccountModel.User,
+    user: null,
     session: null,
+    username: null
   },
 })
 
 @Injectable()
 export class AccountState {
-  backendUnderMaintenanceModal: HTMLIonModalElement;
-
   constructor(private navController: NavController,
               private ngZone: NgZone,
               private store: Store,
-              private router: Router,
-              private modalController: ModalController) {
+              private router: Router) {
   }
 
   @Selector()
@@ -134,6 +145,11 @@ export class AccountState {
   }
 
   @Selector()
+  static username(state: AccountStateModel) {
+    return state.username;
+  }
+
+  @Selector()
   static isAuthenticated(state: AccountStateModel): boolean {
     return !!state.user;
   }
@@ -147,9 +163,48 @@ export class AccountState {
     try {
       await Appwrite.accountProvider().createEmailSession(email, password);
       await dispatch(new Account.Fetch());
-      dispatch(new Account.Redirect({path: Path.default, forward: true, navigateRoot: false}));
     } catch (e: any) {
-      this.handleError(e, dispatch);
+      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
+    }
+  }
+
+  @Action(Account.UpdateUsername)
+  async updateUsername(
+    {patchState, dispatch}: StateContext<AccountStateModel>,
+    action: Account.UpdateUsername
+  ) {
+    const {userId, username} = action.payload;
+    try {
+      await Appwrite.databasesProvider().updateDocument(environment.radarDatabaseId, environment.usernameCollectionId, userId, {
+        username
+      });
+      const user = this.store.selectSnapshot(AccountState.user);
+      const updatedUser = {...user};
+      updatedUser.username = username;
+
+      patchState({
+        user: updatedUser
+      });
+
+      this.store.dispatch(new Account.Redirect({
+        path: Path.default,
+        forward: true,
+        navigateRoot: false
+      }));
+      this.store.dispatch(new GlobalActions.ShowToast({
+        message: 'Konfiguration erfolgreich abgeschlossen',
+        color: 'success'
+      }));
+    } catch (e: any) {
+      if (e.code === 409 && e.type === 'document_already_exists') {
+        this.store.dispatch(new GlobalActions.ShowToast({
+          message: 'Der Benutzername ist bereits vergeben',
+          color: 'danger'
+        }));
+        return;
+      }
+
+      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
     }
   }
 
@@ -168,14 +223,16 @@ export class AccountState {
       ) as AccountModel.User;
       const session = await Appwrite.accountProvider().createEmailSession(email, password);
       await Appwrite.accountProvider().updatePrefs(prefs);
-      user.pictureBreaker = await this.updateProfilePicture(profilePicture, user.$id, dispatch);
+      user.pictureBreaker = await this.updateProfilePicture(profilePicture, user.$id);
+
+      dispatch(new Account.Redirect({path: Path.additionalLoginData, forward: true, navigateRoot: true}));
+
       patchState({
         user,
         session,
       });
-      dispatch(new Account.Redirect({path: Path.default, forward: true, navigateRoot: false}));
     } catch (e: any) {
-      await this.handleError(e, dispatch);
+      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
     }
   }
 
@@ -197,8 +254,14 @@ export class AccountState {
       }
 
       // If user is already fetched, don't fetch again
-      if (!user.$id) {
+      if (!user) {
         user = await Appwrite.accountProvider().get() as AccountModel.User;
+        user.username = await this.getUsername(user);
+        if (this.isUserIsFullyRegistered(user)) {
+          dispatch(new Account.Redirect({path: Path.default, forward: true, navigateRoot: true}));
+        } else {
+          dispatch(new Account.Redirect({path: Path.additionalLoginData, forward: true, navigateRoot: true}));
+        }
       }
 
       // Set cacheBreaker to force image reload if not set
@@ -214,11 +277,10 @@ export class AccountState {
       // Ignore if route is reset password
       const isResetPassword = new RegExp('^(\\/reset-password\\?)').test(this.router.url);
       if (isResetPassword) {
-        console.warn('Reset password. Skip login redirect.');
         return;
       }
 
-      this.handleError(e, dispatch);
+      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
     }
   }
 
@@ -229,22 +291,22 @@ export class AccountState {
   ) {
     const {prefs, profilePicture, name} = action.payload;
     let user: AccountModel.User = this.store.selectSnapshot(AccountState.user);
-    let updated_user = {} as AccountModel.User;
+    let updatedUser = {} as AccountModel.User;
 
     if (!!name) {
-      updated_user = await this.updateUserName(name, dispatch);
-      user = {...user, ...updated_user} as AccountModel.User;
+      updatedUser = await this.updateName(name, dispatch);
+      user = {...user, ...updatedUser} as AccountModel.User;
     }
 
     if (!!prefs) {
-      const updated_prefs = {...user.prefs, ...prefs};
-      updated_user = await this.updateUserPrefs(updated_prefs, patchState, dispatch);
-      user = {...user, ...updated_user} as AccountModel.User;
+      const updatedPrefs = {...user.prefs, ...prefs};
+      updatedUser = await this.updateUserPrefs(updatedPrefs);
+      user = {...user, ...updatedUser} as AccountModel.User;
     }
 
     if (!!profilePicture) {
-      updated_user.pictureBreaker = await this.updateProfilePicture(profilePicture, user.$id, dispatch);
-      user = {...user, ...updated_user} as AccountModel.User;
+      updatedUser.pictureBreaker = await this.updateProfilePicture(profilePicture, user.$id);
+      user = {...user, ...updatedUser} as AccountModel.User;
     }
 
     patchState({
@@ -260,14 +322,12 @@ export class AccountState {
     try {
       await Appwrite.accountProvider().deleteSession('current');
       patchState({
-        user: {
-          prefs
-        } as unknown as AccountModel.User,
-        session: null,
+        user: null,
+        session: null
       });
       dispatch(new Account.Redirect({path: Path.login, forward: false, navigateRoot: true}));
     } catch (e: any) {
-      this.handleError(e, dispatch);
+      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
     }
   }
 
@@ -280,12 +340,12 @@ export class AccountState {
     try {
       await Appwrite.accountProvider().createRecovery(email, `${environment.appUrl}/reset-password'`);
 
-      const toastData = {} as any;
-      toastData.message = 'Mail gesendet. Bitte prüfe deine E-Mails.';
-
-      await this.store.dispatch(new GlobalActions.ShowToast({error: toastData as Error, color: 'success'}));
+      await this.store.dispatch(new GlobalActions.ShowToast({
+        message: 'Mail gesendet. Bitte prüfe deine E-Mails.',
+        color: 'success'
+      }));
     } catch (e: any) {
-      this.handleError(e, dispatch);
+      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
     }
   }
 
@@ -298,13 +358,38 @@ export class AccountState {
     try {
       await Appwrite.accountProvider().updateRecovery(userId, secret, password, confirmPassword);
 
-      const toastData = {} as any;
-      toastData.message = 'Passwort erfolgreich zurückgesetzt. Bitte melde dich an.';
-
-      await this.store.dispatch(new GlobalActions.ShowToast({error: toastData as Error, color: 'success'}));
+      await this.store.dispatch(new GlobalActions.ShowToast({
+        message: 'Passwort erfolgreich zurückgesetzt. Bitte melde dich an.',
+        color: 'success'
+      }));
       this.store.dispatch(new Account.Redirect({path: Path.login, forward: false, navigateRoot: false}));
     } catch (e: any) {
-      this.handleError(e, dispatch);
+      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
+    }
+  }
+
+  @Action(Account.UpdateVerification)
+  async updateVerification(
+    {patchState, dispatch}: StateContext<AccountStateModel>,
+    action: Account.UpdateVerification
+  ) {
+    const {userId, secret} = action.payload;
+    try {
+      await Appwrite.accountProvider().updateVerification(userId, secret);
+      const user = this.store.selectSnapshot(AccountState.user);
+      const updatedUser = {...user};
+      updatedUser.emailVerification = true;
+
+      patchState({
+        user: updatedUser
+      });
+
+      await this.store.dispatch(new GlobalActions.ShowToast({
+        message: 'Email erfolgreich verifiziert.',
+        color: 'success'
+      }));
+    } catch (e: any) {
+      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
     }
   }
 
@@ -330,34 +415,35 @@ export class AccountState {
     });
   }
 
-  @Action(Account.ResetPasswordExpired)
-  resetPasswordExpired(ctx: StateContext<AccountStateModel>, action: Account.ResetPasswordExpired) {
-    const toastData = {} as any;
-    toastData.message = 'Passwort zurücksetzen ist abgelaufen. Bitte versuche es erneut.';
-
-    this.store.dispatch(new GlobalActions.ShowToast({error: toastData as Error, color: 'danger'}));
+  @Action(Account.VerificationExpired)
+  verificationExpired(ctx: StateContext<AccountStateModel>, action: Account.VerificationExpired) {
+    const {message} = action.payload;
+    this.store.dispatch(new GlobalActions.ShowToast({
+      message,
+      color: 'danger'
+    }));
     this.store.dispatch(new Account.Redirect({path: Path.login, forward: false, navigateRoot: false}));
   }
 
-  @Action(Account.ResetBackendUnderMaintenance)
-  resetBackendUnderMaintenance(ctx: StateContext<AccountStateModel>, action: Account.ResetBackendUnderMaintenance) {
-    const toastData = {} as any;
-    toastData.message = 'Verbindung wiederhergestellt.';
-
-    this.store.dispatch(new GlobalActions.ShowToast({error: toastData as Error, color: 'success'}));
-    this.backendUnderMaintenanceModal = null;
+  @Action(Account.VerifyEmail)
+  async verifyUserEmail({patchState, dispatch}: StateContext<AccountStateModel>, action: Account.VerificationExpired) {
+    try {
+      await Appwrite.accountProvider().createVerification(`${environment.appUrl}/additional-login-data`);
+    } catch (e: any) {
+      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
+    }
   }
 
-  private async updateUserName(name: string, dispatch: (actions: any) => Observable<void>) {
+  private async updateName(name: string, dispatch: (actions: any) => Observable<void>) {
     try {
       const user = await Appwrite.accountProvider().updateName(name) as AccountModel.User;
       return user;
     } catch (e: any) {
-      this.handleError(e, dispatch);
+      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
     }
   }
 
-  private async updateProfilePicture(profilePictureString: string, userId, dispatch: (actions: any) => Observable<void>) {
+  private async updateProfilePicture(profilePictureString: string, userId) {
     try {
       const picture = await Picture.convertToPicture(profilePictureString) as unknown as File;
       await Appwrite.storageProvider().createFile('profile-picture', userId, picture,
@@ -368,43 +454,43 @@ export class AccountState {
         ]);
       return Picture.cacheBreaker();
     } catch (e: any) {
-      this.handleError(e, dispatch);
+      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
     }
   }
 
-  private async updateUserPrefs(prefs: AccountModel.UserPrefs, patchState: (val: Partial<AccountStateModel>) => AccountStateModel, dispatch: (actions: any) => Observable<void>) {
+  private async updateUserPrefs(userPrefs: AccountModel.UserPrefs) {
     try {
-      return await Appwrite.accountProvider().updatePrefs(prefs) as AccountModel.User;
+      return await Appwrite.accountProvider().updatePrefs(userPrefs) as AccountModel.User;
     } catch (e: any) {
-      this.handleError(e, dispatch);
+      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
     }
   }
 
-  private async handleError(e: any, dispatch: (actions: any) => Observable<void>) {
-    if (this.backendUnderMaintenanceModal) {
-      return;
+  private isUserIsFullyRegistered(user) {
+    return user.emailVerification && user.username.length > 0;
+  }
+
+  private async getUsername(user: Models.Account<{}> & { prefs: UserPrefs; pictureBreaker: string; username: string }) {
+    try {
+      const document = await Appwrite.databasesProvider().getDocument(environment.radarDatabaseId, environment.usernameCollectionId, user.$id);
+      return document.username;
+    } catch (e) {
+      if (e.code === 404 && e.type === 'document_not_found') {
+        try {
+          await Appwrite.databasesProvider().createDocument(environment.radarDatabaseId, environment.usernameCollectionId, user.$id,{
+            username: '',
+            email: user.email
+          });
+          return '';
+        } catch (createError) {
+          this.store.dispatch(new GlobalActions.HandleError({
+            error: createError
+          }));
+        }
+      }
+      this.store.dispatch(new GlobalActions.HandleError({
+        error: e
+      }));
     }
-
-    if (e.type === 'general_unauthorized_scope') {
-      dispatch(new Account.Redirect({path: Path.login, forward: true, navigateRoot: false}));
-      return;
-    }
-
-    if (e.name === 'AppwriteException' && e.code === 0) {
-      this.backendUnderMaintenanceModal = await this.modalController.create({
-        component: BackendUnderMaintenanceComponent,
-        cssClass: 'fullscreen',
-      });
-
-      await this.backendUnderMaintenanceModal.present();
-      return;
-    }
-
-    dispatch(
-      new GlobalActions.ShowToast({
-        error: e,
-        color: 'danger',
-      })
-    );
   }
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Appwrite } from '../../helpers/appwrite';
+import { Appwrite } from '../../helper/appwrite';
 import { AccountState } from '../../store';
 import { Store } from '@ngxs/store';
 
@@ -17,7 +17,7 @@ export class RealtimeService {
 
   async watchRealtime() {
     this.store.select(AccountState.user).subscribe(user => {
-      if (user.$id && !this.alive) {
+      if (user && !this.alive) {
         this.getContacts(user.$id);
         this.getNearbyUsers(user.$id);
         this.alive = true;

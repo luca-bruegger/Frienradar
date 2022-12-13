@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { GlobalActions } from '../global';
-import { Appwrite } from '../../helpers/appwrite';
+import { Appwrite } from '../../helper/appwrite';
 import { AccountState } from '../account';
 import { Account as AccountModel } from '../../model/account';
 import { Permission, Query, Role } from 'appwrite';
-import { GeohashLength } from '../../component/radar-display/radar-display.component';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { GeohashLength } from '../../component/element/radar-display/radar-display.component';
 
 interface LocationData {
   geohash: string;
@@ -145,7 +145,7 @@ export class LocationState {
       } catch (e: any) {
         dispatch(
           new GlobalActions.ShowToast({
-            error: e,
+            message: e.message,
             color: 'danger',
           })
         );
@@ -162,6 +162,10 @@ export class LocationState {
     const currentGeohash = this.store.selectSnapshot(LocationState.geohash);
     const user = this.store.selectSnapshot(AccountState.user);
 
+    if (!user) {
+      return;
+    }
+
     // Only update if geohash changed
     if (currentGeohash === geohash) {
       return;
@@ -174,7 +178,6 @@ export class LocationState {
     };
 
     if (user && user.$id) {
-      console.warn('User', user);
       await this.setGeohashesForUser(user.$id, geohash, data, dispatch);
     }
 
@@ -211,7 +214,7 @@ export class LocationState {
           } catch (e: any) {
             dispatch(
               new GlobalActions.ShowToast({
-                error: e,
+                message: e.message,
                 color: 'danger',
               })
             );
@@ -219,7 +222,7 @@ export class LocationState {
         } else {
           dispatch(
             new GlobalActions.ShowToast({
-              error: e,
+              message: e.message,
               color: 'danger',
             })
           );
@@ -282,7 +285,7 @@ export class LocationState {
     } catch (e: any) {
       dispatch(
         new GlobalActions.ShowToast({
-          error: e,
+          message: e.message,
           color: 'danger',
         })
       );

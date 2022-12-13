@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Appwrite } from '../../helpers/appwrite';
+import { Appwrite } from '../../helper/appwrite';
 import { interval, Subscription } from 'rxjs';
 import { Store } from '@ngxs/store';
-import { Account } from '../../store';
+import { Account, GlobalActions } from '../../store';
 
 @Component({
   selector: 'app-backend-under-maintenance',
@@ -19,10 +19,7 @@ export class BackendUnderMaintenanceComponent implements OnInit, OnDestroy {
     const source = interval(5000);
     this.subscription = source.subscribe(val => {
       Appwrite.accountProvider().getSession('current').then(data => {
-        this.store.dispatch(new Account.ResetBackendUnderMaintenance());
-      }).catch(e => {
-        console.log(e);
-        return;
+        this.store.dispatch(new GlobalActions.ResetBackendUnderMaintenance());
       });
     });
   }

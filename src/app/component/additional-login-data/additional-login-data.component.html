@@ -1,0 +1,110 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title color="primary">Konfiguration</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="back()" color="danger">Zurück</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-header collapse="condense" class="ion-no-margin">
+    <ion-toolbar>
+      <ion-title size="large" style="color: var(--ion-color-primary)">Konfiguration</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content>
+
+    </ion-refresher-content>
+  </ion-refresher>
+  <ion-grid>
+    <ion-row>
+      <ion-col size-xl="4" offset-xl="4" size="12">
+        <ion-row style="margin-bottom: 0; padding-bottom: 0">
+          <ion-col>
+            <ion-card color="light">
+              <ion-card-content>
+                <ion-card-subtitle>Berechtigungen</ion-card-subtitle>
+                <ion-item color="light">
+                  <ion-icon *ngIf="geolocationPermission" slot="start" name="checkbox-outline" color="success"></ion-icon>
+                  <ion-icon *ngIf="!geolocationPermission" slot="start" name="close-circle-outline" color="danger"></ion-icon>
+                  <ion-label>Standortzugriff</ion-label>
+                  <ion-button *ngIf="!geolocationPermission && isMobile" slot="end" (click)="requestGeolocationPermission()">
+                    <ion-label>Anfordern</ion-label>
+                  </ion-button>
+                </ion-item>
+                <ion-item color="light" lines="none">
+                  <!--                    <ion-icon slot="start" name="checkbox-outline" color="success"></ion-icon>-->
+                  <ion-icon slot="start" name="close-circle-outline" color="danger"></ion-icon>
+                  <ion-label>Benachrichtigungen</ion-label>
+                  <ion-button slot="end">
+                    <ion-label>Erlauben</ion-label>
+                  </ion-button>
+                </ion-item>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size-xl="4" offset-xl="4" size="12">
+        <ion-row style="margin-bottom: 0; padding-bottom: 0">
+          <ion-col>
+            <ion-card color="light">
+              <ion-card-content>
+                <ion-card-subtitle>Email bestätigung</ion-card-subtitle>
+                <ion-note>Deine Email: <strong>{{user.email}}</strong></ion-note>
+                <ion-item color="light" lines="none">
+                  <ion-icon *ngIf="user.emailVerification" slot="start" name="checkbox-outline" color="success"></ion-icon>
+                  <ion-icon *ngIf="!user.emailVerification" slot="start" name="close-circle-outline" color="danger"></ion-icon>
+                  <ion-label>Bestätigt</ion-label>
+                  <ion-button *ngIf="!user.emailVerification" slot="end" (click)="verifyEmail()">
+                    <ion-label>Anfordern</ion-label>
+                  </ion-button>
+                </ion-item>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size-xl="4" offset-xl="4" size="12">
+        <ion-row style="margin-bottom: 0; padding-bottom: 0">
+          <ion-col>
+            <ion-card color="light">
+              <ion-card-content>
+                <ion-card-subtitle>Benutzername</ion-card-subtitle>
+                <ion-note>
+                  <span>Der Benutzername wird für die Anzeige in der App verwendet. Dieser ist für dich, aber auch andere sichtbar.</span>
+                </ion-note>
+                <ion-item color="light" class="ion-margin-top" counter="true">
+                  <ion-input [formControl]="usernameFormControl" maxlength="30"
+                             required="true"
+                             autocorrect="true" placeholder="Benutzername"></ion-input>
+                </ion-item>
+                <div>
+                  <ng-container *ngFor="let validation of formMessages.username">
+                    <div class="error-message"
+                         *ngIf="usernameFormControl.hasError(validation.type) && (usernameFormControl.dirty || usernameFormControl.touched)">
+                      {{ validation.message }}
+                    </div>
+                  </ng-container>
+                </div>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col class="ion-text-center">
+        <ion-button (click)="finishAdditionalSetup()">
+          <ion-label>Abschliessen</ion-label>
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

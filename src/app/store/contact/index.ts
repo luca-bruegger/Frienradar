@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { NavController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Contact as ContactModel } from '../../model/contact';
-import { Appwrite } from '../../helpers/appwrite';
+import { Appwrite } from '../../helper/appwrite';
 import { AccountState } from '../account';
 import { Permission, Role } from 'appwrite';
 import { Md5 } from 'ts-md5';
@@ -79,7 +79,7 @@ export class ContactState {
         ]);
         return;
       }
-      this.handleError(e, dispatch);
+      this.store.dispatch(new GlobalActions.HandleError({ error: e as Error }));
     }
   }
 
@@ -130,22 +130,13 @@ export class ContactState {
       } else {
         dispatch(
           new GlobalActions.ShowToast({
-            error: {message: 'Already requested'} as Error,
+            message: 'Already requested',
             color: 'danger',
           })
         );
       }
     } catch (e: any) {
-      this.handleError(e, dispatch);
+      this.store.dispatch(new GlobalActions.HandleError({ error: e as Error }));
     }
-  }
-
-  private handleError(e: any, dispatch: (actions: any) => Observable<void>) {
-    dispatch(
-      new GlobalActions.ShowToast({
-        error: e,
-        color: 'danger',
-      })
-    );
   }
 }

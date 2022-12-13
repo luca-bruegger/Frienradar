@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { AccountValidation } from '../../core/validation/account-validation';
 import { Account as AccountModel } from '../../model/account';
-import { Picture } from '../../helpers/picture';
+import { Picture } from '../../helper/picture';
 
 @Component({
   selector: 'app-edit-user-profile',
