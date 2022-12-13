@@ -9,23 +9,23 @@ const routes: Routes = [
     children: [
       {
         path: 'profile',
-        loadChildren: () => import('../pages/profile/profile.module').then(m => m.ProfilePageModule)
+        loadChildren: () => import('../page/profile/profile.module').then(m => m.ProfilePageModule)
       },
       {
         path: 'radar',
-        loadChildren: () => import('../pages/radar/radar.module').then(m => m.RadarPageModule)
+        loadChildren: () => import('../page/radar/radar.module').then(m => m.RadarPageModule)
       },
       {
         path: 'chat',
-        loadChildren: () => import('../pages/chat/chat.module').then(m => m.ChatPageModule)
+        loadChildren: () => import('../page/chat/chat.module').then(m => m.ChatPageModule)
       },
       {
-        path: 'interests',
-        loadChildren: () => import('../pages/interest/interest.module').then(m => m.InterestPageModule)
+        path: 'accounts',
+        loadChildren: () => import('../page/accounts/accounts.module').then(m => m.AccountsPageModule)
       },
       {
         path: 'nearby',
-        loadChildren: () => import('../pages/nearby/nearby.module').then(m => m.NearbyPageModule)
+        loadChildren: () => import('../page/nearby/nearby.module').then(m => m.NearbyPageModule)
       },
       {
         path: '',

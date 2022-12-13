@@ -14,5 +14,9 @@
 	},
 	"ios": {
 		"scheme": "Frienradar"
+	},
+	"server": {
+		"hostname": "app.frienradar.com",
+		"url": "http://192.168.1.148:8100"
 	}
 }

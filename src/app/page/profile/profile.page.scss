@@ -1,0 +1,34 @@
+.img-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+}
+
+ion-avatar, img {
+  height: 100%;
+  width: 100%;
+  max-width: 256px !important;  //any size
+  max-height: 256px !important; //any size
+}
+
+#notifications-badge {
+  background-color: red;
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  border-radius: 100%;
+}
+
+ion-textarea {
+  --background: #373737;
+  --color: #666666;
+  --padding-bottom: 0;
+  --padding-end: 0;
+  --padding-start: 0;
+  --padding-top: 0;
+  --placeholder-color: #666666;
+  --placeholder-opacity: 0.8;
+  background-color: rgba(229,229,229,0.62);
+  border-radius: 10px;
+}

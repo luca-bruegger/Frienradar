@@ -1,0 +1,19 @@
+.profile-picture {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.img-wrapper {
+  height: 80px;
+  width: 80px;
+  align-self: center;
+}
+
+ion-avatar, img {
+  height: 100%;
+  width: 100%;
+  max-width: 256px !important;  //any size
+  max-height: 256px !important; //any size
+}

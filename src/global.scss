@@ -25,13 +25,9 @@
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
 
-@import 'material-symbols';
-
 html {
   --ion-background-color: var(--ion-color-vbright);
 }
-
-//
 
 .icon-text {
   display: inline-block;
@@ -42,7 +38,6 @@ html {
   display: inline-block;
   vertical-align: middle;
   margin-right: 5px;
-  margin-bottom: 3px;
 }
 
 .phone-number-input {
@@ -100,10 +95,6 @@ html {
 .psm__progress-bar-overlay {
   height: 10px !important;
   border-radius: 15px !important;
-}
-
-.material-symbols-rounded {
-  font-weight: 500;
 }
 
 .fullscreen {
