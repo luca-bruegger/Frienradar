@@ -1,11 +1,11 @@
 <ion-header translucent="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button (click)="closeModalWithSave(false)">Abbrechen</ion-button>
+      <ion-button (click)="closeModalWithSave(false)" color="tertiary">Abbrechen</ion-button>
     </ion-buttons>
     <ion-title>Profil bearbeiten</ion-title>
     <ion-buttons slot="end">
-      <ion-button strong="true" (click)="closeModalWithSave(true)">Speichern</ion-button>
+      <ion-button strong="true" (click)="closeModalWithSave(true)" color="secondary">Speichern</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -28,13 +28,15 @@
         {{ validation.message }}
       </div>
     </ng-container>
-    <ion-item color="light" lines="none">
-      <ion-label style="width: 110px; padding-right: 5px">Email</ion-label>
-      <ion-input style="border-bottom: 1px solid var(--ion-color-bright)" formControlName="email"></ion-input>
-    </ion-item>
-    <ion-item color="light" lines="none">
-      <ion-label style="width: 110px; white-space: pre-wrap; padding-right: 5px">Beschreibung</ion-label>
-      <ion-textarea auto-grow="true" formControlName="description" style="border-bottom: 1px solid var(--ion-color-bright)" placeholder="Deine Beschreibung..."></ion-textarea>
+<!--    <ion-item color="light" lines="none">-->
+<!--      <ion-label style="width: 110px; padding-right: 5px">Email</ion-label>-->
+<!--      <div style="border-bottom: 1px solid var(&#45;&#45;ion-color-bright)">-->
+<!--        <ion-input formControlName="email"></ion-input>-->
+<!--      </div>-->
+<!--    </ion-item>-->
+    <ion-item color="light" lines="none" counter="true">
+      <ion-label style="width: 110px; padding-right: 5px" position="stacked">Beschreibung</ion-label>
+      <ion-textarea class="ion-padding" auto-grow="true" formControlName="description" placeholder="Deine Beschreibung..." maxlength="150"></ion-textarea>
     </ion-item>
     <ng-container *ngFor="let validation of formMessages.description">
       <div class="error-message"

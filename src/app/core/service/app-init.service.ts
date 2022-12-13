@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Account, AccountState, GlobalActions } from '../../store';
+import { Account } from '../../store';
 import { Store } from '@ngxs/store';
 import { LoadingController, Platform } from '@ionic/angular';
 import { Contact } from '../../store/contact';
-import { Geolocation } from '@capacitor/geolocation';
+import { App } from '@capacitor/app';
+import { LocalPermission } from '../../store/local-permission';
 
 @Injectable({
   providedIn: 'root'
@@ -19,25 +20,22 @@ export class AppInitService {
   async init() {
     return new Promise(async (resolve, reject) => {
       const loadingSpinner = await this.createLoadingSpinner();
-      await this.requestPermissions();
-      await this.fetchInitialDataFromApi();
+      await this.setupAppStateListener();
+      await this.fetchUserFromApi();
 
       await loadingSpinner.dismiss();
       return resolve(undefined);
     });
   }
 
-  async fetchInitialDataFromApi() {
-    const user = await this.store.dispatch(new Account.Fetch()).toPromise();
-    if (user.auth.user.$id) {
-      await this.store.dispatch(new Contact.Fetch()).toPromise();
-      return;
-    }
-
-    const subscription = this.store.select(AccountState.user).subscribe(async userState => {
-      if (userState.$id) {
-        await this.store.dispatch(new Contact.Fetch()).toPromise();
-        subscription.unsubscribe();
+  async fetchUserFromApi() {
+    await new Promise(async (resolve, reject) => {
+      const dispatchResponse = await this.store.dispatch(new Account.Fetch()).toPromise();
+      if (dispatchResponse.auth.user) {
+        await this.fetchAdditionalUserData();
+        return resolve(undefined);
+      } else {
+        return resolve(undefined);
       }
     });
   }
@@ -53,14 +51,17 @@ export class AppInitService {
     return spinner;
   }
 
-  private async requestPermissions() {
-    if (this.platform.is('android') || this.platform.is('ios')) {
-      await Geolocation.requestPermissions().then(data => {
-        if (data.location === 'denied') {
-          const error = new Error('Location permission denied');
-          this.store.dispatch(new GlobalActions.ShowToast({ error, color: 'danger' }));
-        }
-      });
-    }
+  private async setupAppStateListener() {
+    App.addListener('appStateChange', async state => {
+      await this.checkForGeolocationPermissionChanges();
+    });
+  }
+
+  private async fetchAdditionalUserData() {
+    await this.store.dispatch(new Contact.Fetch()).toPromise();
+  }
+
+  private async checkForGeolocationPermissionChanges() {
+    this.store.dispatch(new LocalPermission.CheckGeolocation());
   }
 }

@@ -5,7 +5,7 @@ import { Account } from '../../store';
 import { Store } from '@ngxs/store';
 import { ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Path } from '../../helpers/path';
+import { Path } from '../../helper/path';
 
 @Component({
   selector: 'app-reset-password',
@@ -69,6 +69,11 @@ export class ResetPasswordComponent implements OnInit {
 
   dismiss() {
     this.modalController.dismiss();
+    this.store.dispatch(new Account.Redirect({
+      path: Path.login,
+      forward: false,
+      navigateRoot: false
+    }));
   }
 
   sendResetEmail() {
@@ -122,7 +127,9 @@ export class ResetPasswordComponent implements OnInit {
     const currentDate = new Date();
 
     if (recoveryDateOneHourLater.getTime() - currentDate.getTime() < 0) {
-      this.store.dispatch(new Account.ResetPasswordExpired());
+      this.store.dispatch(new Account.VerificationExpired({
+        message: 'Der Link ist abgelaufen. Bitte versuche es erneut.'
+      }));
       return;
     }
   }

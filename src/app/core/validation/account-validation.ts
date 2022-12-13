@@ -85,6 +85,12 @@ export class AccountValidation {
     ],
     acceptTerms: [
       {type: 'required', message: 'Bitte akzeptiere die Datenschutz- und Nutzungsbedingungen.'}
-    ]
+    ],
+    username: [
+      {type: 'required', message: 'Benutzername ist notwendig.'},
+      {type: 'minlength', message: 'Benutzername ist zu kurz.'},
+      {type: 'maxlength', message: 'Benutzername ist zu lang.'},
+      {type: 'pattern', message: 'Benutzername enthält Lücken.'},
+    ],
   };
 }

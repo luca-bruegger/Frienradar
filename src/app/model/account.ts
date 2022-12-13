@@ -4,6 +4,7 @@ export namespace Account {
   export type User = Models.Account<{}> & {
     prefs: UserPrefs;
     pictureBreaker: string;
+    username: string;
   };
 
   export type UserPrefs = {

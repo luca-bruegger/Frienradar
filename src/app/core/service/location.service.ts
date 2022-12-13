@@ -1,9 +1,8 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Geolocation } from '@capacitor/geolocation';
 import { Location, LocationState } from '../../store';
-import { Platform } from '@ionic/angular';
 import { Store } from '@ngxs/store';
-import Geohash from 'latlon-geohash';
+import * as ngeohash from 'ngeohash';
 
 @Injectable({
   providedIn: 'root'
@@ -32,7 +31,7 @@ export class LocationService implements OnDestroy {
   private async watchPosition() {
     await Geolocation.watchPosition(this.geolocationOptions, (position) => {
       if (position) {
-        const geohash = Geohash.encode(position.coords.latitude, position.coords.longitude, 7);
+        const geohash = ngeohash.encode(position.coords.latitude, position.coords.longitude, 7);
         this.store.dispatch(new Location.UpdatePosition(geohash));
       }
     });

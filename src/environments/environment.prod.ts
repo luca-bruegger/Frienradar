@@ -1,6 +1,11 @@
 export const environment = {
   production: true,
-  endpoint: 'https://api.frienradar.com/v1',
-  project: '633467240f7db9ae07d7',
-  mapsKey: 'AIzaSyBI6AT9M_Nz_Y-_Xpql_Q28twKOO0jzu_8'
+  endpoint: 'https://beta.api.frienradar.com/v1',
+  project: '638b8a8bda11a2ebe8fc',
+  mapsKey: 'AIzaSyBI6AT9M_Nz_Y-_Xpql_Q28twKOO0jzu_8',
+  radarDatabaseId: 'radar',
+  geolocationsCollectionId: 'geolocations',
+  contactsCollectionId: 'contacts',
+  appUrl: 'https://app.frienradar.com',
+  googleAnalyticsId: ''
 };

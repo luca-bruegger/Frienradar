@@ -5,11 +5,11 @@ import { FormsModule } from '@angular/forms';
 import { TabsPage } from './tabs.page';
 
 import { TabsPageRoutingModule } from './tabs-routing.module';
-import { NearbyPageModule } from '../pages/nearby/nearby.module';
-import { ChatPageModule } from '../pages/chat/chat.module';
-import { InterestPageModule } from '../pages/interest/interest.module';
-import { ProfilePageModule } from '../pages/profile/profile.module';
-import { RadarPageModule } from '../pages/radar/radar.module';
+import { NearbyPageModule } from '../page/nearby/nearby.module';
+import { ChatPageModule } from '../page/chat/chat.module';
+import { AccountsPageModule } from '../page/accounts/accounts.module';
+import { ProfilePageModule } from '../page/profile/profile.module';
+import { RadarPageModule } from '../page/radar/radar.module';
 
 @NgModule({
   imports: [
@@ -18,7 +18,7 @@ import { RadarPageModule } from '../pages/radar/radar.module';
     IonicModule,
     TabsPageRoutingModule,
     ChatPageModule,
-    InterestPageModule,
+    AccountsPageModule,
     NearbyPageModule,
     ProfilePageModule,
     RadarPageModule

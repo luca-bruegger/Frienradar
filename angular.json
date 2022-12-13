@@ -36,7 +36,7 @@
               "src/global.scss"
             ],
             "scripts": [
-              "./node_modules/latlon-geohash/latlon-geohash.js"
+              "./node_modules/ngeohash/main.js"
             ],
             "aot": false,
             "vendorChunk": true,
