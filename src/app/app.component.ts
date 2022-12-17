@@ -31,8 +31,8 @@ export class AppComponent {
       this.jumpTo();
       this.initializeDeeplinking();
       this.initializeGoogleAnalytics();
-      await locationService.watchGeolocation();
-      await realtimeService.watchRealtime();
+      await locationService.watch();
+      await realtimeService.watch();
     });
   }
 

@@ -6,9 +6,11 @@ import { AccountValidation } from '../../core/validation/account-validation';
 import { Platform } from '@ionic/angular';
 import { LocalPermission, LocalPermissionState } from '../../store/local-permission';
 import * as Filter from 'bad-words';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Account as AccountModel } from '../../model/account';
 import User = AccountModel.User;
+import { Observable, timer } from 'rxjs';
+import { finalize, map, takeUntil, takeWhile } from 'rxjs/operators';
 
 @Component({
   selector: 'app-additional-login-data',
@@ -30,10 +32,11 @@ export class AdditionalLoginDataComponent implements OnInit {
     this.checkForInappropriateWords()
   ]);
 
+  time = 0;
   formMessages = AccountValidation.formMessages;
   isMobile = this.platform.is('android') || this.platform.is('ios');
-
   user: User = {} as User;
+  requestMailButtonDisabled = false;
 
   private verificationData: {
     secret: any;
@@ -42,6 +45,7 @@ export class AdditionalLoginDataComponent implements OnInit {
 
   constructor(private store: Store,
               private platform: Platform,
+              private router: Router,
               private route: ActivatedRoute) {
   }
 
@@ -70,6 +74,7 @@ export class AdditionalLoginDataComponent implements OnInit {
   }
 
   verifyEmail() {
+    this.startRequestMailButtonTimer();
     this.store.dispatch(new Account.VerifyEmail()).toPromise().then(() => {
       this.store.dispatch(new GlobalActions.ShowToast(({
         message: 'Email gesendet',
@@ -95,7 +100,8 @@ export class AdditionalLoginDataComponent implements OnInit {
 
     this.store.dispatch(new Account.UpdateUsername({
       username: this.usernameFormControl.value,
-      userId: this.user.$id
+      userId: this.user.$id,
+      email: this.user.email
     }));
   }
 
@@ -109,6 +115,13 @@ export class AdditionalLoginDataComponent implements OnInit {
 
   async requestGeolocationPermission() {
     this.store.dispatch(new LocalPermission.RequestGeolocation());
+  }
+
+  async clearParams() {
+    await this.router.navigate(
+      ['.'],
+      { relativeTo: this.route, queryParams: null }
+    );
   }
 
   private checkPermissions() {
@@ -127,7 +140,6 @@ export class AdditionalLoginDataComponent implements OnInit {
 
     this.store.dispatch(new LocalPermission.CheckGeolocation());
   }
-
   private readRouteParams() {
     this.route.queryParams.subscribe(params => {
       if (params && params.userId && params.secret && params.expire) {
@@ -137,10 +149,12 @@ export class AdditionalLoginDataComponent implements OnInit {
           secret: params.secret
         };
 
+        this.clearParams();
         this.store.dispatch(new Account.UpdateVerification(this.verificationData));
       }
     });
   }
+
   private checkIfResetIsExpired(expire: string) {
     const recoveryDate = new Date(expire);
     const recoveryDateOneHourLater = new Date(recoveryDate.getTime() + 60 * 60 * 1000);
@@ -152,6 +166,18 @@ export class AdditionalLoginDataComponent implements OnInit {
       }));
       return;
     }
+  }
+
+  private startRequestMailButtonTimer() {
+    this.time = 60;
+    this.requestMailButtonDisabled = true;
+    const interval = setInterval(() => {
+      this.time -= 1;
+      if (this.time === 0) {
+        this.requestMailButtonDisabled = false;
+        clearInterval(interval);
+      }
+    }, 1000);
   }
 }
 

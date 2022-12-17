@@ -73,7 +73,7 @@ export namespace Account {
   export class UpdateUsername {
     static readonly type = '[Auth] Update Username';
 
-    constructor(public payload: { username: string; userId: string }) {
+    constructor(public payload: { username: string; userId: string; email: string }) {
     }
   }
 
@@ -107,9 +107,7 @@ export namespace Account {
 const prefs = {
   description: '',
   distance: 'close',
-  accounts: {
-    instagram: ''
-  }
+  accounts: {}
 };
 
 @State<AccountStateModel>({
@@ -150,6 +148,12 @@ export class AccountState {
   }
 
   @Selector()
+  static isUserIsFullyRegistered(state: AccountStateModel) {
+    const user = state.user;
+    return user.emailVerification && user.username &&user.username.length > 0;
+  }
+
+  @Selector()
   static isAuthenticated(state: AccountStateModel): boolean {
     return !!state.user;
   }
@@ -173,9 +177,10 @@ export class AccountState {
     {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.UpdateUsername
   ) {
-    const {userId, username} = action.payload;
+    const {userId, username, email} = action.payload;
     try {
-      await Appwrite.databasesProvider().updateDocument(environment.radarDatabaseId, environment.usernameCollectionId, userId, {
+      await Appwrite.databasesProvider().createDocument(environment.radarDatabaseId, environment.usernameCollectionId, userId, {
+        email,
         username
       });
       const user = this.store.selectSnapshot(AccountState.user);
@@ -257,7 +262,7 @@ export class AccountState {
       if (!user) {
         user = await Appwrite.accountProvider().get() as AccountModel.User;
         user.username = await this.getUsername(user);
-        if (this.isUserIsFullyRegistered(user)) {
+        if (this.store.selectSnapshot(AccountState.isUserIsFullyRegistered)) {
           dispatch(new Account.Redirect({path: Path.default, forward: true, navigateRoot: true}));
         } else {
           dispatch(new Account.Redirect({path: Path.additionalLoginData, forward: true, navigateRoot: true}));
@@ -466,31 +471,16 @@ export class AccountState {
     }
   }
 
-  private isUserIsFullyRegistered(user) {
-    return user.emailVerification && user.username.length > 0;
-  }
-
   private async getUsername(user: Models.Account<{}> & { prefs: UserPrefs; pictureBreaker: string; username: string }) {
     try {
-      const document = await Appwrite.databasesProvider().getDocument(environment.radarDatabaseId, environment.usernameCollectionId, user.$id);
+      const document = await Appwrite.databasesProvider().getDocument(
+        environment.radarDatabaseId,
+        environment.usernameCollectionId,
+        user.$id
+      );
       return document.username;
     } catch (e) {
-      if (e.code === 404 && e.type === 'document_not_found') {
-        try {
-          await Appwrite.databasesProvider().createDocument(environment.radarDatabaseId, environment.usernameCollectionId, user.$id,{
-            username: '',
-            email: user.email
-          });
-          return '';
-        } catch (createError) {
-          this.store.dispatch(new GlobalActions.HandleError({
-            error: createError
-          }));
-        }
-      }
-      this.store.dispatch(new GlobalActions.HandleError({
-        error: e
-      }));
+      return null;
     }
   }
 }

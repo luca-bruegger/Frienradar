@@ -5,14 +5,25 @@ import { Appwrite } from '../../helper/appwrite';
 import { AccountState } from '../account';
 import { Account as AccountModel } from '../../model/account';
 import { Permission, Query, Role } from 'appwrite';
-import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { GeohashLength } from '../../component/element/radar-display/radar-display.component';
 
+const emptyLocationData: LocationData = {
+  close: '',
+  nearby: '',
+  remote: '',
+  farAway: '',
+  pictureBreaker: '',
+  username: ''
+};
+
 interface LocationData {
-  geohash: string;
-  name: string;
+  close: string;
+  nearby: string;
+  remote: string;
+  farAway: string;
   pictureBreaker: string;
+  username: string;
 }
 
 interface NearbyUserData {
@@ -25,7 +36,7 @@ interface NearbyUserData {
 /* State Model */
 @Injectable()
 export class LocationStateModel {
-  location: LocationData;
+  geolocation: LocationData;
   nearbyUsers: NearbyUserData;
 }
 
@@ -54,7 +65,7 @@ export namespace Location {
 
     constructor(
       public payload: {
-        distance: GeohashLength;
+        geohashLength: GeohashLength;
         geohash: string;
       }
     ) {
@@ -65,11 +76,7 @@ export namespace Location {
 @State<LocationStateModel>({
   name: 'location',
   defaults: {
-    location: {
-      geohash: null,
-      name: null,
-      pictureBreaker: null
-    },
+    geolocation: emptyLocationData,
     nearbyUsers: {
       close: null,
       nearby: null,
@@ -92,7 +99,7 @@ export class LocationState {
 
   @Selector()
   static geohash(state: LocationStateModel) {
-    return state.location.geohash;
+    return state.geolocation.close;
   }
 
   @Selector()
@@ -118,32 +125,16 @@ export class LocationState {
       const location = await Appwrite.databasesProvider().getDocument(
         environment.radarDatabaseId,
         environment.geolocationsCollectionId,
-        `${user.$id}_${GeohashLength.close}`);
+        user.$id);
+
       patchState({
-        location: {
-          geohash: location.geohash,
-          name: user.name,
-          pictureBreaker: user.pictureBreaker
-        }
+        geolocation: location as unknown as LocationData
       });
     } catch (e: any) {
-      try {
-        // Create new document if not exists
-        await Appwrite.databasesProvider().createDocument(
-          environment.radarDatabaseId,
-          environment.geolocationsCollectionId,
-          `${user.$id}_${GeohashLength.close}`,
-          {
-          geohash: '',
-          name: '',
-          pictureBreaker: ''
-        }, [
-          Permission.read(Role.users()),
-          Permission.delete(Role.user(user.$id)),
-          Permission.write(Role.user(user.$id))
-        ]);
-      } catch (e: any) {
-        dispatch(
+      if (e.type === 'document_not_found' && e.code === 404) {
+        await this.initializeEmptyDocumentForUser(user.$id);
+      } else {
+        this.store.dispatch(
           new GlobalActions.ShowToast({
             message: e.message,
             color: 'danger',
@@ -162,6 +153,7 @@ export class LocationState {
     const currentGeohash = this.store.selectSnapshot(LocationState.geohash);
     const user = this.store.selectSnapshot(AccountState.user);
 
+    // Only update if user is logged in
     if (!user) {
       return;
     }
@@ -171,64 +163,16 @@ export class LocationState {
       return;
     }
 
-    const data = {
-      geohash,
-      name: user.name,
-      pictureBreaker: user.pictureBreaker
-    };
+    const data: LocationData = this.locationDataFromGeohash(geohash, user);
 
     if (user && user.$id) {
-      await this.setGeohashesForUser(user.$id, geohash, data, dispatch);
+      // Update location
+      this.updateUserLocation(user.$id, data);
     }
 
-    data.geohash = geohash;
-    patchState({
-      location: data
-    });
-  }
-
-  private async setGeohashesForUser($id: string, geohash: string, data: LocationData, dispatch: (actions: any) => Observable<void>) {
-    const geohashLengths = [
-      GeohashLength.close,
-      GeohashLength.nearby,
-      GeohashLength.remote,
-      GeohashLength.farAway
-    ];
-
-    for (const length of geohashLengths) {
-      data.geohash = geohash.substring(0, length);
-      try {
-        await Appwrite.databasesProvider().updateDocument(environment.radarDatabaseId, environment.geolocationsCollectionId, `${$id}_${length}`, data, [
-          Permission.read(Role.users()),
-          Permission.delete(Role.user($id)),
-          Permission.write(Role.user($id))
-        ]);
-      } catch (e: any) {
-        if (e.code === 404) {
-          try {
-            await Appwrite.databasesProvider().createDocument(environment.radarDatabaseId, environment.geolocationsCollectionId, `${$id}_${length}`, data, [
-              Permission.read(Role.users()),
-              Permission.delete(Role.user($id)),
-              Permission.write(Role.user($id))
-            ]);
-          } catch (e: any) {
-            dispatch(
-              new GlobalActions.ShowToast({
-                message: e.message,
-                color: 'danger',
-              })
-            );
-          }
-        } else {
-          dispatch(
-            new GlobalActions.ShowToast({
-              message: e.message,
-              color: 'danger',
-            })
-          );
-        }
-      }
-    }
+    // patchState({
+    //   location: data
+    // });
   }
 
   @Action(Location.FetchNearbyUser)
@@ -236,14 +180,14 @@ export class LocationState {
     {patchState, dispatch}: StateContext<LocationStateModel>,
     action: Location.FetchNearbyUser
   ) {
-    const {distance, geohash} = action.payload;
+    const {geohashLength, geohash} = action.payload;
 
     // return if distance nor geohash is set
-    if (!distance || !geohash) {
+    if (!geohashLength || !geohash) {
       return;
     }
 
-    const distanceStr = GeohashLength[distance];
+    const distanceStr = GeohashLength[geohashLength];
     const userId = this.store.selectSnapshot(AccountState.user).$id;
     const eightHoursAgo = this.store.selectSnapshot(LocationState.eightHoursAgo);
     const recentGeohash = this.store.selectSnapshot(LocationState.geohash);
@@ -262,7 +206,7 @@ export class LocationState {
     try {
       const users = [];
       await Appwrite.databasesProvider().listDocuments(environment.radarDatabaseId, environment.geolocationsCollectionId, [
-        Query.equal('geohash', [geohash.substring(0, distance)]),
+        Query.equal(distanceStr, [geohash.substring(0, geohashLength)]),
         Query.greaterThan('$updatedAt', eightHoursAgo),
       ]).then(response => {
         response.documents.filter((document: any) => {
@@ -284,6 +228,57 @@ export class LocationState {
       });
     } catch (e: any) {
       dispatch(
+        new GlobalActions.ShowToast({
+          message: e.message,
+          color: 'danger',
+        })
+      );
+    }
+  }
+
+  private updateUserLocation(userId: string, data: LocationData) {
+    try {
+      Appwrite.databasesProvider().updateDocument(
+        environment.radarDatabaseId,
+        environment.geolocationsCollectionId,
+        userId,
+        data
+      );
+    } catch (e: any) {
+      this.store.dispatch(
+        new GlobalActions.ShowToast({
+          message: e.message,
+          color: 'danger',
+        })
+      );
+    }
+  }
+
+  private locationDataFromGeohash(geohash: string, user: AccountModel.User): LocationData {
+    return {
+      close: geohash.substring(0, GeohashLength.close),
+      nearby: geohash.substring(0, GeohashLength.nearby),
+      remote: geohash.substring(0, GeohashLength.remote),
+      farAway: geohash.substring(0, GeohashLength.farAway),
+      username: user.username,
+      pictureBreaker: user.pictureBreaker
+    };
+  }
+
+  private async initializeEmptyDocumentForUser(userId: string) {
+    try {
+      await Appwrite.databasesProvider().createDocument(
+        environment.radarDatabaseId,
+        environment.geolocationsCollectionId,
+        userId,
+        emptyLocationData,
+        [
+          Permission.read(Role.users()),
+          Permission.delete(Role.user(userId)),
+          Permission.write(Role.user(userId))
+        ]);
+    } catch (e: any) {
+      this.store.dispatch(
         new GlobalActions.ShowToast({
           message: e.message,
           color: 'danger',

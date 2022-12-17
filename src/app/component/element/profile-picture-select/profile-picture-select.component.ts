@@ -19,7 +19,7 @@ export class ProfilePictureSelectComponent implements OnChanges {
   private platform: string = Capacitor.getPlatform();
   @Input() displayOnly = false;
 
-  @Input() profilePicture = 'assets/images/blank.png';
+  @Input() profilePicture = null;
   @Output() profilePictureChange = new EventEmitter<string>();
 
   @ViewChild('profilePictureInput') profilePictureInput: ElementRef;
@@ -32,8 +32,15 @@ export class ProfilePictureSelectComponent implements OnChanges {
     const user = this.store.selectSnapshot(AccountState.user);
 
     if (changes.profilePicture.isFirstChange()) {
-      this.profilePicture = Picture.profilePictureViewURL(user.$id, user.pictureBreaker);
-      return;
+      if (user) {
+        this.profilePicture = Picture.profilePictureViewURL(user.$id, user.pictureBreaker);
+        return;
+      }
+
+      if (this.profilePicture === null || this.profilePicture === undefined || this.profilePicture === '') {
+        this.profilePicture = 'assets/images/blank.png';
+        return;
+      }
     }
 
     if(/^(data)/.test(changes.profilePicture.currentValue)) {
