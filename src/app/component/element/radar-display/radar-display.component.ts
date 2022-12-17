@@ -61,9 +61,11 @@ export class RadarDisplayComponent implements OnInit, OnChanges {
   }
 
   private updateLocationBox(geohash) {
-    const {lat, lng, boundaries} = MapsHelper.getLocationData(this.mapGeohashDistance, geohash);
-    this.center = {lat, lng};
-    this.bounds = MapsHelper.getBounds(boundaries);
+    if (geohash) {
+      const {lat, lng, boundaries} = MapsHelper.getLocationData(this.mapGeohashDistance, geohash);
+      this.center = {lat, lng};
+      this.bounds = MapsHelper.getBounds(boundaries);
+    }
   }
 
   setupZoomListener($event: any) {

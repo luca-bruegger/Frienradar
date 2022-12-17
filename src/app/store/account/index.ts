@@ -5,7 +5,6 @@ import { Appwrite } from 'src/app/helper/appwrite';
 import { GlobalActions } from '../global';
 import { Path } from '../../helper/path';
 import { Account as AccountModel } from '../../model/account';
-import { Observable } from 'rxjs';
 import { Picture } from '../../helper/picture';
 import { NavController } from '@ionic/angular';
 import { Router } from '@angular/router';
@@ -104,12 +103,6 @@ export namespace Account {
   }
 }
 
-const prefs = {
-  description: '',
-  distance: 'close',
-  accounts: {}
-};
-
 @State<AccountStateModel>({
   name: 'auth',
   defaults: {
@@ -178,18 +171,21 @@ export class AccountState {
     action: Account.UpdateUsername
   ) {
     const {userId, username, email} = action.payload;
-    try {
-      await Appwrite.databasesProvider().createDocument(environment.radarDatabaseId, environment.usernameCollectionId, userId, {
-        email,
-        username
-      });
-      const user = this.store.selectSnapshot(AccountState.user);
-      const updatedUser = {...user};
-      updatedUser.username = username;
+    const user = this.store.selectSnapshot(AccountState.user);
 
-      patchState({
-        user: updatedUser
-      });
+    try {
+      if (user.username !== username) {
+        await Appwrite.databasesProvider().createDocument(environment.radarDatabaseId, environment.usernameCollectionId, userId, {
+          email,
+          username
+        });
+        const updatedUser = {...user};
+        updatedUser.username = username;
+
+        patchState({
+          user: updatedUser
+        });
+      }
 
       this.store.dispatch(new Account.Redirect({
         path: Path.default,
@@ -227,7 +223,11 @@ export class AccountState {
         name
       ) as AccountModel.User;
       const session = await Appwrite.accountProvider().createEmailSession(email, password);
-      await Appwrite.accountProvider().updatePrefs(prefs);
+      await Appwrite.accountProvider().updatePrefs({
+        description: '',
+        distance: 'close',
+        accounts: {}
+      });
       user.pictureBreaker = await this.updateProfilePicture(profilePicture, user.$id);
 
       dispatch(new Account.Redirect({path: Path.additionalLoginData, forward: true, navigateRoot: true}));
@@ -262,22 +262,24 @@ export class AccountState {
       if (!user) {
         user = await Appwrite.accountProvider().get() as AccountModel.User;
         user.username = await this.getUsername(user);
-        if (this.store.selectSnapshot(AccountState.isUserIsFullyRegistered)) {
-          dispatch(new Account.Redirect({path: Path.default, forward: true, navigateRoot: true}));
-        } else {
-          dispatch(new Account.Redirect({path: Path.additionalLoginData, forward: true, navigateRoot: true}));
+
+        // Set cacheBreaker to force image reload if not set
+        if (!user.pictureBreaker) {
+          user.pictureBreaker = Picture.cacheBreaker();
         }
+
+        patchState({
+          user
+        });
       }
 
-      // Set cacheBreaker to force image reload if not set
-      if (!user.pictureBreaker) {
-        user.pictureBreaker = Picture.cacheBreaker();
+      if (this.store.selectSnapshot(AccountState.isUserIsFullyRegistered)) {
+        dispatch(new Account.Redirect({path: Path.default, forward: true, navigateRoot: true}));
+      } else {
+        dispatch(new Account.Redirect({path: Path.additionalLoginData, forward: true, navigateRoot: true}));
       }
 
       await dispatch(new Location.FetchLastLocation({user}));
-      patchState({
-        user
-      });
     } catch (e: any) {
       // Ignore if route is reset password
       const isResetPassword = new RegExp('^(\\/reset-password\\?)').test(this.router.url);
@@ -299,7 +301,7 @@ export class AccountState {
     let updatedUser = {} as AccountModel.User;
 
     if (!!name) {
-      updatedUser = await this.updateName(name, dispatch);
+      updatedUser = await this.updateName(name);
       user = {...user, ...updatedUser} as AccountModel.User;
     }
 
@@ -381,9 +383,9 @@ export class AccountState {
     const {userId, secret} = action.payload;
     try {
       await Appwrite.accountProvider().updateVerification(userId, secret);
+      const verifiedUser = await Appwrite.accountProvider().get() as AccountModel.User;
       const user = this.store.selectSnapshot(AccountState.user);
-      const updatedUser = {...user};
-      updatedUser.emailVerification = true;
+      const updatedUser = Object.assign({...user}, {...verifiedUser});
 
       patchState({
         user: updatedUser
@@ -407,15 +409,15 @@ export class AccountState {
       return;
     }
 
-    this.ngZone.run(() => {
+    this.ngZone.run(async () => {
       if (navigateRoot) {
-        this.navController.navigateRoot([path]);
+        await this.navController.navigateRoot([path]);
       }
 
       if (forward) {
-        this.navController.navigateForward([path]);
+        await this.navController.navigateForward([path]);
       } else {
-        this.navController.navigateBack([path]);
+        await this.navController.navigateBack([path]);
       }
     });
   }
@@ -439,10 +441,9 @@ export class AccountState {
     }
   }
 
-  private async updateName(name: string, dispatch: (actions: any) => Observable<void>) {
+  private async updateName(name: string) {
     try {
-      const user = await Appwrite.accountProvider().updateName(name) as AccountModel.User;
-      return user;
+      return await Appwrite.accountProvider().updateName(name) as AccountModel.User;
     } catch (e: any) {
       this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
     }
