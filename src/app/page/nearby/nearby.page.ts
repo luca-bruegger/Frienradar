@@ -38,7 +38,6 @@ export class NearbyPage implements OnInit {
       geohash: this.geohash}
     )).toPromise().then(data => {
       const users = data.location.nearbyUsers[distance];
-
       if (users) {
         this.nearbyUsersMap.clear();
         users.forEach((user) => {

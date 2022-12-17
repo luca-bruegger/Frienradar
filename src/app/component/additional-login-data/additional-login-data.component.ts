@@ -9,8 +9,6 @@ import * as Filter from 'bad-words';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Account as AccountModel } from '../../model/account';
 import User = AccountModel.User;
-import { Observable, timer } from 'rxjs';
-import { finalize, map, takeUntil, takeWhile } from 'rxjs/operators';
 
 @Component({
   selector: 'app-additional-login-data',
@@ -24,7 +22,10 @@ export class AdditionalLoginDataComponent implements OnInit {
   notificationPermission = this.store.selectSnapshot(LocalPermissionState.notification);
   usernameSet = this.store.selectSnapshot(AccountState.username);
 
-  usernameFormControl = new FormControl('', [
+  usernameFormControl = new FormControl({
+    value: '',
+    disabled: this.usernameInputDisabled
+  }, [
     Validators.required,
     Validators.maxLength(30),
     Validators.minLength(4),
@@ -68,7 +69,6 @@ export class AdditionalLoginDataComponent implements OnInit {
   checkForInappropriateWords(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       const isProfane = this.filter.isProfane(control.value);
-      console.warn('isProfane', isProfane);
       return isProfane ? {profaneLanguage: true} : null;
     };
   }
@@ -120,8 +120,12 @@ export class AdditionalLoginDataComponent implements OnInit {
   async clearParams() {
     await this.router.navigate(
       ['.'],
-      { relativeTo: this.route, queryParams: null }
+      {relativeTo: this.route, queryParams: null}
     );
+  }
+
+  get usernameInputDisabled() {
+    return this.user.username === this.usernameFormControl.value && this.user.username !== null && this.user.username !== '' && this.user.username !== undefined;
   }
 
   private checkPermissions() {
@@ -140,8 +144,9 @@ export class AdditionalLoginDataComponent implements OnInit {
 
     this.store.dispatch(new LocalPermission.CheckGeolocation());
   }
+
   private readRouteParams() {
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.subscribe(async params => {
       if (params && params.userId && params.secret && params.expire) {
         this.checkIfResetIsExpired(params.expire);
         this.verificationData = {
@@ -149,8 +154,8 @@ export class AdditionalLoginDataComponent implements OnInit {
           secret: params.secret
         };
 
-        this.clearParams();
-        this.store.dispatch(new Account.UpdateVerification(this.verificationData));
+        await this.clearParams();
+        await this.store.dispatch(new Account.UpdateVerification(this.verificationData));
       }
     });
   }

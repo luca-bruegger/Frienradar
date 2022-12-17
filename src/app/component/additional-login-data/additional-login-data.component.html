@@ -82,9 +82,7 @@
                   <span>Der Benutzername wird für die Anzeige in der App verwendet. Dieser ist für dich, aber auch andere sichtbar.</span>
                 </ion-note>
                 <ion-item color="light" class="ion-margin-top" counter="true">
-                  <ion-input [formControl]="usernameFormControl" maxlength="30"
-                             required="true"
-                             autocorrect="true" placeholder="Benutzername"></ion-input>
+                  <ion-input [formControl]="usernameFormControl" maxlength="30" type="text" placeholder="Benutzername"></ion-input>
                 </ion-item>
                 <div>
                   <ng-container *ngFor="let validation of formMessages.username">

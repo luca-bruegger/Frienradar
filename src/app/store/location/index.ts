@@ -209,19 +209,13 @@ export class LocationState {
         Query.equal(distanceStr, [geohash.substring(0, geohashLength)]),
         Query.greaterThan('$updatedAt', eightHoursAgo),
       ]).then(response => {
-        response.documents.filter((document: any) => {
-          const documentId = document.$id.substring(0, document.$id.indexOf('_'));
-          return documentId !== userId;
-        }).forEach((document: any) => {
-          const user = {...document};
-          // remove distance suffix from id
-          user.$id = user.$id.substring(0, user.$id.indexOf('_'));
-          users.push(user);
+        response.documents.filter((document: any) => document.$id !== userId).forEach((document: any) => {
+          users.push(document);
         });
 
         const data = {...nearbyUsers};
         data[distanceStr] = users;
-
+        console.log('data', data);
         patchState({
           nearbyUsers: data
         });
