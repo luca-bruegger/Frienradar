@@ -15,7 +15,7 @@ export class RealtimeService {
     return Appwrite.providerSingleton;
   }
 
-  async watchRealtime() {
+  async watch() {
     this.store.select(AccountState.user).subscribe(user => {
       if (user && !this.alive) {
         this.getContacts(user.$id);

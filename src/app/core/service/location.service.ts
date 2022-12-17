@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Geolocation } from '@capacitor/geolocation';
-import { Location, LocationState } from '../../store';
+import { AccountState, Location } from '../../store';
 import { Store } from '@ngxs/store';
 import * as ngeohash from 'ngeohash';
 
@@ -13,34 +13,23 @@ export class LocationService implements OnDestroy {
     maximumAge: 10000,
     timeout: 10000
   };
-  private locationDelayedJobId: number;
+  private callbackId: string;
 
 
   constructor(private store: Store) {}
 
-  ngOnDestroy() {
-    clearInterval(this.locationDelayedJobId);
+  async ngOnDestroy() {
+    await Geolocation.clearWatch({
+      id: this.callbackId
+    });
   }
 
-  async watchGeolocation() {
-
-
-    await this.watchPosition();
-  }
-
-  private async watchPosition() {
-    await Geolocation.watchPosition(this.geolocationOptions, (position) => {
-      if (position) {
+  async watch() {
+    this.callbackId = await Geolocation.watchPosition(this.geolocationOptions, (position) => {
+      if (position && this.store.selectSnapshot(AccountState.isUserIsFullyRegistered)) {
         const geohash = ngeohash.encode(position.coords.latitude, position.coords.longitude, 7);
         this.store.dispatch(new Location.UpdatePosition(geohash));
       }
     });
   }
-
-  randomPosition(value) {
-    let geohash = this.store.selectSnapshot(LocationState.geohash);
-    geohash = geohash.slice(0, -1) + value;
-    this.store.dispatch(new Location.UpdatePosition(geohash));
-  }
-
 }

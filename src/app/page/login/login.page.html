@@ -19,7 +19,7 @@
               <div [formGroup]="formGroup" class="ion-margin-bottom ion-padding-horizontal">
                 <div *ngIf="isRegister">
                   <app-profile-picture-select
-                    (profilePictureChange)="formGroup.get('profilePicture').setValue($event)">
+                    [profilePicture]="profilePicture" (profilePictureChange)="setProfilePicture($event)">
                   </app-profile-picture-select>
                   <ng-container *ngFor="let validation of formMessages.profilePicture">
                     <div class="error-message" style="text-align: center; padding-left: 0"

@@ -12,10 +12,14 @@ export class NearbyPage implements OnInit {
   nearbyUsersMap = new Map();
   nearbyUsers = null;
 
-  private distance: number;
+  private geohashLength: number;
   private geohash: string;
 
   constructor(private store: Store) {}
+
+  get nearbyUsersAmount() {
+    return this.nearbyUsersMap.size;
+  }
 
   ngOnInit() {
     this.checkForStorageChanges();
@@ -23,17 +27,16 @@ export class NearbyPage implements OnInit {
     this.checkForLocationChanges();
   }
 
-  get nearbyUsersAmount() {
-    return this.nearbyUsersMap.size;
-  }
-
   identifyNearbyUser(index, nearbyUser){
     return nearbyUser.$id;
   }
 
   distanceChanged(distance: string) {
-    this.distance = Number(GeohashLength[distance]);
-    this.store.dispatch(new Location.FetchNearbyUser({distance: this.distance, geohash: this.geohash})).toPromise().then(data => {
+    this.geohashLength = Number(GeohashLength[distance]);
+    this.store.dispatch(new Location.FetchNearbyUser({
+      geohashLength: this.geohashLength,
+      geohash: this.geohash}
+    )).toPromise().then(data => {
       const users = data.location.nearbyUsers[distance];
 
       if (users) {
@@ -48,7 +51,7 @@ export class NearbyPage implements OnInit {
 
   private checkForStorageChanges() {
     this.store.select(LocationState.nearbyUsers).subscribe(state => {
-      const distanceString = GeohashLength[this.distance];
+      const distanceString = GeohashLength[this.geohashLength];
 
       // Ignore first state change
       if (!state[distanceString]) {
@@ -67,7 +70,10 @@ export class NearbyPage implements OnInit {
   private checkForLocationChanges() {
     this.store.select(LocationState.geohash).subscribe((geohash) => {
       this.geohash = geohash;
-      this.store.dispatch(new Location.FetchNearbyUser({distance: this.distance, geohash}));
+      this.store.dispatch(new Location.FetchNearbyUser({
+        geohashLength: this.geohashLength,
+        geohash
+      }));
     });
   }
 

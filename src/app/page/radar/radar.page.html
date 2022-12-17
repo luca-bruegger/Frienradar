@@ -12,9 +12,6 @@
       </ion-toolbar>
     </ion-header>
     <app-distance-change></app-distance-change>
-<!--
-    <ion-range [ticks]="true" [snaps]="true" [min]="0" [max]="9" style="max-height: 30px" (ionChange)="updateLocation($event)"></ion-range>
--->
     <div class="ion-padding radar-wrapper" style="flex: 1">
       <app-radar-display [geohash]="geohash" [currentDistance]="currentDistance"></app-radar-display>
     </div>

@@ -60,8 +60,9 @@
                   <ion-icon *ngIf="user.emailVerification" slot="start" name="checkbox-outline" color="success"></ion-icon>
                   <ion-icon *ngIf="!user.emailVerification" slot="start" name="close-circle-outline" color="danger"></ion-icon>
                   <ion-label>Bestätigt</ion-label>
-                  <ion-button *ngIf="!user.emailVerification" slot="end" (click)="verifyEmail()">
-                    <ion-label>Anfordern</ion-label>
+                  <ion-button *ngIf="!user.emailVerification" [disabled]="requestMailButtonDisabled" slot="end" (click)="verifyEmail()">
+                    <ion-label *ngIf="!requestMailButtonDisabled">Anfordern</ion-label>
+                    <ion-label *ngIf="requestMailButtonDisabled">Warte {{time}}s</ion-label>
                   </ion-button>
                 </ion-item>
               </ion-card-content>

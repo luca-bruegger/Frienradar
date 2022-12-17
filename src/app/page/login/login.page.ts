@@ -19,6 +19,7 @@ export class LoginPage {
   strength = 0;
 
   loginInProgress = false;
+  profilePicture = null;
 
   constructor(private store: Store,
               private modalController: ModalController) {
@@ -38,7 +39,7 @@ export class LoginPage {
     this.isRegister = isRegister;
   }
 
-  signInUser() {
+  async signInUser() {
     if (this.formGroup.invalid) {
       this.formGroup.markAllAsTouched();
       return;
@@ -47,14 +48,12 @@ export class LoginPage {
     this.loginInProgress = true;
 
     if (this.isRegister) {
-      this.store.dispatch(new Account.Signup(this.formGroup.value)).subscribe(data => {
-        this.loginInProgress = false;
-      });
+      await this.store.dispatch(new Account.Signup(this.formGroup.value)).toPromise();
     } else {
-      this.store.dispatch(new Account.Login(this.formGroup.value)).subscribe(data => {
-        this.loginInProgress = false;
-      });
+      await this.store.dispatch(new Account.Login(this.formGroup.value)).toPromise();
     }
+
+    this.loginInProgress = false;
   }
 
   async resetPassword() {
@@ -63,5 +62,10 @@ export class LoginPage {
     });
 
     await modal.present();
+  }
+
+  setProfilePicture(profilePicture: string) {
+    this.profilePicture = profilePicture;
+    this.formGroup.get('profilePicture').setValue(profilePicture);
   }
 }
