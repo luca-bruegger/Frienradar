@@ -125,6 +125,10 @@ export class AdditionalLoginDataComponent implements OnInit {
   }
 
   get usernameInputDisabled() {
+    if (this.user === undefined) {
+      return true;
+    }
+
     return this.user.username === this.usernameFormControl.value && this.user.username !== null && this.user.username !== '' && this.user.username !== undefined;
   }
 
