@@ -11,11 +11,15 @@ import { GeohashLength } from '../../component/element/radar-display/radar-displ
 export class NearbyPage implements OnInit {
   nearbyUsersMap = new Map();
   nearbyUsers = null;
+  percent = 0;
+  reloadTime: number;
+  isReloading = false;
 
   private geohashLength: number;
   private geohash: string;
 
-  constructor(private store: Store) {}
+  constructor(private store: Store) {
+  }
 
   get nearbyUsersAmount() {
     return this.nearbyUsersMap.size;
@@ -27,15 +31,16 @@ export class NearbyPage implements OnInit {
     this.checkForLocationChanges();
   }
 
-  identifyNearbyUser(index, nearbyUser){
+  identifyNearbyUser(index, nearbyUser) {
     return nearbyUser.$id;
   }
 
   distanceChanged(distance: string) {
     this.geohashLength = Number(GeohashLength[distance]);
     this.store.dispatch(new Location.FetchNearbyUser({
-      geohashLength: this.geohashLength,
-      geohash: this.geohash}
+        geohashLength: this.geohashLength,
+        geohash: this.geohash
+      }
     )).toPromise().then(data => {
       const users = data.location.nearbyUsers[distance];
       if (users) {
@@ -46,6 +51,28 @@ export class NearbyPage implements OnInit {
         });
       }
     });
+  }
+
+  handleRefresh($event: any) {
+
+  }
+
+  reloadNearbyUsers() {
+    this.isReloading = true;
+    this.reloadTime = 25;
+    this.percent = 0;
+    const interval = setInterval(() => {
+      this.reloadTime -= 1;
+      this.percent += 4;
+      if (this.reloadTime === 0) {
+        this.isReloading = false;
+        clearInterval(interval);
+      }
+    }, 1000);
+  }
+
+  formatTitle() {
+    return this.percent + '%';
   }
 
   private checkForStorageChanges() {

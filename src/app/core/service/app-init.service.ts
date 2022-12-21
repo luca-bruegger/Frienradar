@@ -53,7 +53,7 @@ export class AppInitService {
 
   private async setupAppStateListener() {
     App.addListener('appStateChange', async state => {
-      await this.checkForGeolocationPermissionChanges();
+      await this.checkPermissionChanges();
     });
   }
 
@@ -61,7 +61,9 @@ export class AppInitService {
     await this.store.dispatch(new Contact.Fetch()).toPromise();
   }
 
-  private async checkForGeolocationPermissionChanges() {
+  private async checkPermissionChanges() {
     this.store.dispatch(new LocalPermission.CheckGeolocation());
+    this.store.dispatch(new LocalPermission.CheckPhoto());
+    this.store.dispatch(new LocalPermission.CheckNotification());
   }
 }

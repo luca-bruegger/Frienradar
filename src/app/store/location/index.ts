@@ -88,12 +88,6 @@ export namespace Location {
 
 @Injectable()
 export class LocationState {
-  geolocationOptions = {
-    enableHighAccuracy: false,
-    maximumAge: 10000,
-    timeout: 10000
-  };
-
   constructor(private store: Store) {
   }
 
@@ -165,14 +159,13 @@ export class LocationState {
 
     const data: LocationData = this.locationDataFromGeohash(geohash, user);
 
+    // Update location
     if (user && user.$id) {
-      // Update location
-      this.updateUserLocation(user.$id, data);
+      await this.updateUserLocation(user.$id, data);
+      patchState({
+        geolocation: data
+      });
     }
-
-    // patchState({
-    //   location: data
-    // });
   }
 
   @Action(Location.FetchNearbyUser)
@@ -230,9 +223,9 @@ export class LocationState {
     }
   }
 
-  private updateUserLocation(userId: string, data: LocationData) {
+  private async updateUserLocation(userId: string, data: LocationData) {
     try {
-      Appwrite.databasesProvider().updateDocument(
+      return await Appwrite.databasesProvider().updateDocument(
         environment.radarDatabaseId,
         environment.geolocationsCollectionId,
         userId,
