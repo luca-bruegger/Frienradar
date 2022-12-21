@@ -34,6 +34,14 @@
                     <ion-label>Anfordern</ion-label>
                   </ion-button>
                 </ion-item>
+                <ion-item color="light" *ngIf="isMobile">
+                  <ion-icon *ngIf="photosPermission" slot="start" name="checkbox-outline" color="success"></ion-icon>
+                  <ion-icon *ngIf="!photosPermission" slot="start" name="close-circle-outline" color="danger"></ion-icon>
+                  <ion-label>Fotozugriff</ion-label>
+                  <ion-button *ngIf="!photosPermission" slot="end" (click)="requestPhotoPermission()">
+                    <ion-label>Anfordern</ion-label>
+                  </ion-button>
+                </ion-item>
                 <ion-item color="light" lines="none">
                   <!--                    <ion-icon slot="start" name="checkbox-outline" color="success"></ion-icon>-->
                   <ion-icon slot="start" name="close-circle-outline" color="danger"></ion-icon>
@@ -81,6 +89,7 @@
                 <ion-note>
                   <span>Der Benutzername wird für die Anzeige in der App verwendet. Dieser ist für dich, aber auch andere sichtbar.</span>
                 </ion-note>
+                {{usernameFormControl.disabled}}
                 <ion-item color="light" class="ion-margin-top" counter="true">
                   <ion-input [formControl]="usernameFormControl" maxlength="30" type="text" placeholder="Benutzername"></ion-input>
                 </ion-item>

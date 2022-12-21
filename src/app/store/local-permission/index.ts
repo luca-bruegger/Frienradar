@@ -4,12 +4,14 @@ import { Geolocation } from '@capacitor/geolocation';
 import { Platform } from '@ionic/angular';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { GlobalActions } from '../global';
+import { ImagePicker } from '@ionic-native/image-picker/ngx';
 
 /* State Model */
 @Injectable()
 export class LocalPermissionStateModel {
   geolocation: boolean;
   notification: boolean;
+  photo: boolean;
 }
 
 export namespace LocalPermission {
@@ -29,26 +31,44 @@ export namespace LocalPermission {
   export class CheckNotification {
     static readonly type = '[localPermission] Check Notification';
   }
+
+  export class RequestPhoto {
+    static readonly type = '[localPermission] Request Photo';
+  }
+
+  export class CheckPhoto {
+    static readonly type = '[localPermission] Check Photo';
+  }
 }
 
 @State<LocalPermissionStateModel>({
   name: 'localPermission',
   defaults: {
     geolocation: false,
-    notification: false
+    notification: false,
+    photo: false
   }
 })
 
 @Injectable()
 export class LocalPermissionState {
-
   constructor(private store: Store,
-              private platform: Platform) {
+              private platform: Platform,
+              private imagePicker: ImagePicker) {
+    if (this.isMobile()) {
+      this.imagePicker.hasReadPermission().then((data) => {
+      });
+    }
   }
 
   @Selector()
   static geolocation(state: LocalPermissionStateModel) {
     return state.geolocation;
+  }
+
+  @Selector()
+  static photo(state: LocalPermissionStateModel) {
+    return state.photo;
   }
 
   @Selector()
@@ -122,6 +142,41 @@ export class LocalPermissionState {
       PushNotifications.checkPermissions().then((data) => {
         patchState({
           notification: data.receive === 'granted'
+        });
+      });
+    }
+  }
+
+  @Action(LocalPermission.RequestPhoto)
+  async requestPhoto(
+    {patchState, dispatch}: StateContext<LocalPermissionStateModel>,
+    action: LocalPermission.RequestPhoto
+  ) {
+    if (this.isMobile()) {
+      this.imagePicker.requestReadPermission().then(() => {
+        this.imagePicker.hasReadPermission().then((data) => {
+          patchState({
+            photo: data
+          });
+        });
+      }, () => {
+        this.store.dispatch(new GlobalActions.ShowToast({
+          message: 'Bilder müssen in den Einstellungen aktiviert werden.',
+          color: 'danger'
+        }));
+      });
+    }
+  }
+
+  @Action(LocalPermission.CheckPhoto)
+  async checkPhoto(
+    {patchState, dispatch}: StateContext<LocalPermissionStateModel>,
+    action: LocalPermission.CheckPhoto
+  ) {
+    if (this.isMobile()) {
+      this.imagePicker.hasReadPermission().then((data) => {
+        patchState({
+          photo: data
         });
       });
     }

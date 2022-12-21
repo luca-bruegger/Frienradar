@@ -13,24 +13,43 @@
 
   <app-distance-change (distanceChange)="distanceChanged($event)"></app-distance-change>
 
-  <div *ngIf="nearbyUsersAmount === 0 && !nearbyUsers" style="position:absolute; top: 50%; left: 50%; display: flex; flex-direction: row; text-align: center; align-items: center; transform: translate(-50%, -50%); gap: 10px">
+  <div *ngIf="nearbyUsersAmount === 0 && !nearbyUsers"
+       style="position:absolute; top: 50%; left: 50%; display: flex; flex-direction: row; text-align: center; align-items: center; transform: translate(-50%, -50%); gap: 10px">
     <ion-spinner name="crescent" style="vertical-align: center"></ion-spinner>
     <ion-label>Personen in der Nähe werden gesucht...</ion-label>
   </div>
 
   <div *ngIf="nearbyUsersAmount === 0 && nearbyUsers"
        style="position:absolute; top: 50%; left: 50%; display: flex; flex-direction: column; text-align: center; align-items: center; transform: translate(-50%, -50%);">
-    <ion-label>Keine Personen in der Nähe gefunden.<br> Bitte bewege dich an einen anderen Ort oder erhöhe die Distanz.</ion-label>
+    <ion-label>Keine Personen in der Nähe gefunden.<br> Bitte bewege dich an einen anderen Ort oder erhöhe die Distanz.
+    </ion-label>
   </div>
 
   <div *ngIf="nearbyUsersAmount > 0" class="ion-padding-horizontal ion-padding-top">
     <ion-grid class="ion-no-padding">
-        <ion-row style="gap: 10px">
-          <ion-col size="12" size-lg="6" size-xl="4" *ngFor="let user of nearbyUsers; trackBy:identifyNearbyUser">
-            <app-nearby-user-element [user]="user"></app-nearby-user-element>
-          </ion-col>
-        </ion-row>
+      <ion-row style="gap: 10px">
+        <ion-col size="12" size-lg="6" size-xl="4" *ngFor="let user of nearbyUsers; trackBy:identifyNearbyUser">
+          <app-nearby-user-element [user]="user"></app-nearby-user-element>
+        </ion-col>
+      </ion-row>
     </ion-grid>
   </div>
+  <ion-fab *ngIf="nearbyUsersAmount > 0" slot="fixed" vertical="bottom" horizontal="center">
+    <ion-fab-button [disabled]="isReloading" (click)="reloadNearbyUsers()">
+      <ion-icon *ngIf="!isReloading" name="reload"></ion-icon>
+      <circle-progress *ngIf="isReloading" style="padding-top: 3px;"
+                       [percent]="percent"
+                       [radius]="15"
+                       [outerStrokeWidth]="4"
+                       [outerStrokeColor]="'#ffffff'"
+                       [clockwise]="true"
+                       [animation]="false"
+                       [showInnerStroke]="false"
+                       [showSubtitle]="false"
+                       [showUnits]="false"
+                       [title]="reloadTime + 's'"
+      ></circle-progress>
+    </ion-fab-button>
+  </ion-fab>
 
 </ion-content>

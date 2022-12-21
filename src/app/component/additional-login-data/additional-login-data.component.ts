@@ -19,12 +19,13 @@ export class AdditionalLoginDataComponent implements OnInit {
   filter = new Filter();
 
   geolocationPermission = this.store.selectSnapshot(LocalPermissionState.geolocation);
+  photosPermission = this.store.selectSnapshot(LocalPermissionState.photo);
   notificationPermission = this.store.selectSnapshot(LocalPermissionState.notification);
   usernameSet = this.store.selectSnapshot(AccountState.username);
 
   usernameFormControl = new FormControl({
     value: '',
-    disabled: this.usernameInputDisabled
+    disabled: true
   }, [
     Validators.required,
     Validators.maxLength(30),
@@ -55,7 +56,13 @@ export class AdditionalLoginDataComponent implements OnInit {
       if (user) {
         this.user = user;
         this.usernameFormControl.patchValue(user.username);
+        if (user.username && user.username !== '') {
+          this.usernameFormControl.disable();
+          return;
+        }
       }
+
+      this.usernameFormControl.enable();
     });
 
     this.readRouteParams();
@@ -117,6 +124,10 @@ export class AdditionalLoginDataComponent implements OnInit {
     this.store.dispatch(new LocalPermission.RequestGeolocation());
   }
 
+  async requestPhotoPermission() {
+    this.store.dispatch(new LocalPermission.RequestPhoto());
+  }
+
   async clearParams() {
     await this.router.navigate(
       ['.'],
@@ -124,16 +135,9 @@ export class AdditionalLoginDataComponent implements OnInit {
     );
   }
 
-  get usernameInputDisabled() {
-    if (this.user === undefined) {
-      return true;
-    }
-
-    return this.user.username === this.usernameFormControl.value && this.user.username !== null && this.user.username !== '' && this.user.username !== undefined;
-  }
-
   private checkPermissions() {
     this.checkGeolocationPermission();
+    this.checkPhotosPermission();
     this.checkNotificationPermission();
   }
 
@@ -188,5 +192,12 @@ export class AdditionalLoginDataComponent implements OnInit {
       }
     }, 1000);
   }
-}
 
+  private checkPhotosPermission() {
+    this.store.select(LocalPermissionState.photo).subscribe((photo) => {
+      this.photosPermission = photo;
+    });
+
+    this.store.dispatch(new LocalPermission.CheckPhoto());
+  }
+}

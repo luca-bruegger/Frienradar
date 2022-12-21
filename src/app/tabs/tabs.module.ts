@@ -21,7 +21,7 @@ import { RadarPageModule } from '../page/radar/radar.module';
     AccountsPageModule,
     NearbyPageModule,
     ProfilePageModule,
-    RadarPageModule
+    RadarPageModule,
   ],
   declarations: [
     TabsPage
