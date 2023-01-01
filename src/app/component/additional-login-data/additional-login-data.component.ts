@@ -23,6 +23,8 @@ export class AdditionalLoginDataComponent implements OnInit {
   notificationPermission = this.store.selectSnapshot(LocalPermissionState.notification);
   usernameSet = this.store.selectSnapshot(AccountState.username);
 
+  isLoading: boolean;
+
   usernameFormControl = new FormControl({
     value: '',
     disabled: true
@@ -105,11 +107,12 @@ export class AdditionalLoginDataComponent implements OnInit {
       return;
     }
 
+    this.isLoading = true;
     this.store.dispatch(new Account.UpdateUsername({
       username: this.usernameFormControl.value,
       userId: this.user.$id,
       email: this.user.email
-    }));
+    })).toPromise().then(() => this.isLoading = false);
   }
 
   handleRefresh($event: any) {

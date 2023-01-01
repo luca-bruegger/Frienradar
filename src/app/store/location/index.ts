@@ -128,12 +128,7 @@ export class LocationState {
       if (e.type === 'document_not_found' && e.code === 404) {
         await this.initializeEmptyDocumentForUser(user.$id);
       } else {
-        this.store.dispatch(
-          new GlobalActions.ShowToast({
-            message: e.message,
-            color: 'danger',
-          })
-        );
+        this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
       }
     }
   }
@@ -214,12 +209,7 @@ export class LocationState {
         });
       });
     } catch (e: any) {
-      dispatch(
-        new GlobalActions.ShowToast({
-          message: e.message,
-          color: 'danger',
-        })
-      );
+      dispatch(new GlobalActions.HandleError({error: e as Error}));
     }
   }
 
@@ -232,12 +222,7 @@ export class LocationState {
         data
       );
     } catch (e: any) {
-      this.store.dispatch(
-        new GlobalActions.ShowToast({
-          message: e.message,
-          color: 'danger',
-        })
-      );
+      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
     }
   }
 
@@ -265,12 +250,7 @@ export class LocationState {
           Permission.write(Role.user(userId))
         ]);
     } catch (e: any) {
-      this.store.dispatch(
-        new GlobalActions.ShowToast({
-          message: e.message,
-          color: 'danger',
-        })
-      );
+      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
     }
   }
 }

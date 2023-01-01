@@ -7,7 +7,6 @@ import { AppInitService } from './core/service/app-init.service';
 import { LocationService } from './core/service/location.service';
 import { RealtimeService } from './core/service/realtime.service';
 import { environment } from '../environments/environment';
-import { Account } from './store';
 import { NavController } from '@ionic/angular';
 
 @Component({
@@ -17,6 +16,7 @@ import { NavController } from '@ionic/angular';
 })
 export class AppComponent {
   hasInitialized = false;
+  isBeta = environment.beta;
 
   constructor(private router: Router,
               private navController: NavController,

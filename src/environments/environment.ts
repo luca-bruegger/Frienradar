@@ -4,6 +4,7 @@
 
 export const environment = {
   production: false,
+  beta: false,
   endpoint: 'https://dev.api.frienradar.com/v1',
   project: '633467240f7db9ae07d7',
   mapsKey: 'AIzaSyBzaHPkOpQSETE6Q9RsIbKFL_LOL_f7xCU',
