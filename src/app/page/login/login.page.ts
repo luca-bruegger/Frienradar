@@ -58,6 +58,7 @@ export class LoginPage implements OnDestroy {
       await this.store.dispatch(new Account.Login(this.formGroup.value)).toPromise();
     }
 
+    this.loginInProgress = false;
   }
 
   async resetPassword() {
