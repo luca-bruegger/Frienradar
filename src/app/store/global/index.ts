@@ -75,11 +75,12 @@ export class GlobalState {
     action: GlobalActions.HandleError
   ) {
     const { error } = action.payload as { error: any };
+
     if (this.backendUnderMaintenanceModal) {
       return;
     }
 
-    if (error.code === 401 && error.type === 'general_unauthorized_scope') {
+    if (error.code === 401 && error.type === 'general_unauthorized_scope' && error.type === 'user_unauthorized') {
       this.store.dispatch(new Account.Redirect({path: Path.login, forward: true, navigateRoot: false}));
       return;
     }

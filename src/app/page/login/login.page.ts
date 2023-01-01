@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { AccountValidation } from '../../core/validation/account-validation';
 import { Account } from '../../store';
@@ -10,7 +10,7 @@ import { ResetPasswordComponent } from '../../component/reset-password/reset-pas
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
 })
-export class LoginPage {
+export class LoginPage implements OnDestroy {
   isRegister = true;
 
   formGroup = AccountValidation.loginFormGroup;
@@ -23,6 +23,11 @@ export class LoginPage {
 
   constructor(private store: Store,
               private modalController: ModalController) {
+  }
+
+  ngOnDestroy() {
+    this.formGroup.reset();
+    this.loginInProgress = false;
   }
 
   changeLoginType(isRegister: boolean) {
@@ -53,7 +58,6 @@ export class LoginPage {
       await this.store.dispatch(new Account.Login(this.formGroup.value)).toPromise();
     }
 
-    this.loginInProgress = false;
   }
 
   async resetPassword() {

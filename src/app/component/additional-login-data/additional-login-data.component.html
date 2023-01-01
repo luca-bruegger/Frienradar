@@ -27,16 +27,20 @@
               <ion-card-content>
                 <ion-card-subtitle>Berechtigungen</ion-card-subtitle>
                 <ion-item color="light">
-                  <ion-icon *ngIf="geolocationPermission" slot="start" name="checkbox-outline" color="success"></ion-icon>
-                  <ion-icon *ngIf="!geolocationPermission" slot="start" name="close-circle-outline" color="danger"></ion-icon>
+                  <ion-icon *ngIf="geolocationPermission" slot="start" name="checkbox-outline"
+                            color="success"></ion-icon>
+                  <ion-icon *ngIf="!geolocationPermission" slot="start" name="close-circle-outline"
+                            color="danger"></ion-icon>
                   <ion-label>Standortzugriff</ion-label>
-                  <ion-button *ngIf="!geolocationPermission && isMobile" slot="end" (click)="requestGeolocationPermission()">
+                  <ion-button *ngIf="!geolocationPermission && isMobile" slot="end"
+                              (click)="requestGeolocationPermission()">
                     <ion-label>Anfordern</ion-label>
                   </ion-button>
                 </ion-item>
                 <ion-item color="light" *ngIf="isMobile">
                   <ion-icon *ngIf="photosPermission" slot="start" name="checkbox-outline" color="success"></ion-icon>
-                  <ion-icon *ngIf="!photosPermission" slot="start" name="close-circle-outline" color="danger"></ion-icon>
+                  <ion-icon *ngIf="!photosPermission" slot="start" name="close-circle-outline"
+                            color="danger"></ion-icon>
                   <ion-label>Fotozugriff</ion-label>
                   <ion-button *ngIf="!photosPermission" slot="end" (click)="requestPhotoPermission()">
                     <ion-label>Anfordern</ion-label>
@@ -65,10 +69,13 @@
                 <ion-card-subtitle>Email bestätigung</ion-card-subtitle>
                 <ion-note>Deine Email: <strong>{{user.email}}</strong></ion-note>
                 <ion-item color="light" lines="none">
-                  <ion-icon *ngIf="user.emailVerification" slot="start" name="checkbox-outline" color="success"></ion-icon>
-                  <ion-icon *ngIf="!user.emailVerification" slot="start" name="close-circle-outline" color="danger"></ion-icon>
+                  <ion-icon *ngIf="user.emailVerification" slot="start" name="checkbox-outline"
+                            color="success"></ion-icon>
+                  <ion-icon *ngIf="!user.emailVerification" slot="start" name="close-circle-outline"
+                            color="danger"></ion-icon>
                   <ion-label>Bestätigt</ion-label>
-                  <ion-button *ngIf="!user.emailVerification" [disabled]="requestMailButtonDisabled" slot="end" (click)="verifyEmail()">
+                  <ion-button *ngIf="!user.emailVerification" [disabled]="requestMailButtonDisabled" slot="end"
+                              (click)="verifyEmail()">
                     <ion-label *ngIf="!requestMailButtonDisabled">Anfordern</ion-label>
                     <ion-label *ngIf="requestMailButtonDisabled">Warte {{time}}s</ion-label>
                   </ion-button>
@@ -89,9 +96,9 @@
                 <ion-note>
                   <span>Der Benutzername wird für die Anzeige in der App verwendet. Dieser ist für dich, aber auch andere sichtbar.</span>
                 </ion-note>
-                {{usernameFormControl.disabled}}
                 <ion-item color="light" class="ion-margin-top" counter="true">
-                  <ion-input [formControl]="usernameFormControl" maxlength="30" type="text" placeholder="Benutzername"></ion-input>
+                  <ion-input [formControl]="usernameFormControl" maxlength="30" type="text"
+                             placeholder="Benutzername"></ion-input>
                 </ion-item>
                 <div>
                   <ng-container *ngFor="let validation of formMessages.username">
@@ -109,8 +116,13 @@
     </ion-row>
     <ion-row>
       <ion-col class="ion-text-center">
-        <ion-button (click)="finishAdditionalSetup()">
-          <ion-label>Abschliessen</ion-label>
+        <ion-button (click)="finishAdditionalSetup()" [disabled]="isLoading">
+          <ion-label *ngIf="!isLoading">Abschliessen</ion-label>
+          <div *ngIf="isLoading"
+            style="display: flex; flex-direction: row; text-align: center; align-items: center; gap: 20px; justify-content: center; height: 90px">
+            <ion-spinner name="crescent" style="vertical-align: center"></ion-spinner>
+            <p style="margin: 0">Anmeldung wird abgeschlossen...</p>
+          </div>
         </ion-button>
       </ion-col>
     </ion-row>
