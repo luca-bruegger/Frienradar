@@ -13,7 +13,7 @@
   <ion-grid>
     <ion-row>
       <ion-col size="12" size-xl="3" *ngFor="let accountObj of accounts | keyvalue">
-        <a href="#" onclick="window.open('https://www.twitter.com/luca_bruegger', '_system', 'location=yes');">
+<!--        <a href="#" onclick="window.open('https://www.twitter.com/luca_bruegger', '_system', 'location=yes');">-->
           <ion-card style="{{accountObj.value.style}} text-align: center;" class="ion-no-margin">
             <ion-card-content (click)="editAccountname(accountObj.key)">
               <ion-icon class="text-icon" name="{{accountObj.value.icon}}"></ion-icon>
@@ -22,7 +22,7 @@
                     *ngIf="accountObj.value.username.length > 0">@{{accountObj.value.username}}</span>
             </ion-card-content>
           </ion-card>
-        </a>
+<!--        </a>-->
       </ion-col>
     </ion-row>
   </ion-grid>
