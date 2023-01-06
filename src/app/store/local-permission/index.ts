@@ -4,7 +4,7 @@ import { Geolocation } from '@capacitor/geolocation';
 import { Platform } from '@ionic/angular';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { GlobalActions } from '../global';
-import { ImagePicker } from '@ionic-native/image-picker/ngx';
+import { Camera } from '@capacitor/camera';
 
 /* State Model */
 @Injectable()
@@ -53,12 +53,7 @@ export namespace LocalPermission {
 @Injectable()
 export class LocalPermissionState {
   constructor(private store: Store,
-              private platform: Platform,
-              private imagePicker: ImagePicker) {
-    if (this.isMobile()) {
-      this.imagePicker.hasReadPermission().then((data) => {
-      });
-    }
+              private platform: Platform) {
   }
 
   @Selector()
@@ -125,7 +120,6 @@ export class LocalPermissionState {
         if (result.receive === 'granted') {
           // Register with Apple / Google to receive push via APNS/FCM
           PushNotifications.register();
-
         } else {
           alert('Bitte aktiviere Push-Benachrichtigungen in den Einstellungen, damit die volle App-Funktionalität gewährleistet ist.');
         }
@@ -153,11 +147,9 @@ export class LocalPermissionState {
     action: LocalPermission.RequestPhoto
   ) {
     if (this.isMobile()) {
-      this.imagePicker.requestReadPermission().then(() => {
-        this.imagePicker.hasReadPermission().then((data) => {
+      Camera.requestPermissions().then((data) => {
           patchState({
-            photo: data
-          });
+            photo: data.photos === 'granted'
         });
       }, () => {
         this.store.dispatch(new GlobalActions.ShowToast({
@@ -174,9 +166,9 @@ export class LocalPermissionState {
     action: LocalPermission.CheckPhoto
   ) {
     if (this.isMobile()) {
-      this.imagePicker.hasReadPermission().then((data) => {
+      Camera.checkPermissions().then((data) => {
         patchState({
-          photo: data
+          photo: data.photos === 'granted'
         });
       });
     }

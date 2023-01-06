@@ -6,8 +6,8 @@
 	<string>development</string>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>webcredentials:app.frienradar.com</string>
-		<string>applinks:app.frienradar.com</string>
+		<string>webcredentials:frienradar.com</string>
+		<string>applinks:frienradar.com</string>
 	</array>
 </dict>
 </plist>

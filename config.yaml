@@ -16,8 +16,8 @@ platforms:
 
         entitlements:
           - com.apple.developer.associated-domains: [
-              "applinks:app.frienradar.com",
-              "webcredentials:app.frienradar.com"
+              "applinks:frienradar.com",
+              "webcredentials:frienradar.com"
           ionic ]
   android:
     packageName: $PACKAGE_NAME

@@ -1,20 +1,21 @@
 import { Injectable } from '@angular/core';
 import { Account } from '../../store';
 import { Store } from '@ngxs/store';
-import { LoadingController, Platform } from '@ionic/angular';
+import { LoadingController } from '@ionic/angular';
 import { Contact } from '../../store/contact';
 import { App } from '@capacitor/app';
 import { LocalPermission } from '../../store/local-permission';
+import { LocationService } from './location.service';
+import { RealtimeService } from './realtime.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppInitService {
-
-
   constructor(private store: Store,
               private loadingController: LoadingController,
-              private platform: Platform) {
+              private locationService: LocationService,
+              private realtimeService: RealtimeService) {
   }
 
   async init() {
@@ -28,7 +29,12 @@ export class AppInitService {
     });
   }
 
-  async fetchUserFromApi() {
+  async startServices() {
+    this.realtimeService.watch();
+    await this.locationService.watch();
+  }
+
+  private async fetchUserFromApi() {
     await new Promise(async (resolve, reject) => {
       const dispatchResponse = await this.store.dispatch(new Account.Fetch()).toPromise();
       if (dispatchResponse.auth.user) {

@@ -9,6 +9,8 @@ import * as Filter from 'bad-words';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Account as AccountModel } from '../../model/account';
 import User = AccountModel.User;
+import { LocationService } from '../../core/service/location.service';
+import { AppInitService } from '../../core/service/app-init.service';
 
 @Component({
   selector: 'app-additional-login-data',
@@ -50,7 +52,9 @@ export class AdditionalLoginDataComponent implements OnInit {
   constructor(private store: Store,
               private platform: Platform,
               private router: Router,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              private appInitService: AppInitService) {
+
   }
 
   ngOnInit() {
@@ -112,7 +116,10 @@ export class AdditionalLoginDataComponent implements OnInit {
       username: this.usernameFormControl.value,
       userId: this.user.$id,
       email: this.user.email
-    })).toPromise().then(() => this.isLoading = false);
+    })).toPromise().then(async () => {
+      await this.appInitService.startServices();
+      this.isLoading = false;
+    });
   }
 
   handleRefresh($event: any) {

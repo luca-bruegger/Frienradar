@@ -8,7 +8,10 @@ import { Providers } from '../../helper/providers';
 })
 export class AccountsPage implements OnInit {
 
-  accounts = Providers.data;
+  accountPresets = Providers.data;
+  selectedPreset = {
+    key: ''
+  };
 
   constructor() { }
 
@@ -17,5 +20,15 @@ export class AccountsPage implements OnInit {
 
   editAccountname(key) {
 
+
+  }
+
+  addAccount(event) {
+    console.log(event);
+    this.selectedPreset = event;
+  }
+
+  isSelectedItem(name) {
+    return this.selectedPreset.key === name;
   }
 }

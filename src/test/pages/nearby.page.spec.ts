@@ -1,7 +1,9 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
-
-import { NearbyPage } from './nearby.page';
+import { NgxsModule } from '@ngxs/store';
+import { NearbyPage } from '../../app/page/nearby/nearby.page';
+import { AppState } from '../../app/store';
+import { environment } from '../../environments/environment';
 
 describe('NearbyPage', () => {
   let component: NearbyPage;
@@ -10,7 +12,14 @@ describe('NearbyPage', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ NearbyPage ],
-      imports: [IonicModule.forRoot()]
+      providers: [
+      ],
+      imports: [
+        IonicModule.forRoot(),
+        NgxsModule.forRoot(AppState, {
+          developmentMode: !environment.production
+        })
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(NearbyPage);

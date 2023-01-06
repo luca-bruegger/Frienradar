@@ -4,6 +4,10 @@ import { HttpClient } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { MapsHelper } from '../../../helper/maps-helper';
 import { environment } from '../../../../environments/environment';
+import { PluginListenerHandle } from '@capacitor/core';
+import MapOptions = google.maps.MapOptions;
+import LatLngLiteral = google.maps.LatLngLiteral;
+import Polygon = google.maps.Polygon;
 
 @Component({
   selector: 'app-radar-display',
@@ -18,10 +22,11 @@ export class RadarDisplayComponent implements OnInit, OnChanges {
 
   mapApiLoaded: Observable<boolean>;
 
-  mapOptions: google.maps.MapOptions = MapsHelper.getOptions();
-  center: google.maps.LatLngLiteral;
-  bounds: google.maps.LatLngLiteral[];
-  locationPolygon: google.maps.Polygon;
+  mapOptions: MapOptions = MapsHelper.getOptions();
+  center: LatLngLiteral;
+  bounds: LatLngLiteral[];
+  locationPolygon: Polygon;
+  accelHandler: PluginListenerHandle;
 
   locationBoxOptions = {
     strokeColor: '#0177B6',
@@ -41,7 +46,7 @@ export class RadarDisplayComponent implements OnInit, OnChanges {
     }
 
     if (this.geohash) {
-      this.updateLocationBox(this.geohash);
+      this.updateLocationBox();
     }
   }
 
@@ -49,23 +54,21 @@ export class RadarDisplayComponent implements OnInit, OnChanges {
     const changedGeohash = simpleChanges.geohash;
     const changedDistance = simpleChanges.currentDistance;
 
-    if (changedDistance || changedGeohash) {
+    if (changedDistance || changedGeohash && changedGeohash.currentValue !== '') {
       const geohash = changedGeohash ? changedGeohash.currentValue : this.geohash;
       const distance = changedDistance ? changedDistance.currentValue : this.currentDistance;
 
       this.geohash = geohash;
       this.currentDistance = distance;
-      this.updateLocationBox(geohash);
+      this.updateLocationBox();
       this.resetLocationBox();
     }
   }
 
-  private updateLocationBox(geohash) {
-    if (geohash) {
-      const {lat, lng, boundaries} = MapsHelper.getLocationData(this.mapGeohashDistance, geohash);
-      this.center = {lat, lng};
-      this.bounds = MapsHelper.getBounds(boundaries);
-    }
+  private updateLocationBox() {
+    const {lat, lng, boundaries} = MapsHelper.getLocationData(this.mapGeohashDistance, this.geohash);
+    this.center = {lat, lng};
+    this.bounds = MapsHelper.getBounds(boundaries);
   }
 
   setupZoomListener($event: any) {
@@ -87,8 +90,9 @@ export class RadarDisplayComponent implements OnInit, OnChanges {
       this.locationPolygon.setMap(null);
     }
 
-    if (!this.map)
-      {return;}
+    if (!this.map) {
+      return;
+    }
 
     this.locationPolygon = new google.maps.Polygon({
       map: this.map.googleMap,

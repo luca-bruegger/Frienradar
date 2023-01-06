@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 
@@ -10,7 +10,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PasswordStrengthMeterModule } from 'angular-password-strength-meter';
 import { TabsPageModule } from './tabs/tabs.module';
 
-import { ImagePicker } from '@ionic-native/image-picker/ngx';
 import { NgxIntlTelInputModule } from 'ngx-intl-tel-input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LoginPageModule } from './page/login/login.module';
@@ -43,7 +42,6 @@ import { HttpClientJsonpModule, HttpClientModule } from '@angular/common/http';
     environment.production ? [] : NgxsReduxDevtoolsPluginModule.forRoot()
   ],
   providers: [
-    ImagePicker,
     {provide: RouteReuseStrategy, useClass: IonicRouteStrategy},
 /*    {
       provide: APP_INITIALIZER,

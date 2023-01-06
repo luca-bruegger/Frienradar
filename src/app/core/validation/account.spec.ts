@@ -1,4 +1,4 @@
-import { AccountValidation } from './account';
+import { AccountValidation } from './account-validation';
 
 describe('Account', () => {
   it('should create an instance', () => {

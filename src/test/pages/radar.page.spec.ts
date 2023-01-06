@@ -1,29 +1,28 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
-
-import { ResetPasswordComponent } from './reset-password.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NgxsModule } from '@ngxs/store';
-import { AppState } from '../../store';
-import { environment } from '../../../environments/environment';
-import { RouterTestingModule } from '@angular/router/testing';
+import { RadarPage } from '../../app/page/radar/radar.page';
+import { AppState } from '../../app/store';
+import { environment } from '../../environments/environment';
 
-describe('ResetPasswordComponent', () => {
-  let component: ResetPasswordComponent;
-  let fixture: ComponentFixture<ResetPasswordComponent>;
+describe('RadarPage', () => {
+  let component: RadarPage;
+  let fixture: ComponentFixture<RadarPage>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ResetPasswordComponent ],
+      declarations: [ RadarPage ],
       imports: [
         IonicModule.forRoot(),
+        HttpClientTestingModule,
         NgxsModule.forRoot(AppState, {
           developmentMode: !environment.production
-        }),
-        RouterTestingModule
+        })
       ]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ResetPasswordComponent);
+    fixture = TestBed.createComponent(RadarPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));

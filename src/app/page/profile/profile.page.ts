@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { ImagePicker } from '@ionic-native/image-picker/ngx';
 import { AlertController, IonRouterOutlet, ModalController } from '@ionic/angular';
 import { EditUserProfileComponent } from '../../component/edit-user-profile/edit-user-profile.component';
 import { Select, Store } from '@ngxs/store';
@@ -18,8 +17,7 @@ export class ProfilePage {
   @Select(AccountState.user) user$: Observable<Partial<AccountModel.User>>;
 
 
-  constructor(private imagePicker: ImagePicker,
-              private alertController: AlertController,
+  constructor(private alertController: AlertController,
               private modalController: ModalController,
               private routerOutlet: IonRouterOutlet,
               private store: Store) {
@@ -102,4 +100,5 @@ export class ProfilePage {
   editAccountname(key) {
 
   }
+
 }

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { LocationService } from '../core/service/location.service';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 @Component({
   selector: 'app-tabs',
@@ -8,4 +8,7 @@ import { LocationService } from '../core/service/location.service';
 })
 export class TabsPage {
 
+  async changeTab() {
+    await Haptics.impact({ style: ImpactStyle.Medium });
+  }
 }

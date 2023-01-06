@@ -1,28 +1,41 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Accounts</ion-title>
+    <ion-title>Konten</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
   <ion-header collapse="condense" class="ion-no-margin">
     <ion-toolbar>
-      <ion-title size="large" style="color: var(--ion-color-primary)">Accounts</ion-title>
+      <ion-title size="large" style="color: var(--ion-color-primary)">Konten</ion-title>
     </ion-toolbar>
   </ion-header>
-  <ion-grid>
-    <ion-row>
-      <ion-col size="12" size-xl="3" *ngFor="let accountObj of accounts | keyvalue">
-<!--        <a href="#" onclick="window.open('https://www.twitter.com/luca_bruegger', '_system', 'location=yes');">-->
-          <ion-card style="{{accountObj.value.style}} text-align: center;" class="ion-no-margin">
-            <ion-card-content (click)="editAccountname(accountObj.key)">
-              <ion-icon class="text-icon" name="{{accountObj.value.icon}}"></ion-icon>
-              <span class="icon-text" *ngIf="accountObj.value.username === ''">{{accountObj.value.name}}</span>
-              <span class="icon-text"
-                    *ngIf="accountObj.value.username.length > 0">@{{accountObj.value.username}}</span>
-            </ion-card-content>
-          </ion-card>
-<!--        </a>-->
+  <ion-grid class="ion-no-padding ion-margin">
+    <ion-row style="gap: 10px">
+      <ion-col size="12" size-lg="4" size-xl="3" size-md="5" size-sm="8" push-xl="1.5" push-lg="2" push-md="1" push-sm="2" *ngFor="let accountPreset of accountPresets | keyvalue">
+        <ion-card style="{{accountPreset.value.style}}" class="ion-no-margin">
+          <ion-card-header>
+            <ion-card-title>{{accountPreset.value.name}}</ion-card-title>
+            <ion-card-subtitle color="light">Konto verbinden</ion-card-subtitle>
+          </ion-card-header>
+
+          <ion-card-content *ngIf="!isSelectedItem(accountPreset.key)">
+            Drücke hinzufügen damit ein Konto verbunden werden kann.
+          </ion-card-content>
+
+          <ion-item *ngIf="isSelectedItem(accountPreset.key)" [(ngModel)]="accountPreset.value.username" fill="solid" lines="none" class="ion-margin-horizontal ion-padding-bottom">
+            <ion-input placeholder="Benutzername"></ion-input>
+          </ion-item>
+
+          <div class="ion-margin-horizontal ion-padding-bottom" *ngIf="!isSelectedItem(accountPreset.key)">
+            <ion-button color="dark" (click)="addAccount(accountPreset)">Hinzufügen</ion-button>
+            <ion-button fill="clear" color="medium">Verstecken</ion-button>
+          </div>
+          <div class="ion-margin-horizontal ion-padding-bottom" *ngIf="isSelectedItem(accountPreset.key)">
+            <ion-button color="success" (click)="addAccount(accountPreset)">Verbinden</ion-button>
+            <ion-button fill="clear" color="danger">Abbrechen</ion-button>
+          </div>
+        </ion-card>
       </ion-col>
     </ion-row>
   </ion-grid>

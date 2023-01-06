@@ -18,8 +18,7 @@ export class NearbyPage implements OnInit {
   private geohashLength: number;
   private geohash: string;
 
-  constructor(private store: Store) {
-  }
+  constructor(private store: Store) {}
 
   get nearbyUsersAmount() {
     return this.nearbyUsersMap.size;
@@ -53,11 +52,11 @@ export class NearbyPage implements OnInit {
     });
   }
 
-  handleRefresh($event: any) {
-
-  }
-
   reloadNearbyUsers() {
+    if (this.isReloading) {
+      return;
+    }
+
     this.isReloading = true;
     this.reloadTime = 25;
     this.percent = 0;

@@ -1,6 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { Account, AccountState } from '../../../store';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 @Component({
   selector: 'app-distance-change',
@@ -22,9 +23,10 @@ export class DistanceChangeComponent implements OnInit {
     this.distanceChange.emit(this.currentDistance);
   }
 
-  changeDistance($event: any) {
+  async changeDistance($event: any) {
     const distance = $event.detail.value;
     this.store.dispatch(new Account.Update({ prefs: { distance } }));
     this.distanceChange.emit(distance);
+    await Haptics.impact({ style: ImpactStyle.Light });
   }
 }

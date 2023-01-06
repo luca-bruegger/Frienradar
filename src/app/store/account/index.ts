@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 import { Location } from '../location';
 import { environment } from '../../../environments/environment';
 import UserPrefs = AccountModel.UserPrefs;
+import { AppInitService } from '../../core/service/app-init.service';
 
 /* State Model */
 @Injectable()
@@ -117,7 +118,8 @@ export class AccountState {
   constructor(private navController: NavController,
               private ngZone: NgZone,
               private store: Store,
-              private router: Router) {
+              private router: Router,
+              private appInitService: AppInitService) {
   }
 
   @Selector()
@@ -246,7 +248,6 @@ export class AccountState {
     {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.Fetch
   ) {
-    let user = this.store.selectSnapshot(AccountState.user);
     let session = this.store.selectSnapshot(AccountState.session);
 
     try {
@@ -258,28 +259,18 @@ export class AccountState {
         });
       }
 
-      // If user is already fetched, don't fetch again
-      if (!user) {
-        user = await Appwrite.accountProvider().get() as AccountModel.User;
-        user.username = await this.getUsername(user);
-
-        // Set cacheBreaker to force image reload if not set
-        if (!user.pictureBreaker) {
-          user.pictureBreaker = Picture.cacheBreaker();
-        }
-
-        patchState({
-          user
-        });
-      }
+      await this.fetchUserData(patchState);
 
       if (this.store.selectSnapshot(AccountState.isUserIsFullyRegistered)) {
+        await this.appInitService.startServices();
         dispatch(new Account.Redirect({path: Path.default, forward: true, navigateRoot: true}));
       } else {
         dispatch(new Account.Redirect({path: Path.additionalLoginData, forward: true, navigateRoot: true}));
       }
 
-      await dispatch(new Location.FetchLastLocation({user}));
+      await dispatch(new Location.FetchLastLocation({
+        user: this.store.selectSnapshot(AccountState.user)
+      }));
     } catch (e: any) {
       // Ignore if route is reset password
       const isResetPassword = new RegExp('^(\\/reset-password\\?)').test(this.router.url);
@@ -482,6 +473,33 @@ export class AccountState {
       return document.username;
     } catch (e) {
       return null;
+    }
+  }
+
+  private async fetchUserData(patchState) {
+    const user = this.store.selectSnapshot(AccountState.user);
+    let userCopy = {...user};
+
+    // If user is already fetched, don't fetch again
+    if (!user) {
+      userCopy = await Appwrite.accountProvider().get() as AccountModel.User;
+    }
+
+    // Set cacheBreaker to force image reload if not set
+    if (!userCopy.pictureBreaker) {
+      userCopy.pictureBreaker = Picture.cacheBreaker();
+    }
+
+    // load username if username is not set
+    if (!userCopy.username) {
+      userCopy.username = await this.getUsername(userCopy);
+    }
+
+    // update user in state if user differs from current user
+    if (userCopy !== user) {
+      patchState({
+        user: userCopy
+      });
     }
   }
 }

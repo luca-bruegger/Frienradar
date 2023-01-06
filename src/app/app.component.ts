@@ -1,4 +1,4 @@
-import { Component, NgZone } from '@angular/core';
+import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { App, URLOpenListenerEvent } from '@capacitor/app';
 import { Path } from './helper/path';
@@ -14,7 +14,7 @@ import { NavController } from '@ionic/angular';
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   hasInitialized = false;
   isBeta = environment.beta;
 
@@ -22,18 +22,15 @@ export class AppComponent {
               private navController: NavController,
               private zone: NgZone,
               private store: Store,
-              private appInitService: AppInitService,
-              private locationService: LocationService,
-              private realtimeService: RealtimeService) {
+              private appInitService: AppInitService) {
+  }
 
-    appInitService.init().then(async () => {
-      this.hasInitialized = true;
-      this.jumpTo();
-      this.initializeDeeplinking();
-      this.initializeGoogleAnalytics();
-      await locationService.watch();
-      await realtimeService.watch();
-    });
+  async ngOnInit() {
+    await this.appInitService.init();
+    this.hasInitialized = true;
+    this.jumpTo();
+    this.initializeDeeplinking();
+    this.initializeGoogleAnalytics();
   }
 
   private jumpTo() {

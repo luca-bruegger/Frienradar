@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Appwrite } from '../../helper/appwrite';
 import { interval, Subscription } from 'rxjs';
 import { Store } from '@ngxs/store';
-import { Account, GlobalActions } from '../../store';
+import { GlobalActions } from '../../store';
 
 @Component({
   selector: 'app-backend-under-maintenance',

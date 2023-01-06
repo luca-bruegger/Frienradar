@@ -1,3 +1,7 @@
-ion-segment-button {
-  --indicator-color: var(--ion-color-light);
+.ios ion-segment {
+  --background: var(--ion-color-dark);
+}
+
+.ios ::part(indicator-background) {
+  background-color: var(--ion-color-light);
 }

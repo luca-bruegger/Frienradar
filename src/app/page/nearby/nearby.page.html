@@ -1,6 +1,9 @@
 <ion-header translucent="true">
   <ion-toolbar>
     <ion-title color="primary">In der Nähe</ion-title>
+    <ion-chip slot="end" style="margin-right: 13px">
+      <ion-label>Anzahl: {{nearbyUsersAmount}}</ion-label>
+    </ion-chip>
   </ion-toolbar>
 </ion-header>
 
@@ -34,20 +37,21 @@
       </ion-row>
     </ion-grid>
   </div>
-  <ion-fab *ngIf="nearbyUsersAmount > 0" slot="fixed" vertical="bottom" horizontal="center">
-    <ion-fab-button [disabled]="isReloading" (click)="reloadNearbyUsers()">
+  <ion-fab slot="fixed" vertical="bottom" horizontal="center">
+    <ion-fab-button (click)="reloadNearbyUsers()">
       <ion-icon *ngIf="!isReloading" name="reload"></ion-icon>
       <circle-progress *ngIf="isReloading" style="padding-top: 3px;"
                        [percent]="percent"
-                       [radius]="15"
-                       [outerStrokeWidth]="4"
+                       [radius]="20"
+                       [outerStrokeWidth]="2"
                        [outerStrokeColor]="'#ffffff'"
+                       [titleColor]="'#ffffff'"
                        [clockwise]="true"
                        [animation]="false"
                        [showInnerStroke]="false"
                        [showSubtitle]="false"
                        [showUnits]="false"
-                       [title]="reloadTime + 's'"
+                       [title]="reloadTime"
       ></circle-progress>
     </ion-fab-button>
   </ion-fab>

@@ -19,17 +19,26 @@ export class LocationService implements OnDestroy {
   constructor(private store: Store) {}
 
   async ngOnDestroy() {
-    await Geolocation.clearWatch({
-      id: this.callbackId
-    });
+    await this.stop();
   }
 
   async watch() {
+    if (this.callbackId) {
+      return;
+    }
+
     this.callbackId = await Geolocation.watchPosition(this.geolocationOptions, (position) => {
       if (position && this.store.selectSnapshot(AccountState.isUserIsFullyRegistered)) {
         const geohash = ngeohash.encode(position.coords.latitude, position.coords.longitude, 7);
         this.store.dispatch(new Location.UpdatePosition(geohash));
       }
     });
+  }
+
+  async stop() {
+    await Geolocation.clearWatch({
+      id: this.callbackId
+    });
+    this.callbackId = null;
   }
 }

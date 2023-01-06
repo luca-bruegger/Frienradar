@@ -2,6 +2,9 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
 import { DistanceChangeComponent } from './distance-change.component';
+import { NgxsModule } from '@ngxs/store';
+import { AppState } from '../../../store';
+import { environment } from '../../../../environments/environment';
 
 describe('DistanceChangeComponent', () => {
   let component: DistanceChangeComponent;
@@ -10,7 +13,11 @@ describe('DistanceChangeComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ DistanceChangeComponent ],
-      imports: [IonicModule.forRoot()]
+      imports: [IonicModule.forRoot(),
+        NgxsModule.forRoot(AppState, {
+          developmentMode: !environment.production
+        })
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(DistanceChangeComponent);
