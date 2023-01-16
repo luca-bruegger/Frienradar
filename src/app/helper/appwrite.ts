@@ -11,7 +11,6 @@ export class Appwrite {
   private static provider(): Client {
     if (this.client) {return this.client;}
 
-    console.log('LANGUAGE:', navigator.language.substring(0, 2));
     this.client = new Client()
       .setEndpoint(environment.endpoint)
       .setProject(environment.project)

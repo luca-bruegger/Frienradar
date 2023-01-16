@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Providers } from '../../helper/providers';
+import { AccountPresets } from '../../helper/accountPresets';
+import { Store } from '@ngxs/store';
+import { AccountState } from '../../store';
 
 @Component({
   selector: 'app-accounts',
@@ -8,14 +10,20 @@ import { Providers } from '../../helper/providers';
 })
 export class AccountsPage implements OnInit {
 
-  accountPresets = Providers.data;
-  selectedPreset = {
-    key: ''
-  };
+  isLoading = false;
+  accountPresets = AccountPresets.set;
+  selectedPresetName = '';
+  accountNameFilter = '';
 
-  constructor() { }
+  constructor(private store: Store) {
+  }
+
+  get filteredAccounts() {
+    return this.accountPresets.filter(preset => preset.key.toLowerCase().includes(this.accountNameFilter.toLowerCase()));
+  }
 
   ngOnInit() {
+    const user = this.store.selectSnapshot(AccountState.user);
   }
 
   editAccountname(key) {
@@ -23,12 +31,12 @@ export class AccountsPage implements OnInit {
 
   }
 
-  addAccount(event) {
+  addAccount(account) {
     console.log(event);
-    this.selectedPreset = event;
+    this.selectedPresetName = account.key;
   }
 
-  isSelectedItem(name) {
-    return this.selectedPreset.key === name;
+  isSelectedItem(key) {
+    return this.selectedPresetName === key;
   }
 }

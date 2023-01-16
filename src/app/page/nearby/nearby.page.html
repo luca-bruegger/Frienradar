@@ -3,7 +3,7 @@
     <ion-title color="primary">In der Nähe</ion-title>
     <ion-chip slot="end" style="margin-right: 13px">
       <ion-icon name="body"></ion-icon>
-      <ion-label>Anzahl: {{nearbyUsersAmount}}</ion-label>
+      <ion-label>{{nearbyUsersAmount}}</ion-label>
     </ion-chip>
   </ion-toolbar>
 </ion-header>
@@ -31,15 +31,16 @@
 
   <div *ngIf="nearbyUsersAmount > 0" class="ion-padding-horizontal ion-padding-top">
     <ion-grid class="ion-no-padding">
-      <ion-row style="gap: 10px">
-        <ion-col size="12" size-lg="6" size-xl="4" *ngFor="let user of nearbyUsers; trackBy:identifyNearbyUser">
+      <ion-row>
+        <ion-col style="padding: 5px" size="12" size-lg="6" size-xl="4" *ngFor="let user of nearbyUsers; trackBy:identifyNearbyUser">
           <app-nearby-user-element [user]="user"></app-nearby-user-element>
         </ion-col>
       </ion-row>
     </ion-grid>
   </div>
+
   <ion-fab slot="fixed" vertical="bottom" horizontal="center">
-    <ion-fab-button (click)="reloadNearbyUsers()">
+    <ion-fab-button (click)="refresh()">
       <ion-icon *ngIf="!isReloading" name="reload"></ion-icon>
       <circle-progress *ngIf="isReloading" style="padding-top: 3px;"
                        [percent]="percent"

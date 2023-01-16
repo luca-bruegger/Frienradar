@@ -1,11 +1,9 @@
-import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
+import { Component, NgZone, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { App, URLOpenListenerEvent } from '@capacitor/app';
 import { Path } from './helper/path';
 import { Store } from '@ngxs/store';
 import { AppInitService } from './core/service/app-init.service';
-import { LocationService } from './core/service/location.service';
-import { RealtimeService } from './core/service/realtime.service';
 import { environment } from '../environments/environment';
 import { NavController } from '@ionic/angular';
 

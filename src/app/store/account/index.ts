@@ -10,8 +10,8 @@ import { NavController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Location } from '../location';
 import { environment } from '../../../environments/environment';
-import UserPrefs = AccountModel.UserPrefs;
 import { AppInitService } from '../../core/service/app-init.service';
+import UserPrefs = AccountModel.UserPrefs;
 
 /* State Model */
 @Injectable()
@@ -95,6 +95,17 @@ export namespace Account {
     static readonly type = '[Auth] Logout';
   }
 
+  export class InitializeEmptyDocuments {
+    static readonly type = '[Auth] Initialize Empty Documents';
+
+    constructor(public payload: { userId: string }) {
+    }
+  }
+
+  export class FinishAdditionalLogin {
+    static readonly type = '[Auth] Finish Additional Login';
+  }
+
   /** Events */
   export class Redirect {
     static readonly type = '[Auth] AccountRedirect';
@@ -145,7 +156,7 @@ export class AccountState {
   @Selector()
   static isUserIsFullyRegistered(state: AccountStateModel) {
     const user = state.user;
-    return user.emailVerification && user.username &&user.username.length > 0;
+    return !!user && user.emailVerification && user.username && user.username.length > 0;
   }
 
   @Selector()
@@ -177,7 +188,7 @@ export class AccountState {
 
     try {
       if (user.username !== username) {
-        await Appwrite.databasesProvider().createDocument(environment.radarDatabaseId, environment.usernameCollectionId, userId, {
+        await Appwrite.databasesProvider().createDocument(environment.usersDatabaseId, environment.usernameCollectionId, userId, {
           email,
           username
         });
@@ -188,16 +199,6 @@ export class AccountState {
           user: updatedUser
         });
       }
-
-      this.store.dispatch(new Account.Redirect({
-        path: Path.default,
-        forward: true,
-        navigateRoot: false
-      }));
-      this.store.dispatch(new GlobalActions.ShowToast({
-        message: 'Konfiguration erfolgreich abgeschlossen',
-        color: 'success'
-      }));
     } catch (e: any) {
       if (e.code === 409 && e.type === 'document_already_exists') {
         this.store.dispatch(new GlobalActions.ShowToast({
@@ -208,6 +209,28 @@ export class AccountState {
       }
 
       this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
+    }
+  }
+
+  @Action(Account.FinishAdditionalLogin)
+  async finishAdditionalLogin(
+    {patchState, dispatch}: StateContext<AccountStateModel>,
+    action: Account.FinishAdditionalLogin
+  ) {
+    const user = this.store.selectSnapshot(AccountState.user);
+    if (user.username !== null && user.username.length > 0) {
+      await dispatch(new Account.InitializeEmptyDocuments({
+        userId: user.$id
+      }));
+      await dispatch(new Account.Redirect({
+        path: Path.default,
+        forward: true,
+        navigateRoot: false
+      }));
+      await dispatch(new GlobalActions.ShowToast({
+        message: 'Konfiguration erfolgreich abgeschlossen',
+        color: 'success'
+      }));
     }
   }
 
@@ -227,8 +250,7 @@ export class AccountState {
       const session = await Appwrite.accountProvider().createEmailSession(email, password);
       await Appwrite.accountProvider().updatePrefs({
         description: '',
-        distance: 'close',
-        accounts: {}
+        distance: 'close'
       });
       user.pictureBreaker = await this.updateProfilePicture(profilePicture, user.$id);
 
@@ -248,38 +270,26 @@ export class AccountState {
     {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.Fetch
   ) {
-    let session = this.store.selectSnapshot(AccountState.session);
+    await this.fetchSessionData(patchState);
+    const session = this.store.selectSnapshot(AccountState.session);
 
-    try {
-      // If session is already fetched, don't fetch again
-      if (!session) {
-        session = await Appwrite.accountProvider().getSession('current') as Models.Session;
-        patchState({
-          session
-        });
-      }
-
-      await this.fetchUserData(patchState);
-
-      if (this.store.selectSnapshot(AccountState.isUserIsFullyRegistered)) {
-        await this.appInitService.startServices();
-        dispatch(new Account.Redirect({path: Path.default, forward: true, navigateRoot: true}));
-      } else {
-        dispatch(new Account.Redirect({path: Path.additionalLoginData, forward: true, navigateRoot: true}));
-      }
-
-      await dispatch(new Location.FetchLastLocation({
-        user: this.store.selectSnapshot(AccountState.user)
-      }));
-    } catch (e: any) {
-      // Ignore if route is reset password
-      const isResetPassword = new RegExp('^(\\/reset-password\\?)').test(this.router.url);
-      if (isResetPassword) {
-        return;
-      }
-
-      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
+    // If user could not be fetched on login, skip
+    if (!session) {
+      return;
     }
+
+    await this.fetchUserData(patchState);
+
+    if (this.store.selectSnapshot(AccountState.isUserIsFullyRegistered)) {
+      await this.appInitService.startServices();
+      this.store.dispatch(new Account.Redirect({path: Path.default, forward: true, navigateRoot: true}));
+    } else {
+      this.store.dispatch(new Account.Redirect({path: Path.additionalLoginData, forward: true, navigateRoot: true}));
+    }
+
+    await dispatch(new Location.FetchLastLocation({
+      user: this.store.selectSnapshot(AccountState.user)
+    }));
   }
 
   @Action(Account.Update)
@@ -432,6 +442,24 @@ export class AccountState {
     }
   }
 
+  @Action(Account.InitializeEmptyDocuments)
+  async initializeEmptyDocuments({
+                                   patchState,
+                                   dispatch
+                                 }: StateContext<AccountStateModel>, action: Account.InitializeEmptyDocuments) {
+    const {userId} = action.payload;
+    try {
+      await Appwrite.databasesProvider().createDocument(
+        environment.usersDatabaseId,
+        environment.accountsCollectionId,
+        userId, {
+          accounts: []
+        });
+    } catch (e: any) {
+      console.log(e);
+    }
+  }
+
   private async updateName(name: string) {
     try {
       return await Appwrite.accountProvider().updateName(name) as AccountModel.User;
@@ -463,10 +491,10 @@ export class AccountState {
     }
   }
 
-  private async getUsername(user: Models.Account<{}> & { prefs: UserPrefs; pictureBreaker: string; username: string }) {
+  private async getUsername(user: Models.Account<unknown> & { prefs: UserPrefs; pictureBreaker: string; username: string }) {
     try {
       const document = await Appwrite.databasesProvider().getDocument(
-        environment.radarDatabaseId,
+        environment.usersDatabaseId,
         environment.usernameCollectionId,
         user.$id
       );
@@ -482,7 +510,11 @@ export class AccountState {
 
     // If user is already fetched, don't fetch again
     if (!user) {
-      userCopy = await Appwrite.accountProvider().get() as AccountModel.User;
+      try {
+        userCopy = await Appwrite.accountProvider().get() as AccountModel.User;
+      } catch (e: any) {
+        return;
+      }
     }
 
     // Set cacheBreaker to force image reload if not set
@@ -500,6 +532,26 @@ export class AccountState {
       patchState({
         user: userCopy
       });
+    }
+  }
+
+  private async fetchSessionData(patchState) {
+    let session = this.store.selectSnapshot(AccountState.session);
+
+    // If session is already fetched, don't fetch again
+    if (!session) {
+      try {
+        session = await Appwrite.accountProvider().getSession('current') as Models.Session;
+
+        patchState({
+          session
+        });
+      } catch (e: any) {
+        if (!Path.unauthorizedRoutes.includes(this.router.url)) {
+          this.store.dispatch(new Account.Redirect({path: Path.login, forward: false, navigateRoot: false}));
+        }
+        return;
+      }
     }
   }
 }

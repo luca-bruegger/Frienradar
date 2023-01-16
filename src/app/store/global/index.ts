@@ -24,6 +24,11 @@ export namespace GlobalActions {
     constructor(public payload: { error: Error }) {}
   }
 
+  export class HandleLoginError {
+    static readonly type = '[GlobalActions] Handle Login Error';
+    constructor(public payload: { error: Error }) {}
+  }
+
   export class ResetBackendUnderMaintenance {
     static readonly type = '[GlobalActions] Reset Backend Under Maintenance';
   }
@@ -94,6 +99,21 @@ export class GlobalState {
     //   await this.backendUnderMaintenanceModal.present();
     //   return;
     // }
+
+    this.store.dispatch(
+      new GlobalActions.ShowToast({
+        message: error.message,
+        color: 'danger',
+      })
+    );
+  }
+
+  @Action(GlobalActions.HandleLoginError)
+  async handleLoginError(
+    {patchState}: StateContext<GlobalStateModel>,
+    action: GlobalActions.HandleLoginError
+  ) {
+    const { error } = action.payload as { error: any };
 
     this.store.dispatch(
       new GlobalActions.ShowToast({

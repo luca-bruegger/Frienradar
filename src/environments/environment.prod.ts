@@ -8,5 +8,6 @@ export const environment = {
   geolocationsCollectionId: 'geolocations',
   contactsCollectionId: 'contacts',
   appUrl: 'https://app.frienradar.com',
-  googleAnalyticsId: ''
+  googleAnalyticsId: '',
+  usersDatabaseId: 'users'
 };

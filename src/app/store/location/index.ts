@@ -178,18 +178,7 @@ export class LocationState {
     const distanceStr = GeohashLength[geohashLength];
     const userId = this.store.selectSnapshot(AccountState.user).$id;
     const eightHoursAgo = this.store.selectSnapshot(LocationState.eightHoursAgo);
-    const recentGeohash = this.store.selectSnapshot(LocationState.geohash);
     const nearbyUsers = this.store.selectSnapshot(LocationState.nearbyUsers);
-
-    // Only fetch if geohash changed
-    if (recentGeohash === geohash && !!nearbyUsers[distanceStr]) {
-      return;
-    }
-
-    // Only fetch if distance has not yet been loaded
-    if (!!nearbyUsers[distanceStr]) {
-      return;
-    }
 
     try {
       const users = [];
@@ -203,7 +192,6 @@ export class LocationState {
 
         const data = {...nearbyUsers};
         data[distanceStr] = users;
-        console.log('data', data);
         patchState({
           nearbyUsers: data
         });

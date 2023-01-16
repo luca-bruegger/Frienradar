@@ -8,9 +8,9 @@ import { LocalPermission, LocalPermissionState } from '../../store/local-permiss
 import * as Filter from 'bad-words';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Account as AccountModel } from '../../model/account';
-import User = AccountModel.User;
-import { LocationService } from '../../core/service/location.service';
 import { AppInitService } from '../../core/service/app-init.service';
+import { Path } from '../../helper/path';
+import User = AccountModel.User;
 
 @Component({
   selector: 'app-additional-login-data',
@@ -73,6 +73,9 @@ export class AdditionalLoginDataComponent implements OnInit {
 
     this.readRouteParams();
     this.checkPermissions();
+    if (this.time === 60 && !this.user.emailVerification) {
+      this.verifyEmail();
+    }
   }
 
   back() {
@@ -97,7 +100,7 @@ export class AdditionalLoginDataComponent implements OnInit {
   }
 
 
-  finishAdditionalSetup() {
+  async finishAdditionalSetup() {
     if (!this.user.emailVerification) {
       this.store.dispatch(new GlobalActions.ShowToast({
         message: 'Bestätige deine Email Adresse zum fortfahren',
@@ -117,7 +120,7 @@ export class AdditionalLoginDataComponent implements OnInit {
       userId: this.user.$id,
       email: this.user.email
     })).toPromise().then(async () => {
-      await this.appInitService.startServices();
+      await this.store.dispatch(new Account.FinishAdditionalLogin());
       this.isLoading = false;
     });
   }

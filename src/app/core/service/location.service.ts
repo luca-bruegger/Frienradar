@@ -3,6 +3,7 @@ import { Geolocation } from '@capacitor/geolocation';
 import { AccountState, Location } from '../../store';
 import { Store } from '@ngxs/store';
 import * as ngeohash from 'ngeohash';
+import { GeohashLength } from '../../component/element/radar-display/radar-display.component';
 
 @Injectable({
   providedIn: 'root'
@@ -29,7 +30,7 @@ export class LocationService implements OnDestroy {
 
     this.callbackId = await Geolocation.watchPosition(this.geolocationOptions, (position) => {
       if (position && this.store.selectSnapshot(AccountState.isUserIsFullyRegistered)) {
-        const geohash = ngeohash.encode(position.coords.latitude, position.coords.longitude, 7);
+        const geohash = ngeohash.encode(position.coords.latitude, position.coords.longitude, GeohashLength.close);
         this.store.dispatch(new Location.UpdatePosition(geohash));
       }
     });

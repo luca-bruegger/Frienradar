@@ -7,7 +7,7 @@
     </div>
     <div style="width: 100%">
       <ion-label color="primary"><strong>{{user.username}}</strong></ion-label>
-      <p>Gesehen um: <br> <samp>{{lastSeen}}</samp></p>
+      <p>Gesehen um: <br> <strong>{{lastSeen}}</strong></p>
     </div>
     <div style="display: flex; align-items: center">
       <ion-chip *ngIf="!isRequested" (click)="requestUserContact()" color="secondary">

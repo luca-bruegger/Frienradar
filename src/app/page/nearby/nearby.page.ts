@@ -17,6 +17,7 @@ export class NearbyPage implements OnInit {
 
   private geohashLength: number;
   private geohash: string;
+  private distance: string;
 
   constructor(private store: Store) {}
 
@@ -35,27 +36,17 @@ export class NearbyPage implements OnInit {
   }
 
   distanceChanged(distance: string) {
+    this.distance = distance;
     this.geohashLength = Number(GeohashLength[distance]);
-    this.store.dispatch(new Location.FetchNearbyUser({
-        geohashLength: this.geohashLength,
-        geohash: this.geohash
-      }
-    )).toPromise().then(data => {
-      const users = data.location.nearbyUsers[distance];
-      if (users) {
-        this.nearbyUsersMap.clear();
-        users.forEach((user) => {
-          this.nearbyUsersMap.set(user.$id, user);
-          this.nearbyUsers = Array.from(this.nearbyUsersMap.values());
-        });
-      }
-    });
+    this.reloadNearbyUsers();
   }
 
-  reloadNearbyUsers() {
+  refresh() {
     if (this.isReloading) {
       return;
     }
+
+    this.reloadNearbyUsers();
 
     this.isReloading = true;
     this.reloadTime = 25;
@@ -104,5 +95,22 @@ export class NearbyPage implements OnInit {
 
   private checkForNearbyUsersChanges() {
 
+  }
+
+  private reloadNearbyUsers() {
+    this.store.dispatch(new Location.FetchNearbyUser({
+        geohashLength: this.geohashLength,
+        geohash: this.geohash
+      }
+    )).toPromise().then(data => {
+      const users = data.location.nearbyUsers[this.distance];
+      if (users) {
+        this.nearbyUsersMap.clear();
+        users.forEach((user) => {
+          this.nearbyUsersMap.set(user.$id, user);
+          this.nearbyUsers = Array.from(this.nearbyUsersMap.values());
+        });
+      }
+    });
   }
 }

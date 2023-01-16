@@ -73,4 +73,8 @@ export class LoginPage implements OnDestroy {
     this.profilePicture = profilePicture;
     this.formGroup.get('profilePicture').setValue(profilePicture);
   }
+
+  displayFormErrorByName(name: string, validationType: string) {
+    return this.formGroup.get(name).hasError(validationType) && (this.formGroup.get(name).dirty || this.formGroup.get(name).touched);
+  }
 }

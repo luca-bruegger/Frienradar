@@ -19,7 +19,7 @@ export class AuthGuard implements CanLoad {
     const isAuthenticated = !!this.store.selectSnapshot(AccountState.session);
 
     if (isAuthenticated) {
-      this.checkIfIsOnForbiddenRoute(segments);
+      this.checkIfIsOnUnauthorizedRoute(segments);
       return true;
     } else {
       if ('/' + segments[0].path !== Path.login) {
@@ -29,13 +29,8 @@ export class AuthGuard implements CanLoad {
     }
   }
 
-  private checkIfIsOnForbiddenRoute(segments: UrlSegment[]) {
-    const forbiddenRoutes = [
-      Path.login,
-      Path.additionalLoginData
-    ];
-
-    if (forbiddenRoutes.includes('/' + segments[0].path)) {
+  private checkIfIsOnUnauthorizedRoute(segments: UrlSegment[]) {
+    if (Path.unauthorizedRoutes.includes('/' + segments[0].path)) {
       this.navController.navigateBack([Path.getJumpTo()]);
     }
   }

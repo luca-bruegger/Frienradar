@@ -9,6 +9,10 @@ import { Haptics, ImpactStyle } from '@capacitor/haptics';
 export class TabsPage {
 
   async changeTab() {
-    await Haptics.impact({ style: ImpactStyle.Medium });
+    try {
+      await Haptics.impact({style: ImpactStyle.Medium});
+    } catch (e) {
+      return;
+    }
   }
 }

@@ -12,22 +12,24 @@
 <ion-content fullscreen="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large" style="color: var(--ion-color-primary)">Profil</ion-title>
+      <ion-title color="primary" size="large">Profil</ion-title>
     </ion-toolbar>
   </ion-header>
 
   <ion-grid class="ion-no-padding">
     <ion-row>
       <ion-col sizeXl="6" offsetXl="3" class="ion-padding">
-        <ng-template #loading style="display: flex; align-items: center; justify-content: center; gap: 10px">
-          <ion-spinner name="crescent" style="vertical-align: center"></ion-spinner>
-          <p>Profil wird geladen...</p>
+        <ng-template #loading>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 14px">
+            <ion-spinner name="crescent" style="vertical-align: center"></ion-spinner>
+            <p>Profil wird geladen...</p>
+          </div>
         </ng-template>
         <ion-card color="light" *ngIf="user$ | async; let user; else loading" class="ion-no-margin">
           <ion-card-content>
             <div style="display: flex; flex-direction: column" class="ion-padding-bottom">
               <div style="display: flex; flex-direction: row; gap: 20px">
-                <app-profile-picture-select [displayOnly]="true"
+                <app-profile-picture-select class="ion-padding-top" [displayOnly]="true"
                                             [profilePicture]="user.pictureBreaker"></app-profile-picture-select>
                 <div class="ion-padding-top">
                   <ion-text color="primary">
@@ -51,9 +53,9 @@
               </ion-item>
             </div>
             <div>
-              <ion-button (click)="openEditProfile()" expand="block" color="secondary">
-                <ion-icon class="text-icon" name="create-outline"></ion-icon>
-                <p class="icon-text">Profil bearbeiten</p>
+              <ion-button (click)="openEditProfile()" expand="block" color="bright">
+                <ion-icon color="light" class="text-icon" name="create-outline"></ion-icon>
+                <p class="icon-text" style="color: var(--ion-color-light)">Profil bearbeiten</p>
               </ion-button>
             </div>
           </ion-card-content>

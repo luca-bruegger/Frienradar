@@ -4,14 +4,14 @@ export class Path {
   static resetPassword = '/reset-password';
   static additionalLoginData = '/additional-login-data';
 
-  static forbiddenUrls = [
+  static unauthorizedRoutes = [
     Path.login,
     Path.resetPassword,
     Path.additionalLoginData
   ];
 
   static setJumpTo(url: string) {
-    if (this.forbiddenUrls.includes(url)) {
+    if (this.unauthorizedRoutes.includes(url)) {
       return;
     }
 

@@ -45,27 +45,36 @@ export class RadarDisplayComponent implements OnInit, OnChanges {
         .pipe(map(() => true), catchError(() => of(false)));
     }
 
-    if (this.geohash) {
-      this.updateLocationBox();
-    }
+    this.updateLocationBox();
   }
 
   ngOnChanges(simpleChanges) {
     const changedGeohash = simpleChanges.geohash;
     const changedDistance = simpleChanges.currentDistance;
 
-    if (changedDistance || changedGeohash && changedGeohash.currentValue !== '') {
-      const geohash = changedGeohash ? changedGeohash.currentValue : this.geohash;
-      const distance = changedDistance ? changedDistance.currentValue : this.currentDistance;
+    if (changedDistance || changedGeohash) {
+      if (changedDistance) {
+        console.log('distance changed', changedDistance.currentValue);
+        this.currentDistance = changedDistance.currentValue;
+      }
 
-      this.geohash = geohash;
-      this.currentDistance = distance;
+      if (changedGeohash && changedGeohash.currentValue && changedGeohash.currentValue.length > 0) {
+        console.log('geohash changed', changedGeohash.currentValue);
+        this.geohash = changedGeohash.currentValue;
+      }
+
+      console.log(this.geohash, this.currentDistance);
+
       this.updateLocationBox();
       this.resetLocationBox();
     }
   }
 
   private updateLocationBox() {
+    if (!this.geohash) {
+      return;
+    }
+
     const {lat, lng, boundaries} = MapsHelper.getLocationData(this.mapGeohashDistance, this.geohash);
     this.center = {lat, lng};
     this.bounds = MapsHelper.getBounds(boundaries);
@@ -103,14 +112,14 @@ export class RadarDisplayComponent implements OnInit, OnChanges {
 }
 
 enum MapZoom {
-  close = 16,
+  close = 15,
   nearby = 12,
-  remote = 7,
+  remote = 8,
   farAway = 5
 }
 
 export enum GeohashLength {
-  close = 7,
+  close = 6,
   nearby = 5,
   remote = 3,
   farAway = 2

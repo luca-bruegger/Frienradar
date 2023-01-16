@@ -23,7 +23,7 @@ export class NearbyUserElementComponent implements OnInit {
   }
 
   get lastSeen() {
-    return new Date(this.user.$updatedAt).toLocaleTimeString();
+    return new Date(this.user.$updatedAt).toLocaleTimeString().substring(0, 5);
   }
 
   profilePicture() {

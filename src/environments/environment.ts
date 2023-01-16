@@ -13,7 +13,9 @@ export const environment = {
   contactsCollectionId: 'contacts',
   appUrl: 'https://frienradar.com',
   googleAnalyticsId: '',
-  usernameCollectionId: 'usernames'
+  usernameCollectionId: 'usernames',
+  usersDatabaseId: 'users',
+  accountsCollectionId: 'accounts'
 };
 
 /*

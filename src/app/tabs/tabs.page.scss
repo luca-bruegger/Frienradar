@@ -9,7 +9,7 @@ ion-tab-bar {
 }
 
 ion-tab-bar {
-  background-color: var(--ion-color-light);
+  background-color: var(--ion-color-bright);
 }
 
 .ios ion-tab-button {
@@ -21,9 +21,9 @@ ion-tab-bar {
 }
 
 ion-tab-button {
-  --color: var(--ion-color-secondary);
-  --color-selected: var(--ion-color-primary);
-  --ripple-color: var(--ion-color-primary);
+  --color: var(--ion-color-light);
+  //--color-selected: var(--ion-color-primary);
+  //--ripple-color: var(--ion-color-primary);
 
   &::before {
     background-color: transparent;

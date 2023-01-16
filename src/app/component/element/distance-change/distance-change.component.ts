@@ -27,6 +27,10 @@ export class DistanceChangeComponent implements OnInit {
     const distance = $event.detail.value;
     this.store.dispatch(new Account.Update({ prefs: { distance } }));
     this.distanceChange.emit(distance);
-    await Haptics.impact({ style: ImpactStyle.Light });
+    try {
+      await Haptics.impact({ style: ImpactStyle.Light });
+    } catch (e) {
+      return;
+    }
   }
 }
