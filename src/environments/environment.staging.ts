@@ -14,7 +14,8 @@ export const environment = {
   appUrl: 'https://beta.frienradar.com',
   googleAnalyticsId: 'G-G2452L0H7H',
   usernameCollectionId: 'usernames',
-  usersDatabaseId: 'users'
+  usersDatabaseId: 'users',
+  accountsCollectonId: 'accounts'
 };
 
 /*
