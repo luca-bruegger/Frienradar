@@ -9,5 +9,7 @@ export const environment = {
   contactsCollectionId: 'contacts',
   appUrl: 'https://app.frienradar.com',
   googleAnalyticsId: '',
-  usersDatabaseId: 'users'
+  usernameCollectionId: 'usernames',
+  usersDatabaseId: 'users',
+  accountsCollectionId: 'accounts'
 };

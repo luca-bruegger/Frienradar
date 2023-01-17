@@ -15,7 +15,7 @@ export const environment = {
   googleAnalyticsId: 'G-G2452L0H7H',
   usernameCollectionId: 'usernames',
   usersDatabaseId: 'users',
-  accountsCollectonId: 'accounts'
+  accountsCollectionId: 'accounts'
 };
 
 /*
