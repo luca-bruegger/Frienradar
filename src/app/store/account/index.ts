@@ -12,12 +12,14 @@ import { Location } from '../location';
 import { environment } from '../../../environments/environment';
 import { AppInitService } from '../../core/service/app-init.service';
 import UserPrefs = AccountModel.UserPrefs;
+import { AccountData } from '../../model/accountData';
 
 /* State Model */
 @Injectable()
 export class AccountStateModel {
   user: AccountModel.User;
   session: Models.Session;
+  accountsData: [];
   username: string;
 }
 
@@ -84,6 +86,13 @@ export namespace Account {
     }
   }
 
+  export class UpdateAccountsData {
+    static readonly type = '[Auth] Update Accounts Data';
+
+    constructor(public payload: { accountsData: AccountData[] }) {
+    }
+  }
+
   export class VerificationExpired {
     static readonly type = '[Auth] Reset Password expired';
 
@@ -120,7 +129,8 @@ export namespace Account {
   defaults: {
     user: null,
     session: null,
-    username: null
+    username: null,
+    accountsData: null
   },
 })
 
@@ -151,6 +161,11 @@ export class AccountState {
   @Selector()
   static username(state: AccountStateModel) {
     return state.username;
+  }
+
+  @Selector()
+  static accountsData(state: AccountStateModel) {
+    return state.accountsData;
   }
 
   @Selector()
@@ -442,6 +457,26 @@ export class AccountState {
     }
   }
 
+  @Action(Account.UpdateAccountsData)
+  async updateAccountsData({patchState, dispatch}: StateContext<AccountStateModel>, action: Account.UpdateAccountsData) {
+    const { accountsData } = action.payload;
+    const preparedAccountsData = [];
+
+    accountsData.forEach((accountData: AccountData) => {
+      preparedAccountsData.push(accountData.key + ':' + accountData.username);
+    });
+
+    try {
+      await Appwrite.databasesProvider().updateDocument(
+        environment.usersDatabaseId,
+        environment.accountsCollectionId,
+        this.store.selectSnapshot(AccountState.user).$id,
+        {accounts: preparedAccountsData});
+    } catch (e: any) {
+      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
+    }
+  }
+
   @Action(Account.InitializeEmptyDocuments)
   async initializeEmptyDocuments({
                                    patchState,
@@ -517,6 +552,8 @@ export class AccountState {
       }
     }
 
+    await this.fetchUserAccountsData(userCopy, patchState);
+
     // Set cacheBreaker to force image reload if not set
     if (!userCopy.pictureBreaker) {
       userCopy.pictureBreaker = Picture.cacheBreaker();
@@ -550,6 +587,34 @@ export class AccountState {
         if (!Path.unauthorizedRoutes.includes(this.router.url)) {
           this.store.dispatch(new Account.Redirect({path: Path.login, forward: false, navigateRoot: false}));
         }
+        return;
+      }
+    }
+  }
+
+  private async fetchUserAccountsData(userCopy, patchState) {
+    const accountsData = this.store.selectSnapshot(AccountState.accountsData);
+    // If user is already fetched, don't fetch again
+    if (!accountsData) {
+      try {
+        const response = await Appwrite.databasesProvider().getDocument(
+          environment.usersDatabaseId,
+          environment.accountsCollectionId,
+          userCopy.$id
+        );
+
+        const fetchedAccountsData = response.accounts as string[];
+        const preparedAccountsData: AccountData[] = [];
+
+        fetchedAccountsData.forEach((accountData: string) => {
+          const [key, username] = accountData.split(':');
+          preparedAccountsData.push({key, username});
+        });
+
+        patchState({
+          accountsData: preparedAccountsData
+        });
+      } catch (e: any) {
         return;
       }
     }

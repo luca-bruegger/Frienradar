@@ -52,7 +52,8 @@ export class ProfilePictureSelectComponent implements OnChanges {
       promptLabelPicture: 'Foto aufnehmen',
       promptLabelPhoto: 'Bild auswählen',
       promptLabelCancel: 'Abbrechen',
-      promptLabelHeader: 'Profilbild auswählen'
+      promptLabelHeader: 'Profilbild auswählen',
+      source: 'PHOTOS'
     } as ImageOptions;
 
 

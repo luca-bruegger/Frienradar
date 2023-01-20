@@ -5,6 +5,7 @@ export type AccountPreset = {
   backgroundStyle: string;
   titleStyle: string;
   textStyle: string;
+  profileUrl: string;
 };
 
 export class AccountPresets {
@@ -15,7 +16,8 @@ export class AccountPresets {
       icon: 'logo-discord',
       backgroundStyle: 'background: linear-gradient(135deg, #7289DA 0%, #2C2F33 100%)',
       titleStyle: 'color: #fff',
-      textStyle: 'color: #fff'
+      textStyle: 'color: #fff',
+      profileUrl: 'https://discord.com/users/'
     },
     {
       key: 'twitter',
@@ -23,7 +25,8 @@ export class AccountPresets {
       name: 'Twitter',
       icon: 'logo-twitter',
       titleStyle: 'color: #fff',
-      textStyle: 'color: #fff'
+      textStyle: 'color: #fff',
+      profileUrl: 'https://twitter.com/'
     },
     {
       key: 'instagram',
@@ -31,7 +34,8 @@ export class AccountPresets {
       name: 'Instagram',
       icon: 'logo-instagram',
       titleStyle: 'color: #fff',
-      textStyle: 'color: #fff'
+      textStyle: 'color: #fff',
+      profileUrl: 'https://www.instagram.com/'
     },
     {
       key: 'snapchat',
@@ -39,7 +43,8 @@ export class AccountPresets {
       name: 'Snapchat',
       icon: 'logo-snapchat',
       titleStyle: 'color: #000',
-      textStyle: 'color: #000'
+      textStyle: 'color: #000',
+      profileUrl: 'https://www.snapchat.com/add/'
     },
     {
       key: 'facebook',
@@ -47,7 +52,8 @@ export class AccountPresets {
       name: 'Facebook',
       icon: 'logo-facebook',
       titleStyle: 'color: #fff',
-      textStyle: 'color: #fff'
+      textStyle: 'color: #fff',
+      profileUrl: 'https://www.facebook.com/'
     },
     {
       key: 'linkedin',
@@ -55,7 +61,8 @@ export class AccountPresets {
       name: 'LinkedIn',
       icon: 'logo-linkedin',
       titleStyle: 'color: #fff',
-      textStyle: 'color: #fff'
+      textStyle: 'color: #fff',
+      profileUrl: 'https://www.linkedin.com/in/'
     },
     {
       key: 'tiktok',
@@ -63,7 +70,8 @@ export class AccountPresets {
       name: 'TikTok',
       icon: 'logo-tiktok',
       titleStyle: 'color: #fff',
-      textStyle: 'color: #fff'
+      textStyle: 'color: #fff',
+      profileUrl: 'https://www.tiktok.com/@'
     },
     {
       key: 'youtube',
@@ -71,7 +79,8 @@ export class AccountPresets {
       name: 'YouTube',
       icon: 'logo-youtube',
       titleStyle: 'color: #fff',
-      textStyle: 'color: #fff'
+      textStyle: 'color: #fff',
+      profileUrl: 'https://www.youtube.com/channel/'
     },
     {
       key: 'twitch',
@@ -79,7 +88,8 @@ export class AccountPresets {
       name: 'Twitch',
       icon: 'logo-twitch',
       titleStyle: 'color: #fff',
-      textStyle: 'color: #fff'
+      textStyle: 'color: #fff',
+      profileUrl: 'https://www.twitch.tv/'
     },
     {
       key: 'reddit',
@@ -87,7 +97,8 @@ export class AccountPresets {
       name: 'Reddit',
       icon: 'logo-reddit',
       titleStyle: 'color: #fff',
-      textStyle: 'color: #fff'
+      textStyle: 'color: #fff',
+      profileUrl: 'https://www.reddit.com/user/'
     },
     {
       key: 'github',
@@ -95,7 +106,8 @@ export class AccountPresets {
       name: 'GitHub',
       icon: 'logo-github',
       titleStyle: 'color: #fff',
-      textStyle: 'color: #fff'
+      textStyle: 'color: #fff',
+      profileUrl: 'https://www.github.com/'
     },
     {
       key: 'pinterest',
@@ -103,7 +115,8 @@ export class AccountPresets {
       name: 'Pinterest',
       icon: 'logo-pinterest',
       titleStyle: 'color: #fff',
-      textStyle: 'color: #fff'
+      textStyle: 'color: #fff',
+      profileUrl: 'https://www.pinterest.com/'
     },
     {
       key: 'tumblr',
@@ -111,7 +124,8 @@ export class AccountPresets {
       name: 'Tumblr',
       icon: 'logo-tumblr',
       titleStyle: 'color: #fff',
-      textStyle: 'color: #fff'
+      textStyle: 'color: #fff',
+      profileUrl: 'https://'
     },
     {
       key: 'soundcloud',
@@ -119,7 +133,8 @@ export class AccountPresets {
       name: 'SoundCloud',
       icon: 'logo-soundcloud',
       titleStyle: 'color: #fff',
-      textStyle: 'color: #fff'
+      textStyle: 'color: #fff',
+      profileUrl: 'https://soundcloud.com/'
     },
     {
       key: 'spotify',
@@ -127,7 +142,8 @@ export class AccountPresets {
       name: 'Spotify',
       icon: 'logo-spotify',
       titleStyle: 'color: #fff',
-      textStyle: 'color: #fff'
+      textStyle: 'color: #fff',
+      profileUrl: 'https://open.spotify.com/user/'
     },
     {
       key: 'steam',
@@ -135,7 +151,8 @@ export class AccountPresets {
       name: 'Steam',
       icon: 'logo-steam',
       titleStyle: 'color: #fff',
-      textStyle: 'color: #fff'
+      textStyle: 'color: #fff',
+      profileUrl: 'https://steamcommunity.com/id/'
     },
     {
       key: 'xbox',
@@ -143,7 +160,8 @@ export class AccountPresets {
       name: 'Xbox',
       icon: 'logo-xbox',
       titleStyle: 'color: #fff',
-      textStyle: 'color: #fff'
+      textStyle: 'color: #fff',
+      profileUrl: 'https://account.xbox.com/en-US/Profile?Gamertag='
     },
     {
       key: 'playstation',
@@ -151,7 +169,8 @@ export class AccountPresets {
       name: 'PlayStation',
       icon: 'logo-playstation',
       titleStyle: 'color: #fff',
-      textStyle: 'color: #fff'
+      textStyle: 'color: #fff',
+      profileUrl: 'https://my.playstation.com/profile/'
     },
     {
       key: 'nintendo',
@@ -159,7 +178,8 @@ export class AccountPresets {
       name: 'Nintendo',
       icon: 'logo-nintendo',
       titleStyle: 'color: #fff',
-      textStyle: 'color: #fff'
+      textStyle: 'color: #fff',
+      profileUrl: 'https://my.nintendo.com/profile/'
     },
   ];
 }
