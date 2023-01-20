@@ -35,7 +35,7 @@
           <div *ngIf="!isSelectedItem(accountPreset.key) && accountsFormGroup.get(accountPreset.key).value.length > 0">
             <ion-card-content style="{{accountPreset.textStyle}}" class="ion-no-padding ion-padding-horizontal">
               <ion-item lines="none">
-                <ion-input type="text" disabled="true" formControlName="{{accountPreset.key}}"></ion-input>
+                <ion-input type="text" [disabled]="true" formControlName="{{accountPreset.key}}"></ion-input>
               </ion-item>
             </ion-card-content>
           </div>
