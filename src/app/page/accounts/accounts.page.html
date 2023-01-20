@@ -42,7 +42,7 @@
 
           <ion-item *ngIf="isSelectedItem(accountPreset.key)" fill="solid" lines="none"
                     class="ion-margin-horizontal">
-            <ion-input placeholder="Benutzername" [formControl]="accountsFormGroup.get(accountPreset.key)"></ion-input>
+            <ion-input placeholder="Benutzername" formControlName="{{accountPreset.key}}"></ion-input>
           </ion-item>
 
           <div class="ion-padding-horizontal ion-padding-vertical" *ngIf="!isSelectedItem(accountPreset.key)" style="display: flex">
@@ -100,7 +100,7 @@
 
           <ion-item *ngIf="isSelectedItem(accountPreset.key)" fill="solid" lines="none"
                     class="ion-margin-horizontal">
-            <ion-input placeholder="Benutzername" [formControl]="accountsFormGroup.get(accountPreset.key)"></ion-input>
+            <ion-input placeholder="Benutzername" formControlName="{{accountPreset.key}}"></ion-input>
           </ion-item>
 
           <div class="ion-margin-horizontal ion-padding-vertical" *ngIf="!isSelectedItem(accountPreset.key)">
