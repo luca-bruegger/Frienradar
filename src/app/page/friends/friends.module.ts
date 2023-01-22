@@ -1,14 +1,10 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
 import { IonicModule } from '@ionic/angular';
-
-import { NearbyPageRoutingModule } from './nearby-routing.module';
-
-import { NearbyPage } from './nearby.page';
-import { SharedModule } from '../../shared.module';
-import { NearbyUserElementComponent } from '../../component/element/nearby-user-element/nearby-user-element.component';
+import { FriendsPageRoutingModule } from './friends-routing.module';
+import { FriendsPage } from './friends.page';
+import { FriendRequestsComponent } from '../../component/friend-requests/friend-requests.component';
 import { NgCircleProgressModule } from 'ng-circle-progress';
 
 @NgModule({
@@ -16,8 +12,7 @@ import { NgCircleProgressModule } from 'ng-circle-progress';
     CommonModule,
     FormsModule,
     IonicModule,
-    NearbyPageRoutingModule,
-    SharedModule,
+    FriendsPageRoutingModule,
     NgCircleProgressModule.forRoot({
       radius: 100,
       outerStrokeWidth: 16,
@@ -27,6 +22,9 @@ import { NgCircleProgressModule } from 'ng-circle-progress';
       animationDuration: 300,
     })
   ],
-  declarations: [NearbyPage, NearbyUserElementComponent],
+  declarations: [
+    FriendsPage,
+    FriendRequestsComponent
+  ]
 })
-export class NearbyPageModule {}
+export class FriendsPageModule {}

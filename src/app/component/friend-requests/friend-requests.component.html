@@ -1,0 +1,65 @@
+<ion-header>
+  <ion-toolbar color="vbright">
+    <ion-buttons slot="start">
+      <ion-back-button style="color: var(--ion-color-dark)" text="Zurück" defaultHref="/tabs/friends" color="primary"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Anfragen</ion-title>
+    <ion-chip color="primary" slot="end" style="margin-right: 13px">
+      <ion-icon name="mail"></ion-icon>
+      <ion-label>{{fetchedUsers.length}}</ion-label>
+    </ion-chip>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list class="ion-padding">
+    <ion-card color="vbright" *ngFor="let contact of fetchedUsers;" class="ion-no-margin">
+      <ion-card-content style="display: flex; flex-direction: row; gap: 15px; flex-grow: 1">
+        <ion-grid class="ion-no-padding">
+          <ion-row class="ion-no-margin ion-no-padding">
+            <ion-col class="ion-no-padding ion-no-margin" style="display: flex">
+              <div style="display: inline">
+                <ion-avatar style="height: 64px; width: 64px">
+                  <img style="aspect-ratio: 1/1" src="{{profilePicture(contact.$id, contact.pictureBreaker)}}">
+                </ion-avatar>
+              </div>
+              <div style="width: 100%; margin-left: 10px">
+                <ion-label color="secondary">
+                  <h1><strong>{{contact.username}}</strong></h1>
+                  <p>Angefragt um: <br> <strong>22:15</strong></p>
+                </ion-label>
+              </div>
+            </ion-col>
+          </ion-row>
+          <ion-row class="ion-no-margin ion-no-padding">
+            <ion-col class="ion-no-padding ion-no-margin ion-margin-top">
+              <div style="display: flex; align-items: center; justify-content: space-evenly">
+                <ion-button size="small" (click)="acceptRequest(contact)" color="success" fill="outline">Annehmen</ion-button>
+                <ion-button size="small" (click)="declineRequest(contact)" color="danger" fill="outline">Ablehnen</ion-button>
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+  </ion-list>
+
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="refresh()">
+      <ion-icon *ngIf="interval === null" name="reload"></ion-icon>
+      <circle-progress *ngIf="interval" style="padding-top: 3px;"
+                       [percent]="percent"
+                       [radius]="20"
+                       [outerStrokeWidth]="2"
+                       [outerStrokeColor]="'#ffffff'"
+                       [titleColor]="'#ffffff'"
+                       [clockwise]="true"
+                       [animation]="false"
+                       [showInnerStroke]="false"
+                       [showSubtitle]="false"
+                       [showUnits]="false"
+                       title="{{reloadTime}}"
+      ></circle-progress>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

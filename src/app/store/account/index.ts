@@ -361,7 +361,7 @@ export class AccountState {
   ) {
     const email = action.payload;
     try {
-      await Appwrite.accountProvider().createRecovery(email, `${environment.appUrl}/reset-password'`);
+      await Appwrite.accountProvider().createRecovery(email, `${environment.appUrl}/reset-password`);
 
       await this.store.dispatch(new GlobalActions.ShowToast({
         message: 'Mail gesendet. Bitte prüfe deine E-Mails.',
@@ -584,7 +584,8 @@ export class AccountState {
           session
         });
       } catch (e: any) {
-        if (!Path.unauthorizedRoutes.includes(this.router.url)) {
+        if (!Path.unauthorizedRoutes.includes(this.router.url.split('?')[0])) {
+          console.log('Session expired');
           this.store.dispatch(new Account.Redirect({path: Path.login, forward: false, navigateRoot: false}));
         }
         return;

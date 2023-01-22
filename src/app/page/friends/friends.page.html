@@ -1,0 +1,32 @@
+<ion-header>
+  <ion-toolbar color="vbright">
+    <ion-title>Freunde</ion-title>
+    <ion-chip color="secondary" slot="end" style="margin-right: 13px">
+      <ion-icon name="people"></ion-icon>
+      <ion-label>0</ion-label>
+    </ion-chip>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-header collapse="condense" class="ion-no-margin">
+    <ion-toolbar>
+      <ion-title size="large" style="color: var(--ion-color-primary)">Freunde</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <div
+    style="position:absolute; top: 50%; left: 50%; display: flex; flex-direction: column; text-align: center; align-items: center; transform: translate(-50%, -50%);">
+    <ion-label>Du hast zurzeit noch keine Freunde. Es wird Zeit dies zu ändern :)</ion-label>
+    <ion-button color="secondary" expand="block" routerLink="/tabs/nearby" class="ion-margin-top">
+      <ion-icon slot="start" name="body"></ion-icon>
+      <ion-label>Benutzer in der Nähe</ion-label>
+    </ion-button>
+  </div>
+
+  <ion-fab vertical="bottom" horizontal="center" slot="fixed">
+    <ion-badge *ngIf="count > 0" color="danger" style="right: -5px; top: 0px; z-index: 3; position: absolute;">{{count}}</ion-badge>
+    <ion-fab-button color="primary" routerLink="/tabs/friends/requests">
+      <ion-icon name="mail"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

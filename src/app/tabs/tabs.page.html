@@ -3,7 +3,8 @@
     <ion-tab-button tab="accounts">
       <ion-icon name="layers-outline"></ion-icon>
     </ion-tab-button>
-    <ion-tab-button tab="chat">
+    <ion-tab-button tab="friends">
+      <ion-badge *ngIf="count > 0" color="danger" style="right: -15px; top: 3px; z-index: 3; position: absolute; max-width: min-content">{{count}}</ion-badge>
       <ion-icon name="people-outline"></ion-icon>
     </ion-tab-button>
     <ion-tab-button tab="radar">

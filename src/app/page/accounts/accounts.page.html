@@ -1,5 +1,5 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar color="vbright">
     <ion-title>Konten</ion-title>
   </ion-toolbar>
 </ion-header>
@@ -11,10 +11,10 @@
     </ion-toolbar>
   </ion-header>
   <ion-grid class="ion-no-padding ion-padding-horizontal">
-    <h1 *ngIf="connectedAccounts.length > 0">Verbundene Accounts</h1>
+    <h1 *ngIf="connectedAccounts.length > 0" style="color: var(--ion-color-secondary)" class="ion-no-margin ion-margin-bottom">Verbundene Accounts</h1>
     <ion-row style="gap: 10px" [formGroup]="accountsFormGroup">
       <ion-col size="12" size-lg="4" size-xl="3" size-md="5" size-sm="8" push-xl="1.5" push-lg="2" push-md="1"
-               push-sm="2" *ngFor="let accountPreset of connectedAccounts">
+               push-sm="2" *ngFor="let accountPreset of connectedAccounts" class="ion-margin-bottom">
         <ion-card style="{{accountPreset.backgroundStyle}}" class="ion-no-margin">
           <ion-card-header>
             <div style="display: flex;">
@@ -64,11 +64,11 @@
         </ion-card>
       </ion-col>
     </ion-row>
-    <h1>Verfügbare Accounts</h1>
+    <h1 style="color: var(--ion-color-secondary)" class="ion-no-margin ion-margin-bottom" >Verfügbare Accounts</h1>
 
     <ion-row>
       <ion-col size="12" size-lg="8" size-xl="9" size-md="10" size-sm="8" push-xl="1.5" push-lg="2" push-md="1" push-sm="2">
-        <ion-searchbar color="light" placeholder="Suchen"
+        <ion-searchbar color="light" placeholder="Suchen" class="ion-no-padding ion-padding-vertical"
                        [(ngModel)]="searchBarValue"></ion-searchbar>
       </ion-col>
     </ion-row>

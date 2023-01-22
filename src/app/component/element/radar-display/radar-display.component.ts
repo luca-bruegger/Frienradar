@@ -29,11 +29,8 @@ export class RadarDisplayComponent implements OnInit, OnChanges {
   accelHandler: PluginListenerHandle;
 
   locationBoxOptions = {
-    strokeColor: '#0177B6',
-    strokeOpacity: 0.5,
-    strokeWeight: 3.0,
-    fillColor: '#04B3D8',
-    fillOpacity: 0.2
+    strokeColor: '#8ddae6',
+    fillColor: '#8ddae6',
   };
 
   constructor(private httpClient: HttpClient) {

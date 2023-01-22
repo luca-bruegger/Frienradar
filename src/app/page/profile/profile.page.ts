@@ -16,7 +16,6 @@ import { SettingsComponent } from '../../component/element/settings/settings.com
 export class ProfilePage {
   @Select(AccountState.user) user$: Observable<Partial<AccountModel.User>>;
 
-
   constructor(private alertController: AlertController,
               private modalController: ModalController,
               private routerOutlet: IonRouterOutlet,
@@ -90,8 +89,8 @@ export class ProfilePage {
   async openSettings() {
     const modal = await this.modalController.create({
       component: SettingsComponent,
-      initialBreakpoint: 0.3,
-      breakpoints: [0.3, 0.85]
+      initialBreakpoint: 0.27,
+      breakpoints: [0.27, 0.85]
     });
 
     await modal.present();

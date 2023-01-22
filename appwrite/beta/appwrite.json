@@ -1,0 +1,21 @@
+{
+    "projectId": "638b8a8bda11a2ebe8fc",
+    "projectName": "Frienradar beta",
+    "functions": [
+        {
+            "$id": "contact-requests",
+            "name": "Contact request",
+            "runtime": "node-16.0",
+            "path": "functions/Contact request",
+            "entrypoint": "src/index.js",
+            "ignore": [
+                "node_modules",
+                ".npm"
+            ],
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
+        }
+    ]
+}

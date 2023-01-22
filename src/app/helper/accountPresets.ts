@@ -48,7 +48,7 @@ export class AccountPresets {
     },
     {
       key: 'facebook',
-      backgroundStyle: 'background-color: #4267B2; color: white;',
+      backgroundStyle: 'background:linear-gradient(120deg, #3b5998, #FFFFFF);',
       name: 'Facebook',
       icon: 'logo-facebook',
       titleStyle: 'color: #fff',
@@ -57,7 +57,7 @@ export class AccountPresets {
     },
     {
       key: 'linkedin',
-      backgroundStyle: 'background-color: #0A66C2; color: white;',
+      backgroundStyle: 'background:linear-gradient(45deg, #000000, #0077b5, #00a0dc);',
       name: 'LinkedIn',
       icon: 'logo-linkedin',
       titleStyle: 'color: #fff',
@@ -75,7 +75,7 @@ export class AccountPresets {
     },
     {
       key: 'youtube',
-      backgroundStyle: 'background-color: #FF0000; color: white;',
+      backgroundStyle: 'background:linear-gradient(120deg, #ff0000, #282828);',
       name: 'YouTube',
       icon: 'logo-youtube',
       titleStyle: 'color: #fff',
@@ -93,7 +93,7 @@ export class AccountPresets {
     },
     {
       key: 'reddit',
-      backgroundStyle: 'background-color: #FF4500; color: white;',
+      backgroundStyle: 'background:linear-gradient(-120deg, #ff4500, #5f99cf, #cee3f8);',
       name: 'Reddit',
       icon: 'logo-reddit',
       titleStyle: 'color: #fff',
@@ -111,7 +111,7 @@ export class AccountPresets {
     },
     {
       key: 'pinterest',
-      backgroundStyle: 'background-color: #E60023; color: white;',
+      backgroundStyle: 'background:linear-gradient(-120deg, #FFFFFF, #bd081c, #000000);',
       name: 'Pinterest',
       icon: 'logo-pinterest',
       titleStyle: 'color: #fff',
@@ -120,7 +120,7 @@ export class AccountPresets {
     },
     {
       key: 'tumblr',
-      backgroundStyle: 'background-color: #35465C; color: white;',
+      backgroundStyle: 'background:linear-gradient(120deg, #35465c, #FFFFFF);',
       name: 'Tumblr',
       icon: 'logo-tumblr',
       titleStyle: 'color: #fff',
@@ -129,7 +129,7 @@ export class AccountPresets {
     },
     {
       key: 'soundcloud',
-      backgroundStyle: 'background-color: #FF3300; color: white;',
+      backgroundStyle: 'background:linear-gradient(120deg, #ff8800, #ff3300);',
       name: 'SoundCloud',
       icon: 'logo-soundcloud',
       titleStyle: 'color: #fff',
@@ -138,7 +138,7 @@ export class AccountPresets {
     },
     {
       key: 'spotify',
-      backgroundStyle: 'background-color: #1DB954; color: white;',
+      backgroundStyle: 'background:linear-gradient(120deg, #1db954, #191414);',
       name: 'Spotify',
       icon: 'logo-spotify',
       titleStyle: 'color: #fff',
@@ -147,7 +147,7 @@ export class AccountPresets {
     },
     {
       key: 'steam',
-      backgroundStyle: 'background-color: #000000; color: white;',
+      backgroundStyle: 'background:linear-gradient(120deg, #00adee, #000000);',
       name: 'Steam',
       icon: 'logo-steam',
       titleStyle: 'color: #fff',
@@ -156,7 +156,7 @@ export class AccountPresets {
     },
     {
       key: 'xbox',
-      backgroundStyle: 'background-color: #107C10; color: white;',
+      backgroundStyle: 'background:linear-gradient(120deg, #52b043, #FFFFFF);',
       name: 'Xbox',
       icon: 'logo-xbox',
       titleStyle: 'color: #fff',
@@ -165,7 +165,7 @@ export class AccountPresets {
     },
     {
       key: 'playstation',
-      backgroundStyle: 'background-color: #003087; color: white;',
+      backgroundStyle: 'background:linear-gradient(120deg, #FFFFFF, #000080);',
       name: 'PlayStation',
       icon: 'logo-playstation',
       titleStyle: 'color: #fff',
@@ -181,5 +181,14 @@ export class AccountPresets {
       textStyle: 'color: #fff',
       profileUrl: 'https://my.nintendo.com/profile/'
     },
+    {
+      key: 'deezermusic',
+      backgroundStyle: 'background:linear-gradient(56deg, rgba(255,237,0,1) 14%, rgba(255,0,146,1) 38%, rgba(0,199,242,1) 70%, rgba(193,241,252,1) 100%);',
+      name: 'Deezer',
+      icon: 'musical-notes',
+      titleStyle: 'color: #fff',
+      textStyle: 'color: #fff',
+      profileUrl: 'https://www.deezer.com/profile/'
+    }
   ];
 }

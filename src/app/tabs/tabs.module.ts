@@ -6,10 +6,10 @@ import { TabsPage } from './tabs.page';
 
 import { TabsPageRoutingModule } from './tabs-routing.module';
 import { NearbyPageModule } from '../page/nearby/nearby.module';
-import { ChatPageModule } from '../page/chat/chat.module';
 import { AccountsPageModule } from '../page/accounts/accounts.module';
 import { ProfilePageModule } from '../page/profile/profile.module';
 import { RadarPageModule } from '../page/radar/radar.module';
+import { FriendsPageModule } from '../page/friends/friends.module';
 
 @NgModule({
   imports: [
@@ -17,7 +17,7 @@ import { RadarPageModule } from '../page/radar/radar.module';
     FormsModule,
     IonicModule,
     TabsPageRoutingModule,
-    ChatPageModule,
+    FriendsPageModule,
     AccountsPageModule,
     NearbyPageModule,
     ProfilePageModule,

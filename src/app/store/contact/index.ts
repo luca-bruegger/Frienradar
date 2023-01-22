@@ -1,14 +1,12 @@
 import { Injectable, NgZone } from '@angular/core';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { GlobalActions } from '../global';
-import { Observable } from 'rxjs';
 import { NavController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Contact as ContactModel } from '../../model/contact';
 import { Appwrite } from '../../helper/appwrite';
 import { AccountState } from '../account';
-import { Permission, Role } from 'appwrite';
-import { Md5 } from 'ts-md5';
+import { Query } from 'appwrite';
 import { environment } from '../../../environments/environment';
 
 /* State Model */
@@ -27,6 +25,20 @@ export namespace Contact {
     static readonly type = '[Contact] Request';
 
     constructor(public payload: { requestUserId: string }) {
+    }
+  }
+
+  export class RemoveRequest {
+    static readonly type = '[Contact] Remove Request';
+
+    constructor(public payload: { requestUserId: string }) {
+    }
+  }
+
+  export class UpdateRequested {
+    static readonly type = '[Contact] UpdateRequested';
+
+    constructor(public payload: { requested: string[] }) {
     }
   }
 }
@@ -51,6 +63,35 @@ export class ContactState {
     return state.contacts;
   }
 
+  @Selector()
+  static requestedCount(state: ContactStateModel) {
+    return state.contacts.receivedFrom.length;
+  }
+
+  @Selector()
+  static requested(state: ContactStateModel) {
+    return state.contacts.receivedFrom;
+  }
+
+  @Selector()
+  static sentTo(state: ContactStateModel) {
+    return state.contacts.sentTo;
+  }
+
+  @Action(Contact.UpdateRequested)
+  async updateRequested(
+    {patchState, dispatch}: StateContext<ContactStateModel>,
+    action: Contact.UpdateRequested
+  ) {
+    const {requested} = action.payload;
+    const filteredRequested = requested.filter((item) => item !== '');
+    patchState({
+      contacts: {
+        requested: filteredRequested
+      } as unknown as ContactModel
+    });
+  }
+
   @Action(Contact.Fetch)
   async fetch(
     {patchState, dispatch}: StateContext<ContactStateModel>,
@@ -61,25 +102,41 @@ export class ContactState {
 
     try {
       // If session is already fetched, don't fetch again
-      if (!contacts) {
-        const loaded_contacts = await Appwrite.databasesProvider().getDocument(environment.radarDatabaseId, 'contacts', userId);
-        patchState({
-          contacts: loaded_contacts as unknown as ContactModel
-        });
-      }
-    } catch (e: any) {
-      if (e.type == 'document_not_found') {
-        await Appwrite.databasesProvider().createDocument(environment.radarDatabaseId, environment.contactsCollectionId, userId, {
-          accepted: [],
-          requested: []
-        }, [
-          Permission.read(Role.users()),
-          Permission.delete(Role.user(userId)),
-          Permission.write(Role.user(userId))
+      const receivedFromData = await Appwrite.databasesProvider().listDocuments(
+        environment.radarDatabaseId,
+        environment.contactsCollectionId,
+        [
+          Query.equal('recipient', userId)
         ]);
-        return;
-      }
-      this.store.dispatch(new GlobalActions.HandleError({ error: e as Error }));
+      const receivedFrom = receivedFromData.documents.map((item) => item.sender);
+
+      const sentToData = await Appwrite.databasesProvider().listDocuments(
+        environment.radarDatabaseId,
+        environment.contactsCollectionId,
+        [
+          Query.equal('sender', userId)
+        ]);
+
+      const sentTo = sentToData.documents.map((item) => item.recipient);
+      patchState({
+        contacts: {
+          receivedFrom,
+          sentTo
+        } as unknown as ContactModel
+      });
+    } catch (e: any) {
+      // if (e.type === 'document_not_found') {
+      //   await Appwrite.databasesProvider().createDocument(environment.radarDatabaseId, environment.contactsCollectionId, userId, {
+      //     accepted: [],
+      //     requested: []
+      //   }, [
+      //     Permission.read(Role.users()),
+      //     Permission.delete(Role.user(userId)),
+      //     Permission.write(Role.user(userId))
+      //   ]);
+      //   return;
+      // }
+      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
     }
   }
 
@@ -88,55 +145,47 @@ export class ContactState {
     {patchState, dispatch}: StateContext<ContactStateModel>,
     action: Contact.Request
   ) {
-    const { requestUserId } = action.payload;
-    const userId = this.store.selectSnapshot(AccountState.user).$id;
+    const {requestUserId} = action.payload;
+    const currentUserId = this.store.selectSnapshot(AccountState.user).$id;
     const contacts = this.store.selectSnapshot(ContactState.contacts);
 
+    try {
+      const requestedUserContacts = await Appwrite.databasesProvider().createDocument(
+        environment.radarDatabaseId,
+        environment.contactsCollectionId,
+        'unique()',
+        {
+          sender: currentUserId,
+          recipient: requestUserId
+        }
+      );
+
+      const updatedContacts = {
+        sentTo: [...contacts.sentTo, requestUserId],
+        receivedFrom: contacts.receivedFrom
+      };
+
+      patchState({
+        contacts: updatedContacts
+      });
+    } catch (e: any) {
+      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
+    }
+  }
+
+  @Action(Contact.RemoveRequest)
+  async removeRequest(
+    {patchState, dispatch}: StateContext<ContactStateModel>,
+    action: Contact.RemoveRequest
+  ) {
+    const { requestUserId } = action.payload;
+    const currentUserId = this.store.selectSnapshot(AccountState.user).$id;
+    const contacts = this.store.selectSnapshot(ContactState.contacts);
 
     try {
-      if (!contacts.requested.includes(requestUserId)) {
-        const hash = Md5.hashStr('password');
-        console.log(hash);
 
-
-        // CREATE REQUEST
-        /*
-
-           --- REQUEST ---
-           First create new document (random id, { requestUserId: userId, userId: requestUserId, accepted: false })
-           add requestUserId to contacts.requested from current user
-
-           --- ACCEPT ---
-           Delete request Document, add requestUserId to contacts.accepted from current user !!Make sure document can only be updated from current user!!
-           remove requestUserId from contacts.requested from current user
-
-            --- REJECT ---
-            Delete request Document (where requestUserId matches current user id), remove requestUserId from contacts.requested from current user
-
-         */
-
-        // const loaded_contacts = await Appwrite.databasesProvider().updateDocument('radar', 'friendships', , {
-        //   accepted: false
-        // }, [
-        //   Permission.read(Role.user(userId)),
-        //   Permission.read(Role.user(requestUserId)),
-        //   Permission.delete(Role.user(requestUserId)),
-        //   Permission.delete(Role.user(userId)),
-        //   Permission.write(Role.user(requestUserId)),
-        // ]);
-        patchState({
-          //contacts: loaded_contacts as unknown as ContactModel
-        });
-      } else {
-        dispatch(
-          new GlobalActions.ShowToast({
-            message: 'Already requested',
-            color: 'danger',
-          })
-        );
-      }
     } catch (e: any) {
-      this.store.dispatch(new GlobalActions.HandleError({ error: e as Error }));
+      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
     }
   }
 }

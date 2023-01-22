@@ -1,15 +1,12 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
-
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
-
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PasswordStrengthMeterModule } from 'angular-password-strength-meter';
 import { TabsPageModule } from './tabs/tabs.module';
-
 import { NgxIntlTelInputModule } from 'ngx-intl-tel-input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LoginPageModule } from './page/login/login.module';
@@ -43,16 +40,17 @@ import { HttpClientJsonpModule, HttpClientModule } from '@angular/common/http';
   ],
   providers: [
     {provide: RouteReuseStrategy, useClass: IonicRouteStrategy},
-/*    {
-      provide: APP_INITIALIZER,
-      useFactory: appConfigFactory,
-      deps: [AppInitService],
-      multi: true
-    }*/
+    /*    {
+          provide: APP_INITIALIZER,
+          useFactory: appConfigFactory,
+          deps: [AppInitService],
+          multi: true
+        }*/
   ],
   bootstrap: [AppComponent],
   exports: [],
   schemas: []
 })
 
-export class AppModule {}
+export class AppModule {
+}

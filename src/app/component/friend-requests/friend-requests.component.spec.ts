@@ -1,18 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
-import { FriendsPage } from '../../app/page/friends/friends-page.component';
 
-describe('ChatPage', () => {
-  let component: FriendsPage;
-  let fixture: ComponentFixture<FriendsPage>;
+import { FriendRequestsComponent } from './friend-requests.component';
+
+describe('FriendRequestsComponent', () => {
+  let component: FriendRequestsComponent;
+  let fixture: ComponentFixture<FriendRequestsComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ FriendsPage ],
+      declarations: [ FriendRequestsComponent ],
       imports: [IonicModule.forRoot()]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(FriendsPage);
+    fixture = TestBed.createComponent(FriendRequestsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));

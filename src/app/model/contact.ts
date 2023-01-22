@@ -1,6 +1,6 @@
 export type Contact = {
-  requested: string[];
-  accepted: string[];
+  receivedFrom: string[];
+  sentTo: string[];
 };
 
 export default Contact;

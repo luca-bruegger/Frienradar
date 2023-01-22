@@ -21,6 +21,7 @@ export class AppInitService {
   async init() {
     return new Promise(async (resolve, reject) => {
       const loadingSpinner = await this.createLoadingSpinner();
+
       await this.setupAppStateListener();
       await this.fetchUserFromApi();
 

@@ -182,9 +182,10 @@ export class LocationState {
 
     try {
       const users = [];
+      // enable later when we have more users
+      const timeQuery = Query.greaterThan('$updatedAt', eightHoursAgo);
       await Appwrite.databasesProvider().listDocuments(environment.radarDatabaseId, environment.geolocationsCollectionId, [
-        Query.equal(distanceStr, [geohash.substring(0, geohashLength)]),
-        Query.greaterThan('$updatedAt', eightHoursAgo),
+        Query.equal(distanceStr, [geohash.substring(0, geohashLength)])
       ]).then(response => {
         response.documents.filter((document: any) => document.$id !== userId).forEach((document: any) => {
           users.push(document);

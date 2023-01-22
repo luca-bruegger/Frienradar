@@ -1,5 +1,5 @@
 <ion-header translucent="true">
-  <ion-toolbar>
+  <ion-toolbar color="vbright">
     <ion-buttons slot="end">
       <ion-button (click)="openSettings()">
         <ion-icon color="primary" slot="icon-only" name="menu-outline"></ion-icon>
@@ -18,14 +18,14 @@
 
   <ion-grid class="ion-no-padding">
     <ion-row>
-      <ion-col sizeXl="6" offsetXl="3" class="ion-padding">
+      <ion-col sizeXl="6" offsetXl="3" class="ion-no-padding ion-padding-horizontal">
         <ng-template #loading>
           <div style="display: flex; align-items: center; justify-content: center; gap: 14px">
             <ion-spinner name="crescent" style="vertical-align: center"></ion-spinner>
             <p>Profil wird geladen...</p>
           </div>
         </ng-template>
-        <ion-card color="light" *ngIf="user$ | async; let user; else loading" class="ion-no-margin">
+        <ion-card style="background-color: var(--ion-color-vbright)" *ngIf="user$ | async; let user; else loading" class="ion-no-margin">
           <ion-card-content>
             <div style="display: flex; flex-direction: column" class="ion-padding-bottom">
               <div style="display: flex; flex-direction: row; gap: 20px">
@@ -49,7 +49,8 @@
               </div>
               <ion-item *ngIf="user.prefs.description" color="light" class="ion-margin-top ion-no-padding" lines="none">
                 <ion-textarea auto-grow="true" readonly="true" placeholder="Beschreibung..."
-                              [value]="user.prefs.description" class="ion-padding"></ion-textarea>
+                              [value]="user.prefs.description" class="ion-padding">
+                </ion-textarea>
               </ion-item>
             </div>
             <div>

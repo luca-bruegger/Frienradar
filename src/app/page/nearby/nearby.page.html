@@ -1,7 +1,7 @@
 <ion-header translucent="true">
-  <ion-toolbar>
+  <ion-toolbar color="vbright">
     <ion-title color="primary">In der Nähe</ion-title>
-    <ion-chip slot="end" style="margin-right: 13px">
+    <ion-chip color="secondary" slot="end" style="margin-right: 13px">
       <ion-icon name="body"></ion-icon>
       <ion-label>{{nearbyUsersAmount}}</ion-label>
     </ion-chip>
@@ -32,7 +32,7 @@
   <div *ngIf="nearbyUsersAmount > 0" class="ion-padding-horizontal ion-padding-top">
     <ion-grid class="ion-no-padding">
       <ion-row>
-        <ion-col style="padding: 5px" size="12" size-lg="6" size-xl="4" *ngFor="let user of nearbyUsers; trackBy:identifyNearbyUser">
+        <ion-col style="margin-bottom: 10px" size="12" size-lg="6" size-xl="4" *ngFor="let user of nearbyUsers; trackBy:identifyNearbyUser">
           <app-nearby-user-element [user]="user"></app-nearby-user-element>
         </ion-col>
       </ion-row>
@@ -41,9 +41,9 @@
 
   <ion-fab slot="fixed" vertical="bottom" horizontal="center">
     <ion-fab-button (click)="refresh()">
-      <ion-icon *ngIf="!isReloading" name="reload"></ion-icon>
-      <circle-progress *ngIf="isReloading" style="padding-top: 3px;"
-                       [percent]="percent"
+      <ion-icon *ngIf="reloadData[distance].interval === null" name="reload"></ion-icon>
+      <circle-progress *ngIf="reloadData[distance].interval !== null" style="padding-top: 3px;"
+                       [percent]="reloadData[distance].percent"
                        [radius]="20"
                        [outerStrokeWidth]="2"
                        [outerStrokeColor]="'#ffffff'"
@@ -53,7 +53,7 @@
                        [showInnerStroke]="false"
                        [showSubtitle]="false"
                        [showUnits]="false"
-                       title="{{reloadTime}}"
+                       title="{{reloadData[distance].reloadTime}}"
       ></circle-progress>
     </ion-fab-button>
   </ion-fab>
