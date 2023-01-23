@@ -1,9 +1,9 @@
-<ion-header>
+<ion-header translucent="true">
   <ion-toolbar color="vbright">
     <ion-buttons slot="start">
       <ion-back-button style="color: var(--ion-color-dark)" text="Zurück" defaultHref="/tabs/friends" color="primary"></ion-back-button>
     </ion-buttons>
-    <ion-title>Anfragen</ion-title>
+    <ion-title color="primary">Anfragen</ion-title>
     <ion-chip color="primary" slot="end" style="margin-right: 13px">
       <ion-icon name="mail"></ion-icon>
       <ion-label>{{fetchedUsers.length}}</ion-label>
@@ -20,13 +20,13 @@
             <ion-col class="ion-no-padding ion-no-margin" style="display: flex">
               <div style="display: inline">
                 <ion-avatar style="height: 64px; width: 64px">
-                  <img style="aspect-ratio: 1/1" src="{{profilePicture(contact.$id, contact.pictureBreaker)}}">
+                  <img style="aspect-ratio: 1/1" src="{{profilePicture(contact.sender.$id, contact.sender.pictureBreaker)}}">
                 </ion-avatar>
               </div>
               <div style="width: 100%; margin-left: 10px">
                 <ion-label color="secondary">
-                  <h1><strong>{{contact.username}}</strong></h1>
-                  <p>Angefragt um: <br> <strong>22:15</strong></p>
+                  <h1><strong>{{contact.sender.username}}</strong></h1>
+                  <p>Angefragt um: <br> <strong>{{updatedDate(contact.sender.$updatedAt)}}</strong></p>
                 </ion-label>
               </div>
             </ion-col>
@@ -46,7 +46,7 @@
 
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
     <ion-fab-button (click)="refresh()">
-      <ion-icon *ngIf="interval === null" name="reload"></ion-icon>
+      <ion-icon *ngIf="interval === null" name="reload" color="light"></ion-icon>
       <circle-progress *ngIf="interval" style="padding-top: 3px;"
                        [percent]="percent"
                        [radius]="20"

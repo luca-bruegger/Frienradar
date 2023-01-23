@@ -1,6 +1,5 @@
 const sdk = require("node-appwrite");
-const onesignal = require('onesignal-node');
-
+const OneSignal = require('@onesignal/node-onesignal');
 /*
   'req' variable has:
     'headers' - object with request headers
@@ -40,15 +39,29 @@ module.exports = async function (req, res) {
       .setKey(req.variables['APPWRITE_FUNCTION_API_KEY'])
       .setSelfSigned(true);
   }
-  const payload = JSON.parse(req.payload);
-  const eventData = payload.variables.APPWRITE_FUNCTION_EVENT_DATA;
-  const recipient = eventData.recipient;
-
-  const user = await users.get(recipient);
 
 
+  const eventData = req.variables.APPWRITE_FUNCTION_EVENT_DATA;
+  const recipientId = JSON.parse(eventData).recipient;
+  const senderId = JSON.parse(eventData).sender;
+  const senderUsername = (await database.getDocument('users', 'usernames', senderId)).username;
 
+  const configuration = OneSignal.createConfiguration({
+    appKey: req.variables['ONESIGNAL_API_KEY']
+  });
+
+  const oneSignalClient = new OneSignal.DefaultApi(configuration);
+
+  const notification = new OneSignal.Notification();
+  notification.app_id = req.variables['ONESIGNAL_APP_ID'];
+  notification.contents = {"en": "Du hast eine neue Freundschaftsanfrage von " + senderUsername};
+  notification.headings = {"en": "Neue Freundschaftsanfrage"};
+  notification.include_external_user_ids = [recipientId];
+
+  const notificationResponse = await oneSignalClient.createNotification(notification);
+
+  console.log(notificationResponse);
   res.json({
-    user,
+    oneSignalResponse: notificationResponse,
   });
 };

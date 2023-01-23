@@ -12,7 +12,7 @@
             </ion-card-subtitle>
           </ion-card-header>
           <form (submit)="signInUser()">
-            <ion-card-content class="ion-no-padding" *ngIf="!loginInProgress">
+            <ion-card-content class="ion-no-padding ion-padding-horizontal" *ngIf="!loginInProgress">
               <div [formGroup]="formGroup" class="ion-margin-bottom ion-padding-horizontal">
                 <div *ngIf="isRegister">
                   <app-profile-picture-select [profilePicture]="profilePicture" (profilePictureChange)="setProfilePicture($event)"></app-profile-picture-select>
@@ -23,7 +23,6 @@
                     </div>
                   </ng-container>
                   <ion-item color="light">
-                    <ion-label position="stacked">Echter Name</ion-label>
                     <ion-input formControlName="name" placeholder="Vollständiger Name..." maxlength="50" required="true" autocorrect="true"></ion-input>
                     <ng-container *ngFor="let validation of formMessages.name">
                       <ion-note slot="error" *ngIf="displayFormErrorByName('name', validation.type)">
@@ -33,9 +32,8 @@
                   </ion-item>
                 </div>
                 <ion-item color="light">
-                  <ion-label position="floating">Email Adresse</ion-label>
                   <ion-input formControlName="email" type="email" email="true" maxlength="50" required="true"
-                             autocorrect="true"></ion-input>
+                             autocorrect="true" placeholder="Email Adresse"></ion-input>
                   <ng-container *ngFor="let validation of formMessages.email">
                     <ion-note slot="error" *ngIf="displayFormErrorByName('email', validation.type)">
                       {{ validation.message }}
@@ -43,9 +41,8 @@
                   </ng-container>
                 </ion-item>
                 <ion-item color="light">
-                  <ion-label position="floating">Passwort</ion-label>
                   <ion-input formControlName="password" type="password" maxlength="50" required="true"
-                             autocorrect="true"></ion-input>
+                             autocorrect="true" placeholder="Passwort"></ion-input>
                   <ng-container
                     *ngFor="let validation of isRegister ? formMessages.passwordRegister : formMessages.passwordLogin">
                     <ion-note slot="error" *ngIf="displayFormErrorByName('password', validation.type)">
@@ -77,11 +74,21 @@
                   </ng-container>
                 </div>
               </div>
-              <ion-grid>
+              <ion-grid class="ion-no-padding">
                 <ion-row class="ion-align-items-center">
                   <ion-col size="12" class="ion-text-center">
-                    <ion-button color="secondary" class="ion-margin-bottom" (click)="signInUser()">
+                    <ion-button class="action-button" (click)="signInUser()">
                       {{isRegister ? 'Registrieren' : 'Anmelden'}}
+                    </ion-button>
+                  </ion-col>
+                </ion-row>
+                <ion-row class="ion-align-items-center">
+                  <ion-col size="12" class="ion-text-center">
+                    <ion-button size="small" *ngIf="isRegister" [disabled]="loginInProgress" fill="clear" color="secondary" (click)="changeLoginType(false)">
+                      Hast du bereits ein Konto?
+                    </ion-button>
+                    <ion-button size="small" *ngIf="!isRegister" [disabled]="loginInProgress" fill="clear" color="secondary" (click)="changeLoginType(true)">
+                      Noch kein Konto?
                     </ion-button>
                   </ion-col>
                 </ion-row>
@@ -96,16 +103,6 @@
             </ion-card-content>
           </form>
         </ion-card>
-      </ion-col>
-      <ion-col size="12" sizeXl="4" offsetXl="4" class="ion-text-center ion-padding">
-        <ion-button *ngIf="isRegister" [disabled]="loginInProgress" color="bright" expand="block"
-                    (click)="changeLoginType(false)">
-          <small>Hast du bereits ein Konto?</small>
-        </ion-button>
-        <ion-button *ngIf="!isRegister" [disabled]="loginInProgress" color="bright" expand="block"
-                    (click)="changeLoginType(true)">
-          <small>Noch kein Konto?</small>
-        </ion-button>
       </ion-col>
       <ion-col *ngIf="!isRegister" size="12" class="ion-text-center">
         <ion-button color="secondary" fill="clear" [disabled]="loginInProgress" (click)="resetPassword()">

@@ -27,6 +27,7 @@ ion-label {
 ion-item {
   --inner-padding-end: 0px;
   --padding-end: 15px;
+  --padding-start: 0px;
 }
 
 .ios ion-item {
@@ -34,7 +35,7 @@ ion-item {
 }
 
 .container-grid {
-  height: calc(100% + 56px);
+  height: calc(100%);
   display: flex;
   flex-flow: column;
 }
@@ -51,7 +52,6 @@ ion-item {
   align-items: center;
 }
 
-
 .ios {
   .checkbox-wrapper {
     margin: 0
@@ -61,4 +61,12 @@ ion-item {
     display: flex;
     gap: 15px;
   }
+}
+
+ion-checkbox {
+  --background: var(--ion-color-tertiary);
+}
+
+ion-button {
+  --color: var(--ion-color-light);
 }

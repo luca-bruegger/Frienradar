@@ -1,5 +1,8 @@
 export type Contact = {
-  receivedFrom: string[];
+  receivedFrom: {
+    sender: string;
+    id: string;
+  }[];
   sentTo: string[];
 };
 

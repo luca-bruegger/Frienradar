@@ -31,7 +31,7 @@ export namespace Contact {
   export class RemoveRequest {
     static readonly type = '[Contact] Remove Request';
 
-    constructor(public payload: { requestUserId: string }) {
+    constructor(public payload: { contactId: string }) {
     }
   }
 
@@ -108,7 +108,10 @@ export class ContactState {
         [
           Query.equal('recipient', userId)
         ]);
-      const receivedFrom = receivedFromData.documents.map((item) => item.sender);
+      const receivedFrom = receivedFromData.documents.map((item) => ({
+          sender: item.sender,
+          id: item.$id
+        }));
 
       const sentToData = await Appwrite.databasesProvider().listDocuments(
         environment.radarDatabaseId,
@@ -178,12 +181,25 @@ export class ContactState {
     {patchState, dispatch}: StateContext<ContactStateModel>,
     action: Contact.RemoveRequest
   ) {
-    const { requestUserId } = action.payload;
+    const { contactId } = action.payload;
     const currentUserId = this.store.selectSnapshot(AccountState.user).$id;
     const contacts = this.store.selectSnapshot(ContactState.contacts);
 
     try {
+      await Appwrite.databasesProvider().deleteDocument(
+        environment.radarDatabaseId,
+        environment.contactsCollectionId,
+        contactId
+      );
 
+      const updatedContacts = {
+        sentTo: contacts.sentTo,
+        receivedFrom: contacts.receivedFrom.filter((item: any) => item.id !== contactId)
+      };
+
+      patchState({
+        contacts: updatedContacts
+      });
     } catch (e: any) {
       this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
     }

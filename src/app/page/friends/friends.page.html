@@ -1,6 +1,6 @@
-<ion-header>
+<ion-header translucent="true">
   <ion-toolbar color="vbright">
-    <ion-title>Freunde</ion-title>
+    <ion-title color="primary">Freunde</ion-title>
     <ion-chip color="secondary" slot="end" style="margin-right: 13px">
       <ion-icon name="people"></ion-icon>
       <ion-label>0</ion-label>
@@ -26,7 +26,7 @@
   <ion-fab vertical="bottom" horizontal="center" slot="fixed">
     <ion-badge *ngIf="count > 0" color="danger" style="right: -5px; top: 0px; z-index: 3; position: absolute;">{{count}}</ion-badge>
     <ion-fab-button color="primary" routerLink="/tabs/friends/requests">
-      <ion-icon name="mail"></ion-icon>
+      <ion-icon name="mail" color="light"></ion-icon>
     </ion-fab-button>
   </ion-fab>
 </ion-content>

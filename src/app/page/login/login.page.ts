@@ -51,14 +51,12 @@ export class LoginPage implements OnDestroy {
     }
 
     this.loginInProgress = true;
-
-    if (this.isRegister) {
-      await this.store.dispatch(new Account.Signup(this.formGroup.value)).toPromise();
-    } else {
-      await this.store.dispatch(new Account.Login(this.formGroup.value)).toPromise();
-    }
-
-    this.loginInProgress = false;
+    const model = this.isRegister ? new Account.Signup(this.formGroup.value) : new Account.Login(this.formGroup.value);
+    await this.store.dispatch(model).subscribe(data => {
+      if (data.auth.user === null) {
+        this.loginInProgress = false;
+      }
+    });
   }
 
   async resetPassword() {

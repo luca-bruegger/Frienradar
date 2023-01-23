@@ -12,7 +12,10 @@ import { AlertController } from '@ionic/angular';
   styleUrls: ['./friend-requests.component.scss'],
 })
 export class FriendRequestsComponent implements OnInit {
-  fetchedUsers = [];
+  fetchedUsers: {
+    sender: any;
+    id: string;
+  }[] = [];
   interval = null;
   percent = 0;
   reloadTime = 0;
@@ -25,9 +28,12 @@ export class FriendRequestsComponent implements OnInit {
     this.store.select(ContactState.requested).subscribe(requested => {
       this.fetchedUsers = [];
       if (requested) {
-        requested.forEach(async (contactId: any) => {
-          const user = await this.fetchUser(contactId);
-          this.fetchedUsers.push(user);
+        requested.forEach(async (contact: any) => {
+          const user = await this.fetchUser(contact.sender);
+          this.fetchedUsers.push({
+            sender: user,
+            id: contact.id
+          });
         });
       }
     });
@@ -79,7 +85,7 @@ export class FriendRequestsComponent implements OnInit {
   }
 
   declineRequest(contact) {
-
+    this.store.dispatch(new Contact.RemoveRequest({ contactId: contact.id }));
   }
 
   acceptRequest(contact) {
@@ -103,5 +109,9 @@ export class FriendRequestsComponent implements OnInit {
         this.interval = null;
       }
     }, 1000);
+  }
+
+  updatedDate(updatedAt) {
+    return new Date(updatedAt).toLocaleString();
   }
 }

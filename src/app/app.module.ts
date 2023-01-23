@@ -39,7 +39,7 @@ import { HttpClientJsonpModule, HttpClientModule } from '@angular/common/http';
     environment.production ? [] : NgxsReduxDevtoolsPluginModule.forRoot()
   ],
   providers: [
-    {provide: RouteReuseStrategy, useClass: IonicRouteStrategy},
+    {provide: RouteReuseStrategy, useClass: IonicRouteStrategy}
     /*    {
           provide: APP_INITIALIZER,
           useFactory: appConfigFactory,

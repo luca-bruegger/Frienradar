@@ -31,8 +31,8 @@
 
   <div *ngIf="nearbyUsersAmount > 0" class="ion-padding-horizontal ion-padding-top">
     <ion-grid class="ion-no-padding">
-      <ion-row>
-        <ion-col style="margin-bottom: 10px" size="12" size-lg="6" size-xl="4" *ngFor="let user of nearbyUsers; trackBy:identifyNearbyUser">
+      <ion-row style="gap: 10px">
+        <ion-col size="12" size-lg="6" size-xl="4" *ngFor="let user of nearbyUsers; trackBy:identifyNearbyUser">
           <app-nearby-user-element [user]="user"></app-nearby-user-element>
         </ion-col>
       </ion-row>
@@ -41,7 +41,7 @@
 
   <ion-fab slot="fixed" vertical="bottom" horizontal="center">
     <ion-fab-button (click)="refresh()">
-      <ion-icon *ngIf="reloadData[distance].interval === null" name="reload"></ion-icon>
+      <ion-icon *ngIf="reloadData[distance].interval === null" name="reload" color="light"></ion-icon>
       <circle-progress *ngIf="reloadData[distance].interval !== null" style="padding-top: 3px;"
                        [percent]="reloadData[distance].percent"
                        [radius]="20"
