@@ -52,7 +52,7 @@ export class LoginPage implements OnDestroy {
 
     this.loginInProgress = true;
     const model = this.isRegister ? new Account.Signup(this.formGroup.value) : new Account.Login(this.formGroup.value);
-    await this.store.dispatch(model).subscribe(data => {
+    await this.store.dispatch(model).subscribe(async data => {
       if (data.auth.user === null) {
         this.loginInProgress = false;
       }
@@ -73,6 +73,11 @@ export class LoginPage implements OnDestroy {
   }
 
   displayFormErrorByName(name: string, validationType: string) {
-    return this.formGroup.get(name).hasError(validationType) && (this.formGroup.get(name).dirty || this.formGroup.get(name).touched);
+    if (!this.formGroup.contains(name)) {
+      return;
+    }
+
+    const formcontrol = this.formGroup.get(name);
+    return formcontrol.hasError(validationType) && (formcontrol.dirty || formcontrol.touched);
   }
 }

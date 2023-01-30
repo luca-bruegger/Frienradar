@@ -9,8 +9,8 @@ import * as Filter from 'bad-words';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Account as AccountModel } from '../../model/account';
 import { AppInitService } from '../../core/service/app-init.service';
-import { Path } from '../../helper/path';
 import User = AccountModel.User;
+import OneSignal from 'onesignal-cordova-plugin';
 
 @Component({
   selector: 'app-additional-login-data',
@@ -43,6 +43,7 @@ export class AdditionalLoginDataComponent implements OnInit {
   isMobile = this.platform.is('android') || this.platform.is('ios');
   user: User = {} as User;
   requestMailButtonDisabled = false;
+  mandatoryAnimationClassEnabled = false;
 
   private verificationData: {
     secret: any;
@@ -106,6 +107,19 @@ export class AdditionalLoginDataComponent implements OnInit {
         message: 'Bestätige deine Email Adresse zum fortfahren',
         color: 'danger'
       }));
+
+      this.animateButtons();
+      return;
+    }
+
+    const permissions = this.store.selectSnapshot(LocalPermissionState.hasMandatoryPermissions);
+    if (!permissions && this.isMobile || !this.geolocationPermission && !this.isMobile) {
+      this.store.dispatch(new GlobalActions.ShowToast({
+        message: 'Aktiviere die notwendigen Berechtigungen',
+        color: 'danger'
+      }));
+
+      this.animateButtons();
       return;
     }
 
@@ -113,6 +127,8 @@ export class AdditionalLoginDataComponent implements OnInit {
       this.usernameFormControl.markAsTouched();
       return;
     }
+
+    this.askForNotificationPermission();
 
     this.isLoading = true;
     this.store.dispatch(new Account.UpdateUsername({
@@ -141,6 +157,10 @@ export class AdditionalLoginDataComponent implements OnInit {
     this.store.dispatch(new LocalPermission.RequestPhoto());
   }
 
+  async requestNotificationPermissions() {
+    this.store.dispatch(new LocalPermission.RequestNotification());
+  }
+
   async clearParams() {
     await this.router.navigate(
       ['.'],
@@ -152,18 +172,6 @@ export class AdditionalLoginDataComponent implements OnInit {
     this.checkGeolocationPermission();
     this.checkPhotosPermission();
     this.checkNotificationPermission();
-  }
-
-  private checkNotificationPermission() {
-
-  }
-
-  private checkGeolocationPermission() {
-    this.store.select(LocalPermissionState.geolocation).subscribe((geolocation) => {
-      this.geolocationPermission = geolocation;
-    });
-
-    this.store.dispatch(new LocalPermission.CheckGeolocation());
   }
 
   private readRouteParams() {
@@ -212,5 +220,34 @@ export class AdditionalLoginDataComponent implements OnInit {
     });
 
     this.store.dispatch(new LocalPermission.CheckPhoto());
+  }
+
+  private checkNotificationPermission() {
+    this.store.select(LocalPermissionState.notification).subscribe((notification) => {
+      this.notificationPermission = notification;
+    });
+
+    this.store.dispatch(new LocalPermission.CheckNotification());
+  }
+
+  private checkGeolocationPermission() {
+    this.store.select(LocalPermissionState.geolocation).subscribe((geolocation) => {
+      this.geolocationPermission = geolocation;
+    });
+
+    this.store.dispatch(new LocalPermission.CheckGeolocation());
+  }
+
+  private animateButtons() {
+    if (!this.mandatoryAnimationClassEnabled) {
+      this.mandatoryAnimationClassEnabled = true;
+      setTimeout(() => {
+        this.mandatoryAnimationClassEnabled = false;
+      }, 5000);
+    }
+  }
+
+  private askForNotificationPermission() {
+    OneSignal.promptForPushNotificationsWithUserResponse(response => {});
   }
 }

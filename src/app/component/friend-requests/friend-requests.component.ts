@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Contact, ContactState } from '../../store';
+import { UserRelation, UserRelationState } from '../../store';
 import { Store } from '@ngxs/store';
 import { Appwrite } from '../../helper/appwrite';
 import { environment } from '../../../environments/environment';
@@ -12,27 +12,25 @@ import { AlertController } from '@ionic/angular';
   styleUrls: ['./friend-requests.component.scss'],
 })
 export class FriendRequestsComponent implements OnInit {
-  fetchedUsers: {
+  requests: {
     sender: any;
-    id: string;
-  }[] = [];
-  interval = null;
-  percent = 0;
-  reloadTime = 0;
+    contactId: string;
+  }[] = null;
 
   constructor(private store: Store,
               private alertController: AlertController) {
   }
 
   ngOnInit() {
-    this.store.select(ContactState.requested).subscribe(requested => {
-      this.fetchedUsers = [];
+    this.store.select(UserRelationState.requested).subscribe(requested => {
+      console.warn('requested', requested);
+      this.requests = [];
       if (requested) {
-        requested.forEach(async (contact: any) => {
-          const user = await this.fetchUser(contact.sender);
-          this.fetchedUsers.push({
+        requested.forEach(async (request: any) => {
+          const user = await this.fetchUser(request.senderId);
+          this.requests.push({
             sender: user,
-            id: contact.id
+            contactId: request.contactId
           });
         });
       }
@@ -78,40 +76,28 @@ export class FriendRequestsComponent implements OnInit {
             console.log('Confirm Okay');
           }
         }
-        ]
+      ]
     });
 
     await alert.present();
   }
 
-  declineRequest(contact) {
-    this.store.dispatch(new Contact.RemoveRequest({ contactId: contact.id }));
+  declineRequest(contactId) {
+    this.store.dispatch(new UserRelation.RemoveRequest({contactId}));
   }
 
-  acceptRequest(contact) {
-
-  }
-
-  async refresh() {
-    if (this.interval) {
-      return;
-    }
-
-    this.store.dispatch(new Contact.Fetch());
-
-    this.reloadTime = 25;
-    this.percent = 100;
-    this.interval = await setInterval(() => {
-      this.reloadTime -= 1;
-      this.percent = (this.reloadTime / 25) * 100;
-      if (this.reloadTime === 0) {
-        clearInterval(this.interval);
-        this.interval = null;
-      }
-    }, 1000);
+  acceptRequest(sender) {
+    this.store.dispatch(new UserRelation.AddFriend({sender}));
   }
 
   updatedDate(updatedAt) {
-    return new Date(updatedAt).toLocaleString();
+    return new Date(updatedAt).toLocaleString([], { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }).replace(',', '');
+  }
+
+  handleRefresh(event) {
+    setTimeout(() => {
+      this.store.dispatch(new UserRelation.Fetch());
+      event.target.complete();
+    }, 2000);
   }
 }

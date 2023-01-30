@@ -16,7 +16,8 @@ export const environment = {
   usernameCollectionId: 'usernames',
   usersDatabaseId: 'users',
   accountsCollectionId: 'accounts',
-  oneSignalAppId: 'dbcfaa41-2e99-498a-8293-a3020ac85b2c'
+  oneSignalAppId: 'dbcfaa41-2e99-498a-8293-a3020ac85b2c',
+  friendsCollectionId: 'friends',
 };
 
 /*

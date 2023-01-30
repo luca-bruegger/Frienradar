@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Account, AccountState } from '../../store';
 import { Store } from '@ngxs/store';
 import { LoadingController, Platform } from '@ionic/angular';
-import { Contact } from '../../store/contact';
+import { UserRelation } from '../../store/contact';
 import { App } from '@capacitor/app';
 import { LocalPermission } from '../../store/local-permission';
 import { LocationService } from './location.service';
@@ -40,7 +40,26 @@ export class AppInitService {
   async startServices() {
     this.realtimeService.watch();
     await this.locationService.watch();
-    this.oneSignalInit();
+  }
+
+  oneSignalInit() {
+    if (!this.platform.is('cordova')) {
+      return;
+    }
+
+    OneSignal.setAppId(environment.oneSignalAppId);
+    OneSignal.setExternalUserId(this.store.selectSnapshot(AccountState.user).$id);
+
+    OneSignal.setLogLevel(6, 0);
+
+    // NOTE: Update the setAppId value below with your OneSignal AppId.
+    OneSignal.setNotificationOpenedHandler((jsonData) => {
+      console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
+    });
+
+    OneSignal.setNotificationWillShowInForegroundHandler((jsonData) => {
+      console.log('notificationWillShowInForegroundHandler: ' + JSON.stringify(jsonData));
+    });
   }
 
   private async fetchUserFromApi(): Promise<boolean> {
@@ -73,33 +92,12 @@ export class AppInitService {
   }
 
   private async fetchAdditionalUserData() {
-    await this.store.dispatch(new Contact.Fetch()).toPromise();
+    await this.store.dispatch(new UserRelation.Fetch()).toPromise();
   }
 
   private async checkPermissionChanges() {
     this.store.dispatch(new LocalPermission.CheckGeolocation());
     this.store.dispatch(new LocalPermission.CheckPhoto());
     this.store.dispatch(new LocalPermission.CheckNotification());
-  }
-
-  private oneSignalInit() {
-    if (!this.platform.is('cordova')) {
-      return;
-    }
-    // Uncomment to set OneSignal device logging to VERBOSE
-    // OneSignal.setLogLevel(6, 0);
-
-    // NOTE: Update the setAppId value below with your OneSignal AppId.
-    OneSignal.setAppId(environment.oneSignalAppId);
-    OneSignal.setExternalUserId(this.store.selectSnapshot(AccountState.user).$id);
-    OneSignal.setNotificationOpenedHandler(function(jsonData) {
-      console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
-    });
-
-    // Prompts the user for notification permissions.
-    //    * Since this shows a generic native prompt, we recommend instead using an In-App Message to prompt for notification permission (See step 7) to better communicate to your users what notifications they will get.
-    OneSignal.promptForPushNotificationsWithUserResponse(function(accepted) {
-      console.log('User accepted notifications: ' + accepted);
-    });
   }
 }

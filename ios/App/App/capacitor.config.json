@@ -16,6 +16,7 @@
 		"scheme": "Frienradar"
 	},
 	"server": {
-		"hostname": "app.frienradar.com"
+		"hostname": "app.frienradar.com",
+		"url": "http://172.20.10.2:8100"
 	}
 }

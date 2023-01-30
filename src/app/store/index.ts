@@ -2,7 +2,7 @@
 import { GlobalState } from './global';
 import { AccountState } from './account';
 import { LocationState } from './location';
-import { ContactState } from './contact';
+import { UserRelationState } from './contact';
 import { LocalPermissionState } from './local-permission';
 
 // Still allow other modules to take what they need, eg action & selectors
@@ -17,6 +17,6 @@ export const AppState = [
   AccountState,
   GlobalState,
   LocationState,
-  ContactState,
+  UserRelationState,
   LocalPermissionState
 ];

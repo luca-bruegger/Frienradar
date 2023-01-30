@@ -15,7 +15,22 @@
     </ion-toolbar>
   </ion-header>
 
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
   <app-distance-change (distanceChange)="distanceChanged($event)"></app-distance-change>
+
+  <ion-card color="light" class="ion-no-margin ion-margin-horizontal ion-margin-top" *ngIf="!reloadPossible">
+    <ion-card-content>
+      <ion-progress-bar [value]="(100 - reloadData[distance].percent) /100"></ion-progress-bar>
+      <div style="text-align: center; margin-top: 10px">
+        <ion-label>
+          <strong>{{reloadData[distance].reloadTime}} Sekunden </strong> <br> bis zur nächsten Aktualisierung
+        </ion-label>
+      </div>
+    </ion-card-content>
+  </ion-card>
 
   <div *ngIf="nearbyUsersAmount === 0 && !nearbyUsers"
        style="position:absolute; top: 50%; left: 50%; display: flex; flex-direction: row; text-align: center; align-items: center; transform: translate(-50%, -50%); gap: 10px">
@@ -32,30 +47,12 @@
   <div *ngIf="nearbyUsersAmount > 0" class="ion-padding-horizontal ion-padding-top">
     <ion-grid class="ion-no-padding">
       <ion-row style="gap: 10px">
-        <ion-col size="12" size-lg="6" size-xl="4" *ngFor="let user of nearbyUsers; trackBy:identifyNearbyUser">
-          <app-nearby-user-element [user]="user"></app-nearby-user-element>
+        <ion-col size="12" size-lg="5" size-xl="3" size-md="5" size-sm="8" push-xl="1.5" push-lg="1" push-md="1"
+                 push-sm="2"  *ngFor="let user of nearbyUsers; trackBy:identifyNearbyUser">
+          <app-nearby-user-element [user]="user" [contacts]="contacts"></app-nearby-user-element>
         </ion-col>
       </ion-row>
     </ion-grid>
   </div>
-
-  <ion-fab slot="fixed" vertical="bottom" horizontal="center">
-    <ion-fab-button (click)="refresh()">
-      <ion-icon *ngIf="reloadData[distance].interval === null" name="reload" color="light"></ion-icon>
-      <circle-progress *ngIf="reloadData[distance].interval !== null" style="padding-top: 3px;"
-                       [percent]="reloadData[distance].percent"
-                       [radius]="20"
-                       [outerStrokeWidth]="2"
-                       [outerStrokeColor]="'#ffffff'"
-                       [titleColor]="'#ffffff'"
-                       [clockwise]="true"
-                       [animation]="false"
-                       [showInnerStroke]="false"
-                       [showSubtitle]="false"
-                       [showUnits]="false"
-                       title="{{reloadData[distance].reloadTime}}"
-      ></circle-progress>
-    </ion-fab-button>
-  </ion-fab>
 
 </ion-content>

@@ -150,6 +150,7 @@ export class AccountsPage implements OnInit {
       const i = this.accountsData.findIndex(e => e.key === preset.key);
       const value = i > -1 ? this.accountsData[i].username : '';
       this.accountsFormGroup.addControl(preset.key, this.formBuilder.control(value, [
+        Validators.required,
         Validators.minLength(4),
         Validators.maxLength(30)
       ]));

@@ -2,9 +2,10 @@ import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { Geolocation } from '@capacitor/geolocation';
 import { Platform } from '@ionic/angular';
-import { PushNotifications } from '@capacitor/push-notifications';
 import { GlobalActions } from '../global';
 import { Camera } from '@capacitor/camera';
+import OneSignal from 'onesignal-cordova-plugin';
+import { AndroidSettings, IOSSettings, NativeSettings } from 'capacitor-native-settings';
 
 /* State Model */
 @Injectable()
@@ -44,9 +45,9 @@ export namespace LocalPermission {
 @State<LocalPermissionStateModel>({
   name: 'localPermission',
   defaults: {
-    geolocation: false,
-    notification: false,
-    photo: false
+    geolocation: null,
+    notification: null,
+    photo: null
   }
 })
 
@@ -71,24 +72,28 @@ export class LocalPermissionState {
     return state.notification;
   }
 
+  @Selector()
+  static hasMandatoryPermissions(state: LocalPermissionStateModel) {
+    return state.photo && state.geolocation;
+  }
+
   @Action(LocalPermission.RequestGeolocation)
   async requestGeolocation(
     {patchState, dispatch}: StateContext<LocalPermissionStateModel>,
     action: LocalPermission.RequestGeolocation
   ) {
     if (this.isMobile()) {
-      Geolocation.requestPermissions().then((data) => {
+      await Geolocation.requestPermissions().then((data) => {
         if (data.location === 'denied') {
-          this.store.dispatch(new GlobalActions.ShowToast({
-            message: 'Standort muss in den Einstellungen aktiviert werden.',
-            color: 'primary'
-          }));
+          this.openSettings('Standort');
         }
 
         patchState({
           geolocation: data.location === 'granted'
         });
       });
+    } else {
+      console.log(navigator.geolocation);
     }
   }
 
@@ -97,7 +102,7 @@ export class LocalPermissionState {
     {patchState, dispatch}: StateContext<LocalPermissionStateModel>,
     action: LocalPermission.CheckGeolocation
   ) {
-    let isGranted = false;
+    let isGranted;
     if (this.isMobile()) {
       const permission = await Geolocation.checkPermissions();
       isGranted = permission.location === 'granted';
@@ -105,6 +110,7 @@ export class LocalPermissionState {
       const permission = await navigator.permissions.query({name: 'geolocation'});
       isGranted = permission.state === 'granted';
     }
+
     patchState({
       geolocation: isGranted
     });
@@ -116,12 +122,13 @@ export class LocalPermissionState {
     action: LocalPermission.RequestNotification
   ) {
     if (this.isMobile()) {
-      PushNotifications.requestPermissions().then(result => {
-        if (result.receive === 'granted') {
-          // Register with Apple / Google to receive push via APNS/FCM
-          PushNotifications.register();
-        } else {
-          alert('Bitte aktiviere Push-Benachrichtigungen in den Einstellungen, damit die volle App-Funktionalität gewährleistet ist.');
+      OneSignal.promptForPushNotificationsWithUserResponse(response => {
+        patchState({
+          notification: response
+        });
+
+        if (!response) {
+          this.openSettings('Benachrichtigung');
         }
       });
     }
@@ -133,9 +140,9 @@ export class LocalPermissionState {
     action: LocalPermission.CheckNotification
   ) {
     if (this.isMobile()) {
-      PushNotifications.checkPermissions().then((data) => {
+      OneSignal.getDeviceState(async device => {
         patchState({
-          notification: data.receive === 'granted'
+          notification: device.hasNotificationPermission
         });
       });
     }
@@ -147,15 +154,14 @@ export class LocalPermissionState {
     action: LocalPermission.RequestPhoto
   ) {
     if (this.isMobile()) {
-      Camera.requestPermissions().then((data) => {
-          patchState({
-            photo: data.photos === 'granted'
+      Camera.requestPermissions({permissions: ['photos']}).then((data) => {
+        console.warn('REQUEST PERMISSIONS');
+        patchState({
+          photo: data.photos === 'granted'
         });
-      }, () => {
-        this.store.dispatch(new GlobalActions.ShowToast({
-          message: 'Bilder müssen in den Einstellungen aktiviert werden.',
-          color: 'danger'
-        }));
+        if (data.photos === 'denied') {
+          this.openSettings('Bilderzugriff');
+        }
       });
     }
   }
@@ -171,10 +177,28 @@ export class LocalPermissionState {
           photo: data.photos === 'granted'
         });
       });
+    } else {
+      patchState({
+        photo: true
+      });
     }
   }
 
   private isMobile() {
     return this.platform.is('android') || this.platform.is('ios');
+  }
+
+  private openSettings(action: string) {
+    if (this.isMobile()) {
+      this.store.dispatch(new GlobalActions.ShowToast({
+        message: action + ' muss in den Einstellungen aktiviert werden.',
+        color: 'bright'
+      }));
+
+      NativeSettings.open({
+        optionIOS: IOSSettings.App,
+        optionAndroid: AndroidSettings.Application
+      });
+    }
   }
 }

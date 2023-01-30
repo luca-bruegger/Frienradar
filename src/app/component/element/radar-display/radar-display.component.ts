@@ -22,19 +22,14 @@ export class RadarDisplayComponent implements OnInit, OnChanges {
 
   mapApiLoaded: Observable<boolean>;
 
-  mapOptions: MapOptions = MapsHelper.getOptions();
+  mapOptions: MapOptions;
+  locationBoxOptions;
   center: LatLngLiteral;
   bounds: LatLngLiteral[];
   locationPolygon: Polygon;
   accelHandler: PluginListenerHandle;
 
-  locationBoxOptions = {
-    strokeColor: '#8ddae6',
-    fillColor: '#8ddae6',
-  };
-
-  constructor(private httpClient: HttpClient) {
-  }
+  constructor(private httpClient: HttpClient) {}
 
   async ngOnInit() {
     if (!this.mapApiLoaded) {
@@ -42,7 +37,12 @@ export class RadarDisplayComponent implements OnInit, OnChanges {
         .pipe(map(() => true), catchError(() => of(false)));
     }
 
-    this.updateLocationBox();
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    this.renderMap(prefersDark.matches);
+
+    prefersDark.addEventListener('change', mediaQuery => {
+      this.renderMap(mediaQuery.matches);
+    });
   }
 
   ngOnChanges(simpleChanges) {
@@ -51,16 +51,12 @@ export class RadarDisplayComponent implements OnInit, OnChanges {
 
     if (changedDistance || changedGeohash) {
       if (changedDistance) {
-        console.log('distance changed', changedDistance.currentValue);
         this.currentDistance = changedDistance.currentValue;
       }
 
       if (changedGeohash && changedGeohash.currentValue && changedGeohash.currentValue.length > 0) {
-        console.log('geohash changed', changedGeohash.currentValue);
         this.geohash = changedGeohash.currentValue;
       }
-
-      console.log(this.geohash, this.currentDistance);
 
       this.updateLocationBox();
       this.resetLocationBox();
@@ -105,6 +101,16 @@ export class RadarDisplayComponent implements OnInit, OnChanges {
       paths: this.bounds,
       ...this.locationBoxOptions
     });
+  }
+
+  private renderMap(prefersDark) {
+    this.mapOptions = prefersDark ? MapsHelper.getDarkOptions() : MapsHelper.getLightOptions();
+    this.locationBoxOptions = prefersDark ? MapsHelper.getDarkBoxOptions() : MapsHelper.getLightBoxOptions();
+    this.updateLocationBox();
+  }
+
+  getCurrentPosition() {
+
   }
 }
 

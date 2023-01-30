@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { Location, LocationState } from '../../store';
+import { UserRelationState, Location, LocationState } from '../../store';
 import { GeohashLength } from '../../component/element/radar-display/radar-display.component';
 
 class ReloadData {
@@ -24,6 +24,8 @@ class ReloadDatas {
 export class NearbyPage implements OnInit {
   nearbyUsersMap = new Map();
   nearbyUsers = null;
+  contacts = null;
+
   reloadData: ReloadDatas = {
     close: {
       percent: 0,
@@ -58,10 +60,14 @@ export class NearbyPage implements OnInit {
     return this.nearbyUsersMap.size;
   }
 
+  get reloadPossible() {
+    return this.reloadData[this.distance].reloadTime === 0;
+  }
+
   ngOnInit() {
-    this.checkForStorageChanges();
     this.checkForNearbyUsersChanges();
     this.checkForLocationChanges();
+    this.checkForContactRequestChanges();
   }
 
   identifyNearbyUser(index, nearbyUser) {
@@ -74,20 +80,25 @@ export class NearbyPage implements OnInit {
     this.reloadNearbyUsers();
   }
 
-  async refresh() {
+  async refresh(event) {
+    const RELOAD_TIME = 10;
     const reloadData: ReloadData = this.reloadData[this.distance] as ReloadData;
 
     if (reloadData.interval) {
+      event.target.complete();
       return;
     }
 
     this.reloadNearbyUsers();
 
-    reloadData.reloadTime = 25;
+    reloadData.reloadTime = RELOAD_TIME;
     reloadData.percent = 100;
     reloadData.interval = await setInterval(() => {
+      if (reloadData.reloadTime === RELOAD_TIME) {
+        event.target.complete();
+      }
       reloadData.reloadTime -= 1;
-      reloadData.percent = (reloadData.reloadTime / 25) * 100;
+      reloadData.percent = (reloadData.reloadTime / RELOAD_TIME) * 100;
       if (reloadData.reloadTime === 0) {
         clearInterval(reloadData.interval);
         reloadData.interval = null;
@@ -95,8 +106,12 @@ export class NearbyPage implements OnInit {
     }, 1000);
   }
 
-  private checkForStorageChanges() {
+  private checkForContactRequestChanges() {
+    this.contacts = this.store.selectSnapshot(UserRelationState.contacts);
 
+    this.store.select(UserRelationState.contacts).subscribe(contactsChange => {
+      this.contacts = contactsChange;
+    });
   }
 
   private checkForLocationChanges() {

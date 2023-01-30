@@ -68,7 +68,7 @@
                   <ng-container
                     *ngFor="let validation of isRegister ? formMessages.acceptTerms : formMessages.acceptTerms">
                     <div class="error-message"
-                         *ngIf="formGroup.get('acceptTerms').hasError(validation.type) && (formGroup.get('acceptTerms').dirty || formGroup.get('acceptTerms').touched)">
+                         *ngIf="displayFormErrorByName('acceptTerms', validation.type)">
                       {{ validation.message }}
                     </div>
                   </ng-container>

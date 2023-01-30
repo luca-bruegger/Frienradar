@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { AccountState, LocationState } from '../../store';
+import { AccountState, GlobalActions, LocationState } from '../../store';
 
 @Component({
   selector: 'app-radar',
@@ -20,5 +20,13 @@ export class RadarPage {
 
   get currentDistance() {
     return this.store.selectSnapshot(AccountState.distance);
+  }
+
+  get isRegionalChatAvailable() {
+    return this.currentDistance === 'nearby' || this.currentDistance === 'close';
+  }
+
+  notImplemented() {
+    this.store.dispatch(new GlobalActions.ShowToast({message: 'Not implemented yet', color: 'warning'}));
   }
 }

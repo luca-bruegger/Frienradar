@@ -13,3 +13,56 @@ ion-item {
 ion-card {
   margin: 0;
 }
+
+.access-button {
+  animation-name: shakeMe;
+  animation-duration: 5s;
+  animation-delay: 16s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+.access-button-error {
+  transform: translate3d(0, 0, 0);
+  animation-name: shakeMeError;
+  animation-duration: 800ms;
+  animation-iteration-count: 1;
+  animation-timing-function: linear;
+  --background: var(--ion-color-danger);
+}
+
+@keyframes shakeMeError {
+  8%, 12% {
+    transform: rotateZ(10deg);
+  }
+
+  18.1% {
+    transform: rotateZ(0deg);
+  }
+
+  24.2% {
+    transform: rotateZ(-10deg);
+  }
+
+  30.3% {
+    transform: rotateZ(0deg);
+  }
+}
+
+@keyframes shakeMe {
+  8%, 12% {
+    transform: scale(1.1);
+  }
+
+  18.1% {
+    transform: scale(1.2);
+  }
+
+  24.2% {
+    transform: scale(1.1);
+  }
+
+  30.3% {
+    transform: scale(1);
+  }
+}

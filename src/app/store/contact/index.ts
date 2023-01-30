@@ -3,55 +3,75 @@ import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { GlobalActions } from '../global';
 import { NavController } from '@ionic/angular';
 import { Router } from '@angular/router';
-import { Contact as ContactModel } from '../../model/contact';
 import { Appwrite } from '../../helper/appwrite';
 import { AccountState } from '../account';
 import { Query } from 'appwrite';
 import { environment } from '../../../environments/environment';
+import ContactModel from '../../model/contact';
+import FriendModel from '../../model/friend';
 
 /* State Model */
 @Injectable()
-export class ContactStateModel {
-  contacts: ContactModel;
+export class UserRelationStateModel {
+  contactRequest: ContactModel;
+  friends: FriendModel[];
 }
 
-export namespace Contact {
+export namespace UserRelation {
   /** Actions */
   export class Fetch {
-    static readonly type = '[Contact] Fetch';
+    static readonly type = '[UserRelation] Fetch';
   }
 
   export class Request {
-    static readonly type = '[Contact] Request';
+    static readonly type = '[UserRelation] Request';
 
     constructor(public payload: { requestUserId: string }) {
     }
   }
 
   export class RemoveRequest {
-    static readonly type = '[Contact] Remove Request';
+    static readonly type = '[UserRelation] Remove Request';
 
     constructor(public payload: { contactId: string }) {
     }
   }
 
+  export class PatchContacts {
+    static readonly type = '[UserRelation] Patch Contacts';
+
+    constructor(public payload: { contacts: ContactModel }) {
+    }
+  }
+
   export class UpdateRequested {
-    static readonly type = '[Contact] UpdateRequested';
+    static readonly type = '[UserRelation] Update Requested';
 
     constructor(public payload: { requested: string[] }) {
     }
   }
+
+  export class AddFriend {
+    static readonly type = '[Contact] Add Friend';
+
+    constructor(public payload: { sender: string }) {
+    }
+  }
 }
 
-@State<ContactStateModel>({
-  name: 'contact',
+@State<UserRelationStateModel>({
+  name: 'userRelation',
   defaults: {
-    contacts: null
-  },
+    contactRequest: {
+      receivedFrom: [],
+      sentTo: []
+    },
+    friends: []
+  }
 })
 
 @Injectable()
-export class ContactState {
+export class UserRelationState {
   constructor(private navController: NavController,
               private ngZone: NgZone,
               private store: Store,
@@ -59,131 +79,90 @@ export class ContactState {
   }
 
   @Selector()
-  static contacts(state: ContactStateModel) {
-    return state.contacts;
+  static contacts(state: UserRelationStateModel) {
+    return state.contactRequest;
   }
 
   @Selector()
-  static requestedCount(state: ContactStateModel) {
-    return state.contacts.receivedFrom.length;
+  static requestedCount(state: UserRelationStateModel) {
+    return state.contactRequest.receivedFrom.length;
   }
 
   @Selector()
-  static requested(state: ContactStateModel) {
-    return state.contacts.receivedFrom;
+  static requested(state: UserRelationStateModel) {
+    return state.contactRequest.receivedFrom;
   }
 
   @Selector()
-  static sentTo(state: ContactStateModel) {
-    return state.contacts.sentTo;
+  static sentTo(state: UserRelationStateModel) {
+    return state.contactRequest.sentTo;
   }
 
-  @Action(Contact.UpdateRequested)
+  @Action(UserRelation.UpdateRequested)
   async updateRequested(
-    {patchState, dispatch}: StateContext<ContactStateModel>,
-    action: Contact.UpdateRequested
+    {patchState, dispatch}: StateContext<UserRelationStateModel>,
+    action: UserRelation.UpdateRequested
   ) {
     const {requested} = action.payload;
     const filteredRequested = requested.filter((item) => item !== '');
     patchState({
-      contacts: {
+      contactRequest: {
         requested: filteredRequested
       } as unknown as ContactModel
     });
   }
 
-  @Action(Contact.Fetch)
+  @Action(UserRelation.Fetch)
   async fetch(
-    {patchState, dispatch}: StateContext<ContactStateModel>,
-    action: Contact.Fetch
+    {patchState, dispatch}: StateContext<UserRelationStateModel>,
+    action: UserRelation.Fetch
   ) {
-    const contacts = this.store.selectSnapshot(ContactState.contacts);
     const userId = this.store.selectSnapshot(AccountState.user).$id;
 
-    try {
-      // If session is already fetched, don't fetch again
-      const receivedFromData = await Appwrite.databasesProvider().listDocuments(
-        environment.radarDatabaseId,
-        environment.contactsCollectionId,
-        [
-          Query.equal('recipient', userId)
-        ]);
-      const receivedFrom = receivedFromData.documents.map((item) => ({
-          sender: item.sender,
-          id: item.$id
-        }));
+    const contacts = await this.fetchContacts(userId);
+    patchState({
+      contactRequest: contacts
+    });
 
-      const sentToData = await Appwrite.databasesProvider().listDocuments(
-        environment.radarDatabaseId,
-        environment.contactsCollectionId,
-        [
-          Query.equal('sender', userId)
-        ]);
+    await this.fetchFriends(userId);
 
-      const sentTo = sentToData.documents.map((item) => item.recipient);
-      patchState({
-        contacts: {
-          receivedFrom,
-          sentTo
-        } as unknown as ContactModel
-      });
-    } catch (e: any) {
-      // if (e.type === 'document_not_found') {
-      //   await Appwrite.databasesProvider().createDocument(environment.radarDatabaseId, environment.contactsCollectionId, userId, {
-      //     accepted: [],
-      //     requested: []
-      //   }, [
-      //     Permission.read(Role.users()),
-      //     Permission.delete(Role.user(userId)),
-      //     Permission.write(Role.user(userId))
-      //   ]);
-      //   return;
-      // }
-      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
-    }
+
   }
 
-  @Action(Contact.Request)
+  @Action(UserRelation.Request)
   async request(
-    {patchState, dispatch}: StateContext<ContactStateModel>,
-    action: Contact.Request
+    {patchState, dispatch}: StateContext<UserRelationStateModel>,
+    action: UserRelation.Request
   ) {
     const {requestUserId} = action.payload;
     const currentUserId = this.store.selectSnapshot(AccountState.user).$id;
-    const contacts = this.store.selectSnapshot(ContactState.contacts);
+
+    const data = JSON.stringify({
+      sender: currentUserId,
+      recipient: requestUserId
+    });
 
     try {
-      const requestedUserContacts = await Appwrite.databasesProvider().createDocument(
-        environment.radarDatabaseId,
-        environment.contactsCollectionId,
-        'unique()',
-        {
-          sender: currentUserId,
-          recipient: requestUserId
-        }
-      );
+      const execution = await Appwrite.functionsProvider().createExecution('contact-requests', data) as any;
+      if (execution.response === '') {
+        return;
+      }
 
-      const updatedContacts = {
-        sentTo: [...contacts.sentTo, requestUserId],
-        receivedFrom: contacts.receivedFrom
-      };
-
-      patchState({
-        contacts: updatedContacts
-      });
+      const error = JSON.parse(execution.response).error;
+      if (error) {
+        throw error;
+      }
     } catch (e: any) {
       this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
     }
   }
 
-  @Action(Contact.RemoveRequest)
+  @Action(UserRelation.RemoveRequest)
   async removeRequest(
-    {patchState, dispatch}: StateContext<ContactStateModel>,
-    action: Contact.RemoveRequest
+    {patchState, dispatch}: StateContext<UserRelationStateModel>,
+    action: UserRelation.RemoveRequest
   ) {
-    const { contactId } = action.payload;
-    const currentUserId = this.store.selectSnapshot(AccountState.user).$id;
-    const contacts = this.store.selectSnapshot(ContactState.contacts);
+    const {contactId} = action.payload;
 
     try {
       await Appwrite.databasesProvider().deleteDocument(
@@ -192,14 +171,168 @@ export class ContactState {
         contactId
       );
 
-      const updatedContacts = {
-        sentTo: contacts.sentTo,
-        receivedFrom: contacts.receivedFrom.filter((item: any) => item.id !== contactId)
-      };
+    } catch (e: any) {
+      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
+    }
+  }
 
-      patchState({
-        contacts: updatedContacts
+  @Action(UserRelation.AddFriend)
+  async addFriend(
+    {patchState, dispatch}: StateContext<UserRelationStateModel>,
+    action: UserRelation.AddFriend
+  ) {
+    const {sender} = action.payload;
+    const userId = this.store.selectSnapshot(AccountState.user).$id;
+
+    const data = JSON.stringify({
+      sender,
+      recipient: userId
+    });
+
+    try {
+      const execution = await Appwrite.functionsProvider().createExecution('add-friend', data) as any;
+      if (execution.response === '') {
+        return;
+      }
+
+      const error = JSON.parse(execution.response).error;
+      if (error) {
+        throw error;
+      }
+    } catch (e: any) {
+      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
+    }
+  }
+
+  @Action(UserRelation.PatchContacts)
+  async patchContacts(
+    {patchState, dispatch}: StateContext<UserRelationStateModel>,
+    action: UserRelation.PatchContacts
+  ) {
+    const {contacts} = action.payload;
+    patchState({contactRequest: contacts});
+  }
+
+  private async fetchContacts(userId: string) {
+    try {
+      const query = `query ListContacts(
+              $databaseId: String!
+              $collectionId: String!
+              $queries: [String]
+            ) {
+              databasesListDocuments(
+                databaseId: $databaseId
+                collectionId: $collectionId
+                queries: $queries
+              ) {
+                documents {
+                  data
+                  _id
+                }
+              }
+            }`;
+
+
+      const recipientDataResponse = await Appwrite.graphQLProvider().query({
+        query,
+        variables: {
+          databaseId: environment.radarDatabaseId,
+          collectionId: environment.contactsCollectionId,
+          queries: [
+            Query.equal('sender', userId),
+          ]
+        }
+      }) as { data: { databasesListDocuments: { documents: { data: string; _id: string }[]; total: number } }; errors: any };
+
+      const recipients = recipientDataResponse.data.databasesListDocuments.documents.map((item) => {
+        const {data, _id} = item;
+        const parsedData = JSON.parse(data);
+
+        return {
+          recipientId: parsedData.recipient,
+          contactId: _id
+        };
       });
+
+      const senderDataResponse = await Appwrite.graphQLProvider().query({
+        query,
+        variables: {
+          databaseId: environment.radarDatabaseId,
+          collectionId: environment.contactsCollectionId,
+          queries: [
+            Query.equal('recipient', userId),
+          ]
+        }
+      }) as { data: { databasesListDocuments: { documents: { data: string; _id: string }[]; total: number } }; errors: any };
+
+      const senders = senderDataResponse.data.databasesListDocuments.documents.map((item) => {
+        const {data, _id} = item;
+        const parsedData = JSON.parse(data);
+
+        return {
+          senderId: parsedData.sender,
+          contactId: _id
+        };
+      });
+
+      return {
+        sentTo: recipients,
+        receivedFrom: senders
+      };
+    } catch (e: any) {
+      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
+    }
+  }
+
+  private async fetchFriends(userId: string) {
+    try {
+      const friends = [];
+
+      const query = `query ListFriends(
+              $databaseId: String!
+              $collectionId: String!
+              $queries: [String]
+            ) {
+              databasesListDocuments(
+                databaseId: $databaseId
+                collectionId: $collectionId
+                queries: $queries
+              ) {
+                documents {
+                  data
+                  _id
+                }
+              }
+            }`;
+
+
+      const friendA = await Appwrite.graphQLProvider().query({
+        query,
+        variables: {
+          databaseId: environment.usersDatabaseId,
+          collectionId: environment.friendsCollectionId,
+          queries: [
+            Query.equal('friendA', userId),
+          ]
+        }
+      }) as { data: { databasesListDocuments: { documents: { data: string; _id: string }[]; total: number } }; errors: any };
+
+      const friendB = await Appwrite.graphQLProvider().query({
+        query,
+        variables: {
+          databaseId: environment.usersDatabaseId,
+          collectionId: environment.friendsCollectionId,
+          queries: [
+            Query.equal('friendB', userId),
+          ]
+        }
+      }) as { data: { databasesListDocuments: { documents: { data: string; _id: string }[]; total: number } }; errors: any };
+
+      console.log(friendA, friendB);
+
+      return {
+        friends
+      };
     } catch (e: any) {
       this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
     }

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { Store } from '@ngxs/store';
-import { ContactState } from '../store';
+import { UserRelationState } from '../store';
 
 @Component({
   selector: 'app-tabs',
@@ -14,7 +14,7 @@ export class TabsPage implements OnInit {
   constructor(private store: Store) {}
 
   ngOnInit() {
-    this.store.select(ContactState.requestedCount).subscribe(count => {
+    this.store.select(UserRelationState.requestedCount).subscribe(count => {
       this.count = count;
     });
   }

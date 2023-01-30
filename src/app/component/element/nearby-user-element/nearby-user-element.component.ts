@@ -1,8 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { Account as AccountModel } from '../../../model/account';
-import { Contact, ContactState } from '../../../store';
+import { UserRelation } from '../../../store';
 import { Picture } from '../../../helper/picture';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-nearby-user-element',
@@ -11,27 +12,59 @@ import { Picture } from '../../../helper/picture';
 })
 export class NearbyUserElementComponent implements OnInit {
   @Input() user: AccountModel.User;
-  isRequested = false;
+  @Input() contacts;
 
-  constructor(private store: Store) { }
+  constructor(private store: Store,
+              private alertController: AlertController) { }
 
   get lastSeen() {
-    return new Date(this.user.$updatedAt).toLocaleString();
+    return new Date(this.user.$updatedAt).toLocaleString([], { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }).replace(',', '');
+  }
+
+  get isRequested() {
+    return this.contacts.sentTo.map(contact => contact.recipientId).includes(this.user.$id);
+  }
+
+  get isSentTo() {
+    return this.contacts.receivedFrom.map(contact => contact.senderId).includes(this.user.$id);
   }
 
   ngOnInit() {
-    this.isRequested = this.store.selectSnapshot(ContactState.sentTo).includes(this.user.$id);
-
-    this.store.select(ContactState.sentTo).subscribe(data => {
-      this.isRequested = data.includes(this.user.$id);
-    });
   }
 
-  requestUserContact() {
-    this.store.dispatch(new Contact.Request({ requestUserId: this.user.$id }));
+  requestUserContact(requestUserId) {
+    this.store.dispatch(new UserRelation.Request({ requestUserId }));
   }
 
   profilePicture() {
     return Picture.profilePictureViewURL(this.user.$id, this.user.pictureBreaker);
+  }
+
+  async backOut() {
+    const alert = await this.alertController.create({
+      header: 'Freundschaftsanfrage',
+      subHeader: 'Anfrage zurückziehen',
+      message: 'Anfrage an ' + this.user.username + ' zurückziehen?',
+      buttons: [
+        {
+          text: 'Abbrechen',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {
+            this.alertController.dismiss();
+          }
+        },
+        {
+          text: 'Zurückziehen',
+          cssClass: 'primary',
+          handler: () => {
+            const contactId = this.contacts.sentTo.find(contact => contact.recipientId === this.user.$id).contactId;
+            this.store.dispatch(new UserRelation.RemoveRequest({contactId}));
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 }

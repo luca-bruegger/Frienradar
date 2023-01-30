@@ -1,4 +1,21 @@
 {
     "projectId": "633467240f7db9ae07d7",
-    "projectName": "Frienradar dev"
+    "projectName": "Frienradar dev",
+    "functions": [
+        {
+            "$id": "add-friend",
+            "name": "Add friend",
+            "runtime": "node-16.0",
+            "path": "functions/Add friend",
+            "entrypoint": "src/index.js",
+            "ignore": [
+                "node_modules",
+                ".npm"
+            ],
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
+        }
+    ]
 }

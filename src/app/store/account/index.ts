@@ -6,13 +6,14 @@ import { GlobalActions } from '../global';
 import { Path } from '../../helper/path';
 import { Account as AccountModel } from '../../model/account';
 import { Picture } from '../../helper/picture';
-import { NavController } from '@ionic/angular';
+import { NavController, Platform } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Location } from '../location';
 import { environment } from '../../../environments/environment';
 import { AppInitService } from '../../core/service/app-init.service';
-import UserPrefs = AccountModel.UserPrefs;
 import { AccountData } from '../../model/accountData';
+import { LocalPermission, LocalPermissionState } from '../local-permission';
+import UserPrefs = AccountModel.UserPrefs;
 
 /* State Model */
 @Injectable()
@@ -140,7 +141,8 @@ export class AccountState {
               private ngZone: NgZone,
               private store: Store,
               private router: Router,
-              private appInitService: AppInitService) {
+              private appInitService: AppInitService,
+              private platform: Platform) {
   }
 
   @Selector()
@@ -294,12 +296,22 @@ export class AccountState {
     }
 
     await this.fetchUserData(patchState);
+    this.appInitService.oneSignalInit();
+    await this.checkPermissionChanges();
 
-    if (this.store.selectSnapshot(AccountState.isUserIsFullyRegistered)) {
-      await this.appInitService.startServices();
+    const fullyRegistered = this.store.selectSnapshot(AccountState.isUserIsFullyRegistered);
+    const geolocationPermission = this.store.selectSnapshot(LocalPermissionState.geolocation);
+    const photoPermission = this.store.selectSnapshot(LocalPermissionState.photo);
+
+    const mandatoryMobilePermissions = this.isMobile() && geolocationPermission && photoPermission;
+    const mandatoryWebPermissions = !this.isMobile() && geolocationPermission;
+
+    const hasAllPermissions = mandatoryMobilePermissions || mandatoryWebPermissions;
+
+    if (fullyRegistered && hasAllPermissions) {
       this.store.dispatch(new Account.Redirect({path: Path.default, forward: true, navigateRoot: true}));
     } else {
-      this.store.dispatch(new Account.Redirect({path: Path.additionalLoginData, forward: true, navigateRoot: true}));
+      this.store.dispatch(new Account.Redirect({path: Path.additionalLoginData, forward: true, navigateRoot: false}));
     }
 
     await dispatch(new Location.FetchLastLocation({
@@ -458,8 +470,11 @@ export class AccountState {
   }
 
   @Action(Account.UpdateAccountsData)
-  async updateAccountsData({patchState, dispatch}: StateContext<AccountStateModel>, action: Account.UpdateAccountsData) {
-    const { accountsData } = action.payload;
+  async updateAccountsData({
+                             patchState,
+                             dispatch
+                           }: StateContext<AccountStateModel>, action: Account.UpdateAccountsData) {
+    const {accountsData} = action.payload;
     const preparedAccountsData = [];
 
     accountsData.forEach((accountData: AccountData) => {
@@ -619,5 +634,56 @@ export class AccountState {
         return;
       }
     }
+  }
+
+  private async checkPermissionChanges() {
+    await this.checkGeolocationPermission();
+    if (!this.isMobile()) {
+      return;
+    }
+    await this.checkPhotosPermission();
+    await this.checkNotificationPermission();
+  }
+
+  private checkPhotosPermission() {
+    return new Promise(async (resolve) => {
+      this.store.select(LocalPermissionState.photo).subscribe((photo) => {
+        if (photo === null) {
+          return;
+        }
+        resolve(photo);
+      });
+      await this.store.dispatch(new LocalPermission.CheckPhoto());
+    });
+  }
+
+  private checkNotificationPermission() {
+    return new Promise(async (resolve) => {
+      this.store.select(LocalPermissionState.notification).subscribe((notification) => {
+        if (notification === null) {
+          return;
+        }
+        resolve(notification);
+      });
+      await this.store.dispatch(new LocalPermission.CheckNotification());
+    });
+  }
+
+  private checkGeolocationPermission() {
+    return new Promise(async (resolve) => {
+      this.store.select(LocalPermissionState.geolocation).subscribe((geolocation) => {
+
+        if (geolocation === null) {
+          return;
+        }
+        resolve(geolocation);
+      });
+      await this.store.dispatch(new LocalPermission.CheckGeolocation());
+    });
+  }
+
+
+  private isMobile() {
+    return this.platform.is('android') || this.platform.is('ios') && this.platform.is('cordova');
   }
 }

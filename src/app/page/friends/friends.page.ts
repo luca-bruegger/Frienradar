@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ContactState } from '../../store';
+import { UserRelationState } from '../../store';
 import { Store } from '@ngxs/store';
 
 @Component({
@@ -13,7 +13,7 @@ export class FriendsPage implements OnInit {
   constructor(private store: Store) { }
 
   ngOnInit() {
-    this.store.select(ContactState.requestedCount).subscribe(count => {
+    this.store.select(UserRelationState.requestedCount).subscribe(count => {
       this.count = count;
     });
   }

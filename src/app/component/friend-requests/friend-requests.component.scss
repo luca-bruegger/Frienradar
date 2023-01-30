@@ -1,3 +1,10 @@
 ion-list {
   background: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+ion-item {
+  --background: transparent;
 }

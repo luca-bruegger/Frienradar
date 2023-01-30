@@ -42,22 +42,26 @@ module.exports = async function (req, res) {
   const senderId = eventData.sender;
 
   const recipientDocument = await database.listDocuments('radar', 'contacts', [
-    Query.equal('sender', recipientId)
+    Query.equal('recipient', recipientId),
+    Query.equal('sender', senderId)
   ]);
 
-  if (recipientDocument.documents.length > 0) {
+  if (recipientDocument.documents.length !== 1) {
     res.json({
       error: {
-        message: "User already has a contact request from this user",
+        message: "User relation is not valid",
         code: 409
       }
     })
     return;
   }
 
-  const contactDocument = await database.createDocument('radar', 'contacts', ID.unique(), {
-      recipient: recipientId,
-      sender: senderId
+  const documentId = recipientDocument.documents[0].$id;
+  await database.deleteDocument('radar', 'contacts', documentId);
+
+  const friendDocument = await database.createDocument('users', 'friends', ID.unique(), {
+      friendA: recipientId,
+      friendB: senderId
     },
     [
       Permission.read(Role.user(recipientId)),
@@ -68,7 +72,7 @@ module.exports = async function (req, res) {
       Permission.delete(Role.user(senderId))
     ]);
 
-  const senderUsername = (await database.getDocument('users', 'usernames', senderId)).username;
+  const recipientUsername = (await database.getDocument('users', 'usernames', recipientId)).username;
 
   const configuration = OneSignal.createConfiguration({
     appKey: req.variables['ONESIGNAL_API_KEY']
@@ -78,13 +82,13 @@ module.exports = async function (req, res) {
 
   const notification = new OneSignal.Notification();
   notification.app_id = req.variables['ONESIGNAL_APP_ID'];
-  notification.contents = {"en": "Du hast eine neue Freundschaftsanfrage von " + senderUsername};
-  notification.headings = {"en": "Neue Freundschaftsanfrage"};
-  notification.include_external_user_ids = [recipientId];
+  notification.contents = {"en": recipientUsername + "hat die Freundschaftsanfrage angenommen."};
+  notification.headings = {"en": "Freundschaftsanfrage angenommen"};
+  notification.include_external_user_ids = [senderId];
 
   await oneSignalClient.createNotification(notification);
 
   res.json({
-    contactDocument
+    friendDocument
   });
 };

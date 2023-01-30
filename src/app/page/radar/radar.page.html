@@ -1,6 +1,6 @@
 <ion-header translucent="true">
-  <ion-toolbar>
-    <ion-title color="primary">Radar</ion-title>
+  <ion-toolbar color="vbright">
+    <ion-title>Radar</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -15,5 +15,9 @@
     <div class="ion-padding radar-wrapper" style="flex: 1">
       <app-radar-display [geohash]="geohash" [currentDistance]="currentDistance"></app-radar-display>
     </div>
+    <ion-button size="block" class="ion-margin-horizontal ion-margin-bottom" *ngIf="isRegionalChatAvailable" (click)="notImplemented()">
+      <ion-label>Regional Chat öffnen</ion-label>
+      <ion-icon name="chatbubbles" style="margin-left: 10px"></ion-icon>
+    </ion-button>
   </div>
 </ion-content>

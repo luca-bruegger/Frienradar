@@ -21,4 +21,8 @@ export class Path {
   static getJumpTo() {
     return localStorage.getItem('jumpTo');
   }
+
+  static hasVisitedOnboarding() {
+    return localStorage.getItem('hasVisitedOnboarding') === 'true';
+  }
 }

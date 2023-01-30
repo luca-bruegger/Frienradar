@@ -1,9 +1,10 @@
 import { environment } from '../../environments/environment';
-import { Client, Account, Storage, Databases, Functions } from 'appwrite';
+import { Client, Account, Storage, Databases, Functions, Graphql } from 'appwrite';
 
 export class Appwrite {
   private static client: Client | null;
   private static account: Account | null;
+  private static graphQL: Graphql | null;
   private static storage: Storage | null;
   private static databases: Databases | null;
   private static functions: Functions | null;
@@ -38,6 +39,13 @@ export class Appwrite {
 
     this.databases = new Databases(this.provider());
     return this.databases;
+  }
+
+  static graphQLProvider() {
+    if (this.graphQL) {return this.graphQL;}
+
+    this.graphQL = new Graphql(this.provider());
+    return this.graphQL;
   }
 
   static functionsProvider() {

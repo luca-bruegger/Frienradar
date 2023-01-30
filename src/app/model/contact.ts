@@ -1,9 +1,12 @@
-export type Contact = {
+export type ContactModel = {
   receivedFrom: {
-    sender: string;
-    id: string;
+    senderId: string;
+    contactId: string;
   }[];
-  sentTo: string[];
+  sentTo: {
+    recipientId: string;
+    contactId: string;
+  }[];
 };
 
-export default Contact;
+export default ContactModel;
