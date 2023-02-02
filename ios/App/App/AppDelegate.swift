@@ -1,5 +1,8 @@
 import UIKit
 import Capacitor
+import AdSupport
+import os
+
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {

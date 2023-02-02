@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { NearbyUserElementComponent } from './nearby-user-element.component';
+import { UserElementComponent } from './user-element.component';
 import { NgxsModule } from '@ngxs/store';
 import { AppState } from '../../../store';
 import { environment } from '../../../../environments/environment';
 
 describe('NearbyUserElementComponent', () => {
-  let component: NearbyUserElementComponent;
-  let fixture: ComponentFixture<NearbyUserElementComponent>;
+  let component: UserElementComponent;
+  let fixture: ComponentFixture<UserElementComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ NearbyUserElementComponent ],
+      declarations: [ UserElementComponent ],
       imports: [
         IonicModule.forRoot(),
         NgxsModule.forRoot(AppState, {
@@ -21,7 +21,7 @@ describe('NearbyUserElementComponent', () => {
       ]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(NearbyUserElementComponent);
+    fixture = TestBed.createComponent(UserElementComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));

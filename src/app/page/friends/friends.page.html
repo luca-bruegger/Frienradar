@@ -3,7 +3,7 @@
     <ion-title color="primary">Freunde</ion-title>
     <ion-chip color="secondary" slot="start" style="margin-left: 13px">
       <ion-icon name="people"></ion-icon>
-      <ion-label>0</ion-label>
+      <ion-label>{{friends.length}}</ion-label>
     </ion-chip>
     <ion-buttons collapse="true" slot="end">
       <ion-button color="primary" routerLink="/tabs/friends/requests">
@@ -18,14 +18,30 @@
     <ion-toolbar>
       <ion-title size="large" style="color: var(--ion-color-primary)">Freunde</ion-title>
       <ion-buttons collapse="true" slot="end" style="margin-right: 13px">
-        <ion-badge *ngIf="count > 0" color="danger" style="right: -5px; top: 0px; z-index: 3; position: absolute; pointer-events: none">{{count}}</ion-badge>
+        <ion-badge *ngIf="friendRequestsCount > 0" color="danger" style="right: -5px; top: 0px; z-index: 3; position: absolute; pointer-events: none">{{friendRequestsCount}}</ion-badge>
         <ion-button color="primary" routerLink="/tabs/friends/requests">
           <ion-icon name="mail" color="primary"></ion-icon>
         </ion-button>
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
-  <div style="position:absolute; top: 50%; left: 50%; display: flex; flex-direction: column; text-align: center; align-items: center; transform: translate(-50%, -50%);">
+
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-card color="light" class="ion-no-margin ion-margin-horizontal ion-margin-top" *ngIf="!reloadPossible">
+    <ion-card-content>
+      <ion-progress-bar [value]="(100 - percent) /100"></ion-progress-bar>
+      <div style="text-align: center; margin-top: 10px">
+        <ion-label>
+          <strong>{{reloadTime}} Sekunden </strong> <br> bis zur nächsten manuellen Aktualisierung
+        </ion-label>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <div *ngIf="friends.length === 0" style="position:absolute; top: 50%; left: 50%; display: flex; flex-direction: column; text-align: center; align-items: center; transform: translate(-50%, -50%);">
     <ion-label>Du hast zurzeit noch keine Freunde. Es wird Zeit dies zu ändern :)</ion-label>
     <ion-button color="secondary" expand="block" routerLink="/tabs/nearby" class="ion-margin-top">
       <ion-icon slot="start" name="body"></ion-icon>
@@ -33,4 +49,14 @@
     </ion-button>
   </div>
 
+  <div *ngIf="friends.length > 0" class="ion-padding-horizontal ion-padding-top">
+    <ion-grid class="ion-no-padding">
+      <ion-row style="gap: 10px">
+        <ion-col size="12" size-lg="5" size-xl="3" size-md="5" size-sm="8" push-xl="1.5" push-lg="1" push-md="1"
+                 push-sm="2"  *ngFor="let userId of friends;">
+          <app-user-element [userId]="userId" [friends]="friends"></app-user-element>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
 </ion-content>

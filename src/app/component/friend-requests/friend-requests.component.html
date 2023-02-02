@@ -48,7 +48,7 @@
           <ion-row class="ion-no-margin ion-no-padding">
             <ion-col class="ion-no-padding ion-no-margin ion-margin-top">
               <div style="display: flex; align-items: center; justify-content: space-evenly">
-                <ion-button size="small" (click)="acceptRequest(request.sender)" color="success" fill="outline">Annehmen</ion-button>
+                <ion-button size="small" (click)="acceptRequest(request.sender.$id)" color="success" fill="outline">Annehmen</ion-button>
                 <ion-button size="small" (click)="declineRequest(request.contactId)" color="danger" fill="outline">Ablehnen</ion-button>
               </div>
             </ion-col>

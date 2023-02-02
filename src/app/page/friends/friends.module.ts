@@ -6,6 +6,7 @@ import { FriendsPageRoutingModule } from './friends-routing.module';
 import { FriendsPage } from './friends.page';
 import { FriendRequestsComponent } from '../../component/friend-requests/friend-requests.component';
 import { NgCircleProgressModule } from 'ng-circle-progress';
+import { NearbyPageModule } from '../nearby/nearby.module';
 
 @NgModule({
   imports: [
@@ -20,7 +21,8 @@ import { NgCircleProgressModule } from 'ng-circle-progress';
       outerStrokeColor: '#686868',
       innerStrokeColor: '#c7c7c7',
       animationDuration: 300,
-    })
+    }),
+    NearbyPageModule
   ],
   declarations: [
     FriendsPage,

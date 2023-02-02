@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { UserRelationState, Location, LocationState } from '../../store';
 import { GeohashLength } from '../../component/element/radar-display/radar-display.component';
+import { document } from 'ngx-bootstrap/utils';
 
 class ReloadData {
   percent: number;
@@ -25,6 +26,7 @@ export class NearbyPage implements OnInit {
   nearbyUsersMap = new Map();
   nearbyUsers = null;
   contacts = null;
+  friends = null;
 
   reloadData: ReloadDatas = {
     close: {
@@ -50,9 +52,11 @@ export class NearbyPage implements OnInit {
   };
 
   distance: string;
+  autoReloadPercent = 0;
 
   private geohashLength: number;
   private geohash: string;
+  private autoReloadTime = 30;
 
   constructor(private store: Store) {}
 
@@ -68,6 +72,7 @@ export class NearbyPage implements OnInit {
     this.checkForNearbyUsersChanges();
     this.checkForLocationChanges();
     this.checkForContactRequestChanges();
+    this.startAutoReload();
   }
 
   identifyNearbyUser(index, nearbyUser) {
@@ -77,7 +82,7 @@ export class NearbyPage implements OnInit {
   distanceChanged(distance: string) {
     this.distance = distance;
     this.geohashLength = Number(GeohashLength[distance]);
-    this.reloadNearbyUsers();
+    this.reloadNearbyUsers(this.geohashLength);
   }
 
   async refresh(event) {
@@ -89,7 +94,7 @@ export class NearbyPage implements OnInit {
       return;
     }
 
-    this.reloadNearbyUsers();
+    this.reloadNearbyUsers(this.geohashLength);
 
     reloadData.reloadTime = RELOAD_TIME;
     reloadData.percent = 100;
@@ -106,11 +111,31 @@ export class NearbyPage implements OnInit {
     }, 1000);
   }
 
+  private async startAutoReload() {
+    let currentTime = 0;
+    const geohashLengthKeys = Object.keys(GeohashLength).filter(key => !isNaN(Number(key)));
+    setInterval(() => {
+      if (currentTime === this.autoReloadTime + 1) {
+        geohashLengthKeys.forEach(key => {
+          this.reloadNearbyUsers(key);
+        });
+        currentTime = 0;
+      }
+
+      this.autoReloadPercent = (currentTime / this.autoReloadTime) * 100;
+      currentTime += 1;
+    }, 1000);
+  }
+
   private checkForContactRequestChanges() {
     this.contacts = this.store.selectSnapshot(UserRelationState.contacts);
+    this.friends = this.store.selectSnapshot(UserRelationState.friends);
 
     this.store.select(UserRelationState.contacts).subscribe(contactsChange => {
       this.contacts = contactsChange;
+    });
+    this.store.select(UserRelationState.friends).subscribe(friendsChange => {
+      this.friends = friendsChange;
     });
   }
 
@@ -142,11 +167,15 @@ export class NearbyPage implements OnInit {
     });
   }
 
-  private reloadNearbyUsers() {
+  private reloadNearbyUsers(geohashLength) {
     this.store.dispatch(new Location.FetchNearbyUser({
-        geohashLength: this.geohashLength,
+        geohashLength,
         geohash: this.geohash
       }
     ));
+  }
+
+  get primaryColor() {
+    return getComputedStyle(document.body).getPropertyValue('--ion-color-bright');
   }
 }

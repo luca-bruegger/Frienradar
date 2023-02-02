@@ -36,3 +36,7 @@ ion-item {
   --background: transparentize();
   --inner-padding-end: 0;
 }
+
+ion-content {
+  --offset-top: 0px;
+}

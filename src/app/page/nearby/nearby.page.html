@@ -1,10 +1,24 @@
 <ion-header translucent="true">
   <ion-toolbar color="vbright">
     <ion-title color="primary">In der Nähe</ion-title>
-    <ion-chip color="secondary" slot="end" style="margin-right: 13px">
+    <ion-chip color="secondary" slot="start" style="margin-left: 13px">
       <ion-icon name="body"></ion-icon>
       <ion-label>{{nearbyUsersAmount}}</ion-label>
     </ion-chip>
+    <ion-buttons collapse="true" slot="end" style="margin-right: 13px">
+      <circle-progress slot="end"
+                       [percent]="autoReloadPercent"
+                       [radius]="13"
+                       [outerStrokeWidth]="2"
+                       [outerStrokeColor]="primaryColor"
+                       [clockwise]="true"
+                       [animation]="false"
+                       [showInnerStroke]="false"
+                       [showSubtitle]="false"
+                       [showTitle]="false"
+                       [showUnits]="false"
+      ></circle-progress>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -12,6 +26,20 @@
   <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large" color="primary">In der Nähe</ion-title>
+      <ion-buttons collapse="true" slot="end" style="margin-right: 13px">
+        <circle-progress slot="end"
+                         [percent]="autoReloadPercent"
+                         [radius]="13"
+                         [outerStrokeWidth]="2"
+                         [outerStrokeColor]="primaryColor"
+                         [clockwise]="true"
+                         [showInnerStroke]="false"
+                         [showSubtitle]="false"
+                         [showTitle]="false"
+                         [showUnits]="false"
+                         [startFromZero]="false"
+        ></circle-progress>
+      </ion-buttons>
     </ion-toolbar>
   </ion-header>
 
@@ -26,7 +54,7 @@
       <ion-progress-bar [value]="(100 - reloadData[distance].percent) /100"></ion-progress-bar>
       <div style="text-align: center; margin-top: 10px">
         <ion-label>
-          <strong>{{reloadData[distance].reloadTime}} Sekunden </strong> <br> bis zur nächsten Aktualisierung
+          <strong>{{reloadData[distance].reloadTime}} Sekunden </strong> <br> bis zur nächsten manuellen Aktualisierung
         </ion-label>
       </div>
     </ion-card-content>
@@ -49,7 +77,7 @@
       <ion-row style="gap: 10px">
         <ion-col size="12" size-lg="5" size-xl="3" size-md="5" size-sm="8" push-xl="1.5" push-lg="1" push-md="1"
                  push-sm="2"  *ngFor="let user of nearbyUsers; trackBy:identifyNearbyUser">
-          <app-nearby-user-element [user]="user" [contacts]="contacts"></app-nearby-user-element>
+          <app-user-element [user]="user" [contacts]="contacts" [friends]="friends"></app-user-element>
         </ion-col>
       </ion-row>
     </ion-grid>

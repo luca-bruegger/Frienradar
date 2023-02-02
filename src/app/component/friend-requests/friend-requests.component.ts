@@ -4,7 +4,7 @@ import { Store } from '@ngxs/store';
 import { Appwrite } from '../../helper/appwrite';
 import { environment } from '../../../environments/environment';
 import { Picture } from '../../helper/picture';
-import { AlertController } from '@ionic/angular';
+import { AlertController, LoadingController } from '@ionic/angular';
 
 @Component({
   selector: 'app-friend-requests',
@@ -18,7 +18,8 @@ export class FriendRequestsComponent implements OnInit {
   }[] = null;
 
   constructor(private store: Store,
-              private alertController: AlertController) {
+              private alertController: AlertController,
+              private loadingController: LoadingController) {
   }
 
   ngOnInit() {
@@ -82,16 +83,37 @@ export class FriendRequestsComponent implements OnInit {
     await alert.present();
   }
 
-  declineRequest(contactId) {
-    this.store.dispatch(new UserRelation.RemoveRequest({contactId}));
+  async declineRequest(contactId) {
+    const spinner = await this.loadingController.create({
+      message: 'Wird Abgelehnt...',
+      spinner: 'crescent',
+      showBackdrop: true
+    });
+
+    await spinner.present();
+    await this.store.dispatch(new UserRelation.RemoveRequest({contactId}));
+    await spinner.dismiss();
   }
 
-  acceptRequest(sender) {
-    this.store.dispatch(new UserRelation.AddFriend({sender}));
+  async acceptRequest(senderId) {
+    const spinner = await this.loadingController.create({
+      message: 'Wird Angenommen...',
+      spinner: 'crescent',
+      showBackdrop: true
+    });
+
+    await spinner.present();
+    await this.store.dispatch(new UserRelation.AddFriend({senderId}));
+    await spinner.dismiss();
   }
 
   updatedDate(updatedAt) {
-    return new Date(updatedAt).toLocaleString([], { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }).replace(',', '');
+    return new Date(updatedAt).toLocaleString([], {
+      day: '2-digit',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).replace(',', '');
   }
 
   handleRefresh(event) {

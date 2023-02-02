@@ -30,6 +30,13 @@ export namespace UserRelation {
     }
   }
 
+  export class FetchFriends {
+    static readonly type = '[UserRelation] Fetch Friends';
+
+    constructor() {
+    }
+  }
+
   export class RemoveRequest {
     static readonly type = '[UserRelation] Remove Request';
 
@@ -52,9 +59,9 @@ export namespace UserRelation {
   }
 
   export class AddFriend {
-    static readonly type = '[Contact] Add Friend';
+    static readonly type = '[UserRelation] Add Friend';
 
-    constructor(public payload: { sender: string }) {
+    constructor(public payload: { senderId: string }) {
     }
   }
 }
@@ -98,6 +105,11 @@ export class UserRelationState {
     return state.contactRequest.sentTo;
   }
 
+  @Selector()
+  static friends(state: UserRelationStateModel) {
+    return state.friends;
+  }
+
   @Action(UserRelation.UpdateRequested)
   async updateRequested(
     {patchState, dispatch}: StateContext<UserRelationStateModel>,
@@ -120,13 +132,11 @@ export class UserRelationState {
     const userId = this.store.selectSnapshot(AccountState.user).$id;
 
     const contacts = await this.fetchContacts(userId);
+    const friends = await this.fetchFriendsFromUserById(userId) as FriendModel[];
     patchState({
-      contactRequest: contacts
+      contactRequest: contacts,
+      friends
     });
-
-    await this.fetchFriends(userId);
-
-
   }
 
   @Action(UserRelation.Request)
@@ -181,12 +191,12 @@ export class UserRelationState {
     {patchState, dispatch}: StateContext<UserRelationStateModel>,
     action: UserRelation.AddFriend
   ) {
-    const {sender} = action.payload;
+    const {senderId} = action.payload;
     const userId = this.store.selectSnapshot(AccountState.user).$id;
 
     const data = JSON.stringify({
-      sender,
-      recipient: userId
+      senderId,
+      recipientId: userId
     });
 
     try {
@@ -202,6 +212,18 @@ export class UserRelationState {
     } catch (e: any) {
       this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
     }
+  }
+
+  @Action(UserRelation.FetchFriends)
+  async fetchFriends(
+    {patchState, dispatch}: StateContext<UserRelationStateModel>,
+    action: UserRelation.FetchFriends
+  ) {
+    const userId = this.store.selectSnapshot(AccountState.user).$id;
+    const friends = await this.fetchFriendsFromUserById(userId) as FriendModel[];
+    patchState({
+      friends
+    });
   }
 
   @Action(UserRelation.PatchContacts)
@@ -284,9 +306,9 @@ export class UserRelationState {
     }
   }
 
-  private async fetchFriends(userId: string) {
+  private async fetchFriendsFromUserById(userId: string) {
     try {
-      const friends = [];
+      let friends: FriendModel[] = [];
 
       const query = `query ListFriends(
               $databaseId: String!
@@ -306,7 +328,7 @@ export class UserRelationState {
             }`;
 
 
-      const friendA = await Appwrite.graphQLProvider().query({
+      const friendAResponse = await Appwrite.graphQLProvider().query({
         query,
         variables: {
           databaseId: environment.usersDatabaseId,
@@ -317,7 +339,12 @@ export class UserRelationState {
         }
       }) as { data: { databasesListDocuments: { documents: { data: string; _id: string }[]; total: number } }; errors: any };
 
-      const friendB = await Appwrite.graphQLProvider().query({
+      friends = friendAResponse.data.databasesListDocuments.documents.map((item) => {
+        const {friendB} = JSON.parse(item.data);
+        return friendB;
+      });
+
+      const friendBResponse = await Appwrite.graphQLProvider().query({
         query,
         variables: {
           databaseId: environment.usersDatabaseId,
@@ -328,11 +355,12 @@ export class UserRelationState {
         }
       }) as { data: { databasesListDocuments: { documents: { data: string; _id: string }[]; total: number } }; errors: any };
 
-      console.log(friendA, friendB);
+      friends = friends.concat(friendBResponse.data.databasesListDocuments.documents.map((item) => {
+        const {friendA} = JSON.parse(item.data);
+        return friendA;
+      }));
 
-      return {
-        friends
-      };
+      return friends;
     } catch (e: any) {
       this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
     }

@@ -38,13 +38,18 @@ module.exports = async function (req, res) {
 
 
   const eventData = JSON.parse(req.payload)
-  const recipientId = eventData.recipient;
-  const senderId = eventData.sender;
+  const recipientId = eventData.recipientId;
+  const senderId = eventData.senderId;
 
   const recipientDocument = await database.listDocuments('radar', 'contacts', [
     Query.equal('recipient', recipientId),
     Query.equal('sender', senderId)
   ]);
+
+  console.log('recipientId', recipientId)
+  console.log('senderId', senderId)
+  console.log(recipientDocument.documents)
+  console.log(recipientDocument.documents.length)
 
   if (recipientDocument.documents.length !== 1) {
     res.json({
@@ -82,8 +87,8 @@ module.exports = async function (req, res) {
 
   const notification = new OneSignal.Notification();
   notification.app_id = req.variables['ONESIGNAL_APP_ID'];
-  notification.contents = {"en": recipientUsername + "hat die Freundschaftsanfrage angenommen."};
-  notification.headings = {"en": "Freundschaftsanfrage angenommen"};
+  notification.contents = {"en": recipientUsername + " hat die Freundschaftsanfrage angenommen."};
+  notification.headings = {"en": "Anfrage angenommen"};
   notification.include_external_user_ids = [senderId];
 
   await oneSignalClient.createNotification(notification);
