@@ -7,6 +7,7 @@ import { FriendsPage } from './friends.page';
 import { FriendRequestsComponent } from '../../component/friend-requests/friend-requests.component';
 import { NgCircleProgressModule } from 'ng-circle-progress';
 import { NearbyPageModule } from '../nearby/nearby.module';
+import { FriendsDisplayComponent } from '../../component/friends-display/friends-display.component';
 
 @NgModule({
   imports: [
@@ -26,7 +27,8 @@ import { NearbyPageModule } from '../nearby/nearby.module';
   ],
   declarations: [
     FriendsPage,
-    FriendRequestsComponent
+    FriendRequestsComponent,
+    FriendsDisplayComponent
   ]
 })
 export class FriendsPageModule {}

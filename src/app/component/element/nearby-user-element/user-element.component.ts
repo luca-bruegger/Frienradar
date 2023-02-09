@@ -6,6 +6,7 @@ import { AlertController } from '@ionic/angular';
 import { Appwrite } from '../../../helper/appwrite';
 import { environment } from '../../../../environments/environment';
 import { Account as AccountModel } from '../../../model/account';
+import { first } from 'rxjs/operators';
 
 @Component({
   selector: 'app-user-element',
@@ -13,10 +14,11 @@ import { Account as AccountModel } from '../../../model/account';
   styleUrls: ['./user-element.component.scss'],
 })
 export class UserElementComponent implements OnInit, OnChanges {
-  @Input() userId = null;
+  @Input() contact = null;
   @Input() user = null;
   @Input() contacts = null;
   @Input() friends = null;
+  @Input() currentCacheBreaker = Picture.cacheBreaker();
   user$: Promise<Partial<AccountModel.User>>;
   isFriend = false;
   isLoading = false;
@@ -40,34 +42,36 @@ export class UserElementComponent implements OnInit, OnChanges {
   }
 
   async ngOnInit() {
-    this.isFriend = this.friends.includes(this.userId || this.user.$id);
+    const friendId = this.contact ? this.contact.friendId : this.user.$id;
+    this.isFriend = this.friends.map(friend => friend.friendId).includes(friendId);
     this.user$ = new Promise<any>(async (resolve, reject) => {
-      if (this.user) {
-        resolve(this.user);
-      } else {
-        resolve(await Appwrite.databasesProvider().getDocument(
-          environment.radarDatabaseId,
-          environment.geolocationsCollectionId,
-          this.userId
-        ));
-      }
+      const fetchedUser = this.user || await Appwrite.databasesProvider().getDocument(
+        environment.radarDatabaseId,
+        environment.geolocationsCollectionId,
+        this.contact.friendId
+      );
+      const user = Object.assign({}, fetchedUser, {selected:false});
+      user.username = await this.fetchUsername(fetchedUser.$id);
+      resolve(user);
     });
   }
 
   async ngOnChanges(changes: SimpleChanges) {
     if (changes.friends && changes.friends.currentValue) {
-      this.isFriend = changes.friends.currentValue.includes(this.userId || this.user.$id);
+      const friendId = this.contact ? this.contact.friendId : this.user.$id;
+      this.isFriend = changes.friends.currentValue.map(friend => friend.friendId).includes(friendId);
     }
   }
 
   async requestUserContact(requestUserId) {
     this.isLoading = true;
-    await this.store.dispatch(new UserRelation.Request({ requestUserId }));
-    this.isLoading = false;
+    this.store.dispatch(new UserRelation.Request({ requestUserId })).pipe(first()).subscribe(() => {
+      this.isLoading = false;
+    });
   }
 
   profilePicture(user) {
-    return Picture.profilePictureViewURL(user.$id, user.pictureBreaker);
+    return Picture.profilePictureViewURL(user.$id, this.currentCacheBreaker);
   }
 
   lastSeen(user) {
@@ -94,13 +98,22 @@ export class UserElementComponent implements OnInit, OnChanges {
           handler: async () => {
             const contactId = this.contacts.sentTo.find(contact => contact.recipientId === this.user.$id).contactId;
             this.isLoading = true;
-            await this.store.dispatch(new UserRelation.RemoveRequest({contactId}));
-            this.isLoading = false;
+            this.store.dispatch(new UserRelation.RemoveRequest({contactId})).pipe(first()).subscribe(() => {
+              this.isLoading = false;
+              this.store.dispatch(new GlobalActions.ShowToast({message: 'Anfrage zurückgezogen', color: 'primary'}));
+            });
           }
         }
       ]
     });
 
     await alert.present();
+  }
+
+  private async fetchUsername(userId) {
+    const document = await Appwrite.databasesProvider().getDocument(environment.usersDatabaseId,
+      environment.usernameCollectionId,
+      userId);
+    return document.username;
   }
 }

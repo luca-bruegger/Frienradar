@@ -11,7 +11,6 @@ import { Camera, ImageOptions } from '@capacitor/camera';
 })
 export class ProfilePictureSelectComponent implements OnChanges {
   @Input() displayOnly = false;
-
   @Input() profilePicture = null;
   @Output() profilePictureChange = new EventEmitter<string>();
 
@@ -23,7 +22,7 @@ export class ProfilePictureSelectComponent implements OnChanges {
 
     if (changes.profilePicture.isFirstChange()) {
       if (user) {
-        this.profilePicture = Picture.profilePictureViewURL(user.$id, user.pictureBreaker);
+        this.profilePicture = Picture.profilePictureViewURL(user.$id, Picture.cacheBreaker());
         return;
       }
 
@@ -38,7 +37,7 @@ export class ProfilePictureSelectComponent implements OnChanges {
       return;
     }
 
-    this.profilePicture = Picture.profilePictureViewURL(user.$id, user.pictureBreaker);
+    this.profilePicture = Picture.profilePictureViewURL(user.$id, Picture.cacheBreaker());
   }
 
   displayImagePicker() {

@@ -46,11 +46,6 @@ module.exports = async function (req, res) {
     Query.equal('sender', senderId)
   ]);
 
-  console.log('recipientId', recipientId)
-  console.log('senderId', senderId)
-  console.log(recipientDocument.documents)
-  console.log(recipientDocument.documents.length)
-
   if (recipientDocument.documents.length !== 1) {
     res.json({
       error: {

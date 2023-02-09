@@ -27,16 +27,7 @@ export class AdditionalLoginDataComponent implements OnInit {
 
   isLoading: boolean;
 
-  usernameFormControl = new FormControl({
-    value: '',
-    disabled: true
-  }, [
-    Validators.required,
-    Validators.maxLength(30),
-    Validators.minLength(4),
-    Validators.pattern('^\\S*$'),
-    this.checkForInappropriateWords()
-  ]);
+  usernameFormControl = AccountValidation.usernameControl(true);
 
   time = 0;
   formMessages = AccountValidation.formMessages;
@@ -81,13 +72,6 @@ export class AdditionalLoginDataComponent implements OnInit {
 
   back() {
     this.store.dispatch(new Account.Logout());
-  }
-
-  checkForInappropriateWords(): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const isProfane = this.filter.isProfane(control.value);
-      return isProfane ? {profaneLanguage: true} : null;
-    };
   }
 
   verifyEmail() {

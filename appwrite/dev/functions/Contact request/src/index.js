@@ -44,11 +44,34 @@ module.exports = async function (req, res) {
   const recipientDocument = await database.listDocuments('radar', 'contacts', [
     Query.equal('sender', recipientId)
   ]);
+  const senderDocument = await database.listDocuments('radar', 'contacts', [
+    Query.equal('recipient', recipientId)
+  ]);
 
-  if (recipientDocument.documents.length > 0) {
+  const friendADocument = await database.listDocuments('users', 'friends', [
+    Query.equal('friendA', recipientId),
+    Query.equal('friendB', senderId)
+  ]);
+  const friendBDocument = await database.listDocuments('users', 'friends', [
+    Query.equal('friendB', recipientId),
+    Query.equal('friendA', senderId)
+  ]);
+
+  const contactDocumentLengths = recipientDocument.documents.length + senderDocument.documents.length;
+  const friendDocumentLengths = friendADocument.documents.length + friendBDocument.documents.length;
+
+  if (contactDocumentLengths > 0) {
     res.json({
       error: {
-        message: "User already has a contact request from this user",
+        message: "Friend request already sent",
+        code: 409
+      }
+    })
+    return;
+  } else if (friendDocumentLengths > 0) {
+    res.json({
+      error: {
+        message: "Already friends",
         code: 409
       }
     })

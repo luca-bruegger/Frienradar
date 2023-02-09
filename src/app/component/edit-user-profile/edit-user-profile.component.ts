@@ -35,16 +35,15 @@ export class EditUserProfileComponent implements OnInit {
       name: this.formGroup.get('name').value,
       email: this.formGroup.get('email').value,
       profilePicture: this.formGroup.get('profilePicture').value,
-      prefs: {
-        description: this.formGroup.get('description').value
-      }
+      description: this.formGroup.get('description').value
     });
   }
 
   private setInitialValues() {
     this.formGroup.get('name').patchValue(this.user.name);
     this.formGroup.get('email').patchValue(this.user.email);
-    this.formGroup.get('profilePicture').patchValue(Picture.profilePictureViewURL(this.user.$id, this.user.pictureBreaker));
-    this.formGroup.get('description').patchValue(this.user.prefs.description);
+    this.formGroup.get('username').patchValue(this.user.username);
+    this.formGroup.get('profilePicture').patchValue(Picture.profilePictureViewURL(this.user.$id, Picture.cacheBreaker()));
+    this.formGroup.get('description').patchValue(this.user.description);
   }
 }

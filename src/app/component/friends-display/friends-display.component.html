@@ -1,0 +1,113 @@
+<ion-header translucent="true">
+  <ion-toolbar color="vbright">
+    <ion-buttons slot="start">
+      <ion-back-button text="Zurück" defaultHref="/tabs/friends" color="secondary"></ion-back-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button (click)="removeFriend()">
+        <ion-icon name="cog" color="medium"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title color="primary">Profil</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large" color="primary">Profil</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+
+  <ion-grid class="ion-no-padding" *ngIf="user$ | async; let user; else loading">
+    <ion-row>
+      <ion-col sizeXl="6" offsetXl="3" class="ion-no-padding ion-padding-horizontal">
+        <ion-card style="background-color: var(--ion-color-vbright)"
+                  class="ion-no-margin">
+          <img alt="Silhouette of mountains" src="{{profilePicture()}}"
+               style="object-fit: cover;width: 100%;max-height: 250px;"/>
+          <ion-card-content>
+            <div style="display: flex; flex-direction: column">
+              <div style="display: flex; flex-direction: row; gap: 20px">
+                <div>
+                  <ion-text color="secondary">
+                    <h1><strong>{{user.username}}</strong></h1>
+                  </ion-text>
+                  <ion-text color="secondary">
+                    <p style="width: 100%">Befreundet seit: <br> <strong>{{lastSeen()}}</strong></p>
+                  </ion-text>
+                </div>
+              </div>
+              <ion-item *ngIf="user.description" class="ion-margin-top ion-no-padding" lines="none">
+                <ion-textarea auto-grow="true" readonly="true"
+                              [value]="user.description" class="ion-padding">
+                </ion-textarea>
+              </ion-item>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row class="ion-margin-top">
+      <ion-col class="ion-padding-horizontal">
+        <h1 style="color: var(--ion-color-secondary)" class="ion-no-margin ion-margin-bottom">Verbundene Accounts</h1>
+        <ion-row style="gap: 10px">
+          <ion-col size="12" size-lg="4" size-xl="3" size-md="5" size-sm="8" push-xl="1.5" push-lg="2" push-md="1"
+                   push-sm="2" *ngFor="let accountPreset of user.accounts" class="ion-margin-bottom">
+            <ion-card style="{{accountPreset.backgroundStyle}}" class="ion-no-margin">
+              <ion-card-header>
+                <div style="display: flex;">
+                  <div style="width: 100%">
+                    <ion-card-title style="{{accountPreset.titleStyle}}">{{accountPreset.name}}</ion-card-title>
+                    <ion-card-subtitle
+                      style="{{accountPreset.textStyle}}">Konto verbunden
+                    </ion-card-subtitle>
+                  </div>
+                  <div style="align-items: center">
+                    <h1 class="ion-no-margin">
+                      <ion-icon style="{{accountPreset.titleStyle}}" name="{{accountPreset.icon}}"></ion-icon>
+                    </h1>
+                  </div>
+                </div>
+              </ion-card-header>
+
+              <div
+                *ngIf="!isSelectedItem(accountPreset.key) && accountsFormGroup.get(accountPreset.key).value.length > 0">
+                <ion-card-content style="{{accountPreset.textStyle}}" class="ion-no-padding ion-padding-horizontal">
+                  <ion-item lines="none">
+                    <ion-input type="text" [disabled]="true" formControlName="{{accountPreset.key}}"></ion-input>
+                  </ion-item>
+                </ion-card-content>
+              </div>
+
+              <ion-item fill="solid" lines="none"
+                        class="ion-margin-horizontal">
+                <ion-input placeholder="Benutzername" formControlName="{{accountPreset.key}}"></ion-input>
+              </ion-item>
+
+              <div class="ion-padding-horizontal ion-padding-vertical" *ngIf="!isSelectedItem(accountPreset.key)"
+                   style="display: flex">
+                <ion-button
+                  (click)="openExternalLink(accountPreset.profileUrl + accountsFormGroup.get(accountPreset.key).value)"
+                  class="ion-padding-horizontal ion-no-margin"
+                  color="dark">
+                  <ion-icon name="open-outline"></ion-icon>
+                </ion-button>
+              </div>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <ng-template #loading>
+    <div
+      style="display: flex; align-items: center; justify-content: center; gap: 14px; position:absolute; top: 50%; left: 50%; transform: translate(-50%, -50%)">
+      <ion-spinner name="crescent" style="vertical-align: center"></ion-spinner>
+      <p>Profil wird geladen...</p>
+    </div>
+  </ng-template>
+</ion-content>
+
+

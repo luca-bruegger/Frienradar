@@ -13,8 +13,6 @@ const emptyLocationData: LocationData = {
   nearby: '',
   remote: '',
   farAway: '',
-  pictureBreaker: '',
-  username: ''
 };
 
 interface LocationData {
@@ -22,8 +20,6 @@ interface LocationData {
   nearby: string;
   remote: string;
   farAway: string;
-  pictureBreaker: string;
-  username: string;
 }
 
 interface NearbyUserData {
@@ -152,7 +148,7 @@ export class LocationState {
       return;
     }
 
-    const data: LocationData = this.locationDataFromGeohash(geohash, user);
+    const data: LocationData = this.locationDataFromGeohash(geohash);
 
     // Update location
     if (user && user.$id) {
@@ -215,14 +211,12 @@ export class LocationState {
     }
   }
 
-  private locationDataFromGeohash(geohash: string, user: AccountModel.User): LocationData {
+  private locationDataFromGeohash(geohash: string): LocationData {
     return {
       close: geohash.substring(0, GeohashLength.close),
       nearby: geohash.substring(0, GeohashLength.nearby),
       remote: geohash.substring(0, GeohashLength.remote),
-      farAway: geohash.substring(0, GeohashLength.farAway),
-      username: user.username,
-      pictureBreaker: user.pictureBreaker
+      farAway: geohash.substring(0, GeohashLength.farAway)
     };
   }
 

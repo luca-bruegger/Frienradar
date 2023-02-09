@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { UserRelation, UserRelationState } from '../../store';
 import { Store } from '@ngxs/store';
 import FriendModel from '../../model/friend';
+import { Picture } from '../../helper/picture';
 
 @Component({
   selector: 'app-friends',
@@ -13,6 +14,7 @@ export class FriendsPage implements OnInit {
   friendRequestsCount: number = null;
   reloadTime = 0;
   percent = 0;
+  currentCacheBreaker = Picture.cacheBreaker();
 
   private interval: any;
 

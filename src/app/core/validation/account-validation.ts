@@ -3,6 +3,17 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 export class AccountValidation {
 
   // --- CONTROLS ---
+  static usernameControl(disabled = false) {
+    return new FormControl({
+      value: '',
+      disabled
+    }, [
+      Validators.required,
+      Validators.maxLength(30),
+      Validators.minLength(4),
+      Validators.pattern('^\\S*$')
+    ]);
+  }
 
   static get nameControl() {
     return new FormControl('', [
@@ -48,6 +59,7 @@ export class AccountValidation {
       Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')
     ]),
     name: AccountValidation.nameControl,
+    username: AccountValidation.usernameControl(),
     profilePicture: AccountValidation.profilePictureControl,
     description: new FormControl('', [
       Validators.minLength(2),

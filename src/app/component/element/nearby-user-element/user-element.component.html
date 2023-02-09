@@ -11,36 +11,43 @@
           <div style="width: 100%">
             <ion-label color="secondary">
               <h1><strong>{{asyncUser.username}}</strong></h1>
-              <div style="display: flex; flex-direction: row; margin-top: 8px">
+              <div style="display: flex; flex-direction: row;">
                 <p style="width: 100%">Gesehen um: <br> <strong>{{lastSeen(asyncUser)}}</strong></p>
-                <div *ngIf="!userId && !isLoading && !isFriend">
-                  <ion-button shape="round" size="small" *ngIf="!isRequested && !isSentTo" (click)="requestUserContact(asyncUser.$id)" color="bright">
-                    Anfragen
-                  </ion-button>
-                  <ion-button shape="round" size="small"  *ngIf="isRequested" color="warning" (click)="backOut()">
-                    Zurückziehen
-                  </ion-button>
-                  <ion-button shape="round" size="small"  *ngIf="isSentTo" color="warning" routerLink="/tabs/friends/requests">
-                    Angefragt
-                  </ion-button>
-                </div>
-                <div *ngIf="userId">
-                  <ion-button shape="round" size="small" color="primary">
-                    Anzeigen
-                  </ion-button>
-                </div>
-                <div *ngIf="isLoading">
-                  <ion-button shape="round" size="small" color="medium">
-                      Lädt...
-                  </ion-button>
-                </div>
-                <div *ngIf="isFriend && user.$id">
-                  <ion-button shape="round" size="small" color="success">
-                      Befreundet
-                  </ion-button>
-                </div>
               </div>
             </ion-label>
+          </div>
+        </ion-col>
+      </ion-row>
+      <ion-row class="ion-margin-top">
+        <ion-col style="display: flex; justify-content: center">
+          <div *ngIf="!contact && !isLoading && !isFriend">
+            <ion-button shape="round" size="small" *ngIf="!isRequested && !isSentTo"
+                        (click)="requestUserContact(asyncUser.$id)" color="secondary">
+              Anfragen
+            </ion-button>
+            <ion-button shape="round" size="small" *ngIf="isRequested" color="bright" (click)="backOut()">
+              Zurückziehen
+            </ion-button>
+            <ion-button shape="round" size="small" *ngIf="isSentTo" color="warning"
+                        routerLink="/tabs/friends/requests">
+              Angefragt
+            </ion-button>
+          </div>
+          <div *ngIf="contact">
+            <ion-button shape="round" size="small" color="primary"
+                        routerLink="/tabs/friends/display/{{contact.friendId}}/{{contact.contactId}}/{{contact.since}}">
+              Anzeigen
+            </ion-button>
+          </div>
+          <div *ngIf="isLoading">
+            <ion-button shape="round" size="small" color="medium">
+              Lädt...
+            </ion-button>
+          </div>
+          <div *ngIf="isFriend && (user && user.$id)">
+            <ion-button shape="round" size="small" color="success">
+              Befreundet
+            </ion-button>
           </div>
         </ion-col>
       </ion-row>

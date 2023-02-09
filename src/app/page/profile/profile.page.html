@@ -25,20 +25,21 @@
             <p>Profil wird geladen...</p>
           </div>
         </ng-template>
-        <ion-card style="background-color: var(--ion-color-vbright)" *ngIf="user$ | async; let user; else loading" class="ion-no-margin">
+        <ion-card style="background-color: var(--ion-color-vbright)" *ngIf="user$ | async; let user; else loading"
+                  class="ion-no-margin">
           <ion-card-content>
             <div style="display: flex; flex-direction: column" class="ion-padding-bottom">
               <div style="display: flex; flex-direction: row; gap: 20px">
                 <app-profile-picture-select class="ion-padding-top" [displayOnly]="true"
-                                            [profilePicture]="user.pictureBreaker"></app-profile-picture-select>
+                                            [profilePicture]="currentCacheBreaker"></app-profile-picture-select>
                 <div class="ion-padding-top">
                   <ion-text color="primary">
                     <h1><strong>{{user.username}}</strong></h1>
                   </ion-text>
                   <div>
-                    <ion-icon class="text-icon" name="mail-outline"></ion-icon>
-                    <span class="icon-text">{{user.email}}</span>
-                    <ion-text color="medium">
+                    <ion-text color="dark">
+                      <ion-icon class="text-icon" name="mail-outline"></ion-icon>
+                      <span class="icon-text" style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap; width: 90%">{{user.email}}</span>
                       <div style="display: flex; align-items: center">
                         <ion-icon class="text-icon" name="person-circle-outline"></ion-icon>
                         <p class="icon-text">{{user.name}}</p>
@@ -47,9 +48,9 @@
                   </div>
                 </div>
               </div>
-              <ion-item *ngIf="user.prefs.description" class="ion-margin-top ion-no-padding" lines="none">
+              <ion-item *ngIf="user.description" class="ion-margin-top ion-no-padding" lines="none">
                 <ion-textarea auto-grow="true" readonly="true" placeholder="Beschreibung..."
-                              [value]="user.prefs.description" class="ion-padding">
+                              [value]="user.description" class="ion-padding">
                 </ion-textarea>
               </ion-item>
             </div>

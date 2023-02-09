@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { UserRelationState, Location, LocationState } from '../../store';
+import { UserRelationState, Location, LocationState, UserRelation } from '../../store';
 import { GeohashLength } from '../../component/element/radar-display/radar-display.component';
 import { document } from 'ngx-bootstrap/utils';
+import { Picture } from '../../helper/picture';
 
 class ReloadData {
   percent: number;
@@ -27,6 +28,7 @@ export class NearbyPage implements OnInit {
   nearbyUsers = null;
   contacts = null;
   friends = null;
+  currentCacheBreaker = Picture.cacheBreaker();
 
   reloadData: ReloadDatas = {
     close: {
@@ -79,10 +81,10 @@ export class NearbyPage implements OnInit {
     return nearbyUser.$id;
   }
 
-  distanceChanged(distance: string) {
+  async distanceChanged(distance: string) {
     this.distance = distance;
     this.geohashLength = Number(GeohashLength[distance]);
-    this.reloadNearbyUsers(this.geohashLength);
+    await this.reloadNearbyUsers(this.geohashLength);
   }
 
   async refresh(event) {
@@ -94,7 +96,7 @@ export class NearbyPage implements OnInit {
       return;
     }
 
-    this.reloadNearbyUsers(this.geohashLength);
+    await this.reloadNearbyUsers(this.geohashLength);
 
     reloadData.reloadTime = RELOAD_TIME;
     reloadData.percent = 100;
@@ -116,8 +118,8 @@ export class NearbyPage implements OnInit {
     const geohashLengthKeys = Object.keys(GeohashLength).filter(key => !isNaN(Number(key)));
     setInterval(() => {
       if (currentTime === this.autoReloadTime + 1) {
-        geohashLengthKeys.forEach(key => {
-          this.reloadNearbyUsers(key);
+        geohashLengthKeys.forEach(async key => {
+          await this.reloadNearbyUsers(key);
         });
         currentTime = 0;
       }
@@ -167,12 +169,14 @@ export class NearbyPage implements OnInit {
     });
   }
 
-  private reloadNearbyUsers(geohashLength) {
-    this.store.dispatch(new Location.FetchNearbyUser({
+  private async reloadNearbyUsers(geohashLength) {
+    await this.store.dispatch(new UserRelation.FetchFriends());
+    await this.store.dispatch(new Location.FetchNearbyUser({
         geohashLength,
         geohash: this.geohash
       }
     ));
+    this.currentCacheBreaker = Picture.cacheBreaker();
   }
 
   get primaryColor() {

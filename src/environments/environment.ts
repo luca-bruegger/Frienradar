@@ -19,7 +19,8 @@ export const environment = {
   oneSignalAppId: 'dbcfaa41-2e99-498a-8293-a3020ac85b2c',
   friendsCollectionId: 'friends',
   iosAdId: 'ca-app-pub-6953123179903035/3049634317',
-  androidAdId: ''
+  androidAdId: 'ca-app-pub-6953123179903035/9676252847',
+  descriptionCollectionId: 'description'
 };
 
 /*

@@ -53,8 +53,8 @@
     <ion-grid class="ion-no-padding">
       <ion-row style="gap: 10px">
         <ion-col size="12" size-lg="5" size-xl="3" size-md="5" size-sm="8" push-xl="1.5" push-lg="1" push-md="1"
-                 push-sm="2"  *ngFor="let userId of friends;">
-          <app-user-element [userId]="userId" [friends]="friends"></app-user-element>
+                 push-sm="2"  *ngFor="let friend of friends;">
+          <app-user-element [contact]="friend" [friends]="friends" [currentCacheBreaker]="currentCacheBreaker"></app-user-element>
         </ion-col>
       </ion-row>
     </ion-grid>

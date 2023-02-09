@@ -9,18 +9,23 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-<ion-content fullscreen="true" color="light" [formGroup]="formGroup">
-  <app-profile-picture-select class="ion-padding-top" [profilePicture]="this.formGroup.get('profilePicture').value" (profilePictureChange)="formGroup.get('profilePicture').patchValue($event)"></app-profile-picture-select>
+<ion-content fullscreen="true" color="light" [formGroup]="formGroup" class="ion-padding-top">
+  <app-profile-picture-select [profilePicture]="this.formGroup.get('profilePicture').value" (profilePictureChange)="formGroup.get('profilePicture').patchValue($event)"></app-profile-picture-select>
   <ng-container *ngFor="let validation of formMessages.profilePicture">
     <div class="error-message"
          *ngIf="formGroup.get('profilePicture').hasError(validation.type) && (formGroup.get('profilePicture').dirty || formGroup.get('profilePicture').touched)">
       {{ validation.message }}
     </div>
   </ng-container>
-  <div style="border-top: 1px solid #e0e0e0" class="ion-padding-top">
+  <div style="border-top: 1px solid #e0e0e0" class="ion-padding-top ion-padding-end">
+    <div style="margin-left: 20px">
+      <ion-note>
+        <span>Dein Name ist nur für dich sichtbar.</span>
+      </ion-note>
+    </div>
     <ion-item color="light" lines="none">
-      <ion-label style="width: 110px; padding-right: 5px">Name</ion-label>
-      <ion-input style="border-bottom: 1px solid var(--ion-color-bright)" formControlName="name" ></ion-input>
+      <ion-label style="width: 80px; padding-right: 5px">Name</ion-label>
+      <ion-input style="border-bottom: 1px solid var(--ion-color-bright)" formControlName="name"></ion-input>
     </ion-item>
     <ng-container *ngFor="let validation of formMessages.name">
       <div class="error-message"
@@ -28,13 +33,24 @@
         {{ validation.message }}
       </div>
     </ng-container>
-<!--    <ion-item color="light" lines="none">-->
-<!--      <ion-label style="width: 110px; padding-right: 5px">Email</ion-label>-->
-<!--      <div style="border-bottom: 1px solid var(&#45;&#45;ion-color-bright)">-->
-<!--        <ion-input formControlName="email"></ion-input>-->
-<!--      </div>-->
-<!--    </ion-item>-->
-    <ion-item color="light" lines="none" counter="true">
+    <div style="margin-left: 20px;" class="ion-margin-top">
+      <ion-note>
+        <span>Der Benutzername wird für die Anzeige in der App verwendet. Dieser ist für dich, aber auch andere sichtbar.</span>
+      </ion-note>
+    </div>
+    <ion-item color="light" lines="none" counter="{{formGroup.get('username').enabled}}">
+      <ion-label style="width: 110px; padding-right: 5px" position="stacked">Benutzername</ion-label>
+      <ion-input style="border-bottom: 1px solid var(--ion-color-bright)" formControlName="username" maxlength="30" type="text"></ion-input>
+    </ion-item>
+    <div>
+      <ng-container *ngFor="let validation of formMessages.username">
+        <div class="error-message"
+             *ngIf="formGroup.get('username').hasError(validation.type) && (formGroup.get('username').dirty || formGroup.get('username').touched)">
+          {{ validation.message }}
+        </div>
+      </ng-container>
+    </div>
+    <ion-item color="light" lines="none" counter="true" class="ion-margin-top">
       <ion-label style="width: 110px; padding-right: 5px" position="stacked">Beschreibung</ion-label>
       <ion-textarea class="ion-padding" auto-grow="true" formControlName="description" placeholder="Deine Beschreibung..." maxlength="150"></ion-textarea>
     </ion-item>

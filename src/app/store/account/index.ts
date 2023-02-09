@@ -118,7 +118,7 @@ export namespace Account {
 
   /** Events */
   export class Redirect {
-    static readonly type = '[Auth] AccountRedirect';
+    static readonly type = '[Auth] Account Redirect';
 
     constructor(public payload: { path: string; forward: boolean; navigateRoot: boolean }) {
     }
@@ -188,8 +188,9 @@ export class AccountState {
   ) {
     const {email, password} = action.payload;
     try {
-      await Appwrite.accountProvider().createEmailSession(email, password);
+      const session = await Appwrite.accountProvider().createEmailSession(email, password);
       await dispatch(new Account.Fetch());
+      return session;
     } catch (e: any) {
       this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
     }
@@ -266,10 +267,9 @@ export class AccountState {
       ) as AccountModel.User;
       const session = await Appwrite.accountProvider().createEmailSession(email, password);
       await Appwrite.accountProvider().updatePrefs({
-        description: '',
         distance: 'close'
       });
-      user.pictureBreaker = await this.updateProfilePicture(profilePicture, user.$id);
+      await this.updateProfilePicture(profilePicture, user.$id);
 
       dispatch(new Account.Redirect({path: Path.additionalLoginData, forward: true, navigateRoot: true}));
 
@@ -277,6 +277,7 @@ export class AccountState {
         user,
         session,
       });
+      return user;
     } catch (e: any) {
       this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
     }
@@ -314,7 +315,7 @@ export class AccountState {
       this.store.dispatch(new Account.Redirect({path: Path.additionalLoginData, forward: true, navigateRoot: false}));
     }
 
-    await dispatch(new Location.FetchLastLocation({
+    return dispatch(new Location.FetchLastLocation({
       user: this.store.selectSnapshot(AccountState.user)
     }));
   }
@@ -340,13 +341,13 @@ export class AccountState {
     }
 
     if (!!profilePicture) {
-      updatedUser.pictureBreaker = await this.updateProfilePicture(profilePicture, user.$id);
-      user = {...user, ...updatedUser} as AccountModel.User;
+      await this.updateProfilePicture(profilePicture, user.$id);
     }
 
     patchState({
       user
     });
+    return user;
   }
 
   @Action(Account.Logout)
@@ -521,13 +522,13 @@ export class AccountState {
   private async updateProfilePicture(profilePictureString: string, userId) {
     try {
       const picture = await Picture.convertToPicture(profilePictureString) as unknown as File;
-      await Appwrite.storageProvider().createFile('profile-picture', userId, picture,
+      const updatedPicture = await Appwrite.storageProvider().createFile('profile-picture', userId, picture,
         [
           Permission.read(Role.users()),
           Permission.delete(Role.user(userId)),
           Permission.write(Role.user(userId)),
         ]);
-      return Picture.cacheBreaker();
+      return await updatedPicture;
     } catch (e: any) {
       this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
     }
@@ -541,7 +542,7 @@ export class AccountState {
     }
   }
 
-  private async getUsername(user: Models.Account<unknown> & { prefs: UserPrefs; pictureBreaker: string; username: string }) {
+  private async getUsername(user: Models.Account<unknown> & { prefs: UserPrefs; username: string }) {
     try {
       const document = await Appwrite.databasesProvider().getDocument(
         environment.usersDatabaseId,
@@ -550,6 +551,28 @@ export class AccountState {
       );
       return document.username;
     } catch (e) {
+      return null;
+    }
+  }
+
+  private async getDescription(user: Models.Account<unknown> & { prefs: UserPrefs; username: string }) {
+    try {
+      const document = await Appwrite.databasesProvider().getDocument(
+        environment.usersDatabaseId,
+        environment.descriptionCollectionId,
+        user.$id
+      );
+      return document.value;
+    } catch (e) {
+      if (e.code === 404 && e.type === 'document_not_found') {
+        await Appwrite.databasesProvider().createDocument(
+          environment.usersDatabaseId,
+          environment.descriptionCollectionId,
+          user.$id, {
+            value: ''
+          });
+        return;
+      }
       return null;
     }
   }
@@ -568,15 +591,14 @@ export class AccountState {
     }
 
     await this.fetchUserAccountsData(userCopy, patchState);
-
-    // Set cacheBreaker to force image reload if not set
-    if (!userCopy.pictureBreaker) {
-      userCopy.pictureBreaker = Picture.cacheBreaker();
-    }
-
     // load username if username is not set
     if (!userCopy.username) {
       userCopy.username = await this.getUsername(userCopy);
+    }
+
+    // load description if description is not set
+    if (!userCopy.description) {
+      userCopy.description = await this.getDescription(userCopy);
     }
 
     // update user in state if user differs from current user

@@ -15,6 +15,8 @@ import FriendModel from '../../model/friend';
 export class UserRelationStateModel {
   contactRequest: ContactModel;
   friends: FriendModel[];
+  isLoadingContactRequest: boolean;
+  isAddingFriend: boolean;
 }
 
 export namespace UserRelation {
@@ -73,7 +75,9 @@ export namespace UserRelation {
       receivedFrom: [],
       sentTo: []
     },
-    friends: []
+    friends: [],
+    isLoadingContactRequest: false,
+    isAddingFriend: false
   }
 })
 
@@ -108,6 +112,11 @@ export class UserRelationState {
   @Selector()
   static friends(state: UserRelationStateModel) {
     return state.friends;
+  }
+
+  @Selector()
+  static isLoadingContactRequest(state: UserRelationStateModel) {
+    return state.isLoadingContactRequest;
   }
 
   @Action(UserRelation.UpdateRequested)
@@ -153,15 +162,18 @@ export class UserRelationState {
     });
 
     try {
-      const execution = await Appwrite.functionsProvider().createExecution('contact-requests', data) as any;
-      if (execution.response === '') {
-        return;
-      }
+      return await Appwrite.functionsProvider().createExecution('contact-requests', data).then((execution) => {
+        if (execution.response === '') {
+          return;
+        }
 
-      const error = JSON.parse(execution.response).error;
-      if (error) {
-        throw error;
-      }
+        const error = JSON.parse(execution.response).error;
+        console.log(error);
+        if (error) {
+          throw error;
+        }
+        return execution;
+      });
     } catch (e: any) {
       this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
     }
@@ -175,12 +187,11 @@ export class UserRelationState {
     const {contactId} = action.payload;
 
     try {
-      await Appwrite.databasesProvider().deleteDocument(
+      return await Appwrite.databasesProvider().deleteDocument(
         environment.radarDatabaseId,
         environment.contactsCollectionId,
         contactId
       );
-
     } catch (e: any) {
       this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
     }
@@ -200,7 +211,13 @@ export class UserRelationState {
     });
 
     try {
+      patchState({
+        isAddingFriend: true
+      });
       const execution = await Appwrite.functionsProvider().createExecution('add-friend', data) as any;
+      patchState({
+        isAddingFriend: true
+      });
       if (execution.response === '') {
         return;
       }
@@ -224,6 +241,7 @@ export class UserRelationState {
     patchState({
       friends
     });
+    return friends;
   }
 
   @Action(UserRelation.PatchContacts)
@@ -250,6 +268,7 @@ export class UserRelationState {
                 documents {
                   data
                   _id
+                  _createdAt
                 }
               }
             }`;
@@ -264,15 +283,16 @@ export class UserRelationState {
             Query.equal('sender', userId),
           ]
         }
-      }) as { data: { databasesListDocuments: { documents: { data: string; _id: string }[]; total: number } }; errors: any };
+      }) as { data: { databasesListDocuments: { documents: { data: string; _id: string; _createdAt: string }[]; total: number } }; errors: any };
 
       const recipients = recipientDataResponse.data.databasesListDocuments.documents.map((item) => {
-        const {data, _id} = item;
+        const {data, _id, _createdAt} = item;
         const parsedData = JSON.parse(data);
 
         return {
           recipientId: parsedData.recipient,
-          contactId: _id
+          contactId: _id,
+          createdAt: _createdAt
         };
       });
 
@@ -285,15 +305,16 @@ export class UserRelationState {
             Query.equal('recipient', userId),
           ]
         }
-      }) as { data: { databasesListDocuments: { documents: { data: string; _id: string }[]; total: number } }; errors: any };
+      }) as { data: { databasesListDocuments: { documents: { data: string; _id: string; _createdAt: string }[]; total: number } }; errors: any };
 
       const senders = senderDataResponse.data.databasesListDocuments.documents.map((item) => {
-        const {data, _id} = item;
+        const {data, _id, _createdAt} = item;
         const parsedData = JSON.parse(data);
 
         return {
           senderId: parsedData.sender,
-          contactId: _id
+          contactId: _id,
+          createdAt: _createdAt
         };
       });
 
@@ -308,7 +329,7 @@ export class UserRelationState {
 
   private async fetchFriendsFromUserById(userId: string) {
     try {
-      let friends: FriendModel[] = [];
+      let friends: FriendModel[];
 
       const query = `query ListFriends(
               $databaseId: String!
@@ -323,6 +344,7 @@ export class UserRelationState {
                 documents {
                   data
                   _id
+                  _createdAt
                 }
               }
             }`;
@@ -337,11 +359,17 @@ export class UserRelationState {
             Query.equal('friendA', userId),
           ]
         }
-      }) as { data: { databasesListDocuments: { documents: { data: string; _id: string }[]; total: number } }; errors: any };
+      }) as { data: { databasesListDocuments: { documents: { data: string; _id: string; _createdAt: string }[]; total: number } }; errors: any };
 
       friends = friendAResponse.data.databasesListDocuments.documents.map((item) => {
         const {friendB} = JSON.parse(item.data);
-        return friendB;
+        return {
+          friendId: friendB,
+          // eslint-disable-next-line no-underscore-dangle
+          contactId: item._id,
+          // eslint-disable-next-line no-underscore-dangle
+          since: item._createdAt
+        } as FriendModel;
       });
 
       const friendBResponse = await Appwrite.graphQLProvider().query({
@@ -353,11 +381,18 @@ export class UserRelationState {
             Query.equal('friendB', userId),
           ]
         }
-      }) as { data: { databasesListDocuments: { documents: { data: string; _id: string }[]; total: number } }; errors: any };
+      }) as { data: { databasesListDocuments: { documents: { data: string; _id: string; _createdAt: string }[]; total: number } }; errors: any };
 
       friends = friends.concat(friendBResponse.data.databasesListDocuments.documents.map((item) => {
         const {friendA} = JSON.parse(item.data);
-        return friendA;
+
+        return {
+          friendId: friendA,
+          // eslint-disable-next-line no-underscore-dangle
+          contactId: item._id,
+          // eslint-disable-next-line no-underscore-dangle
+          since: item._createdAt
+        };
       }));
 
       return friends;

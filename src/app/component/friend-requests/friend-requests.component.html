@@ -1,7 +1,7 @@
 <ion-header translucent="true">
   <ion-toolbar color="vbright">
     <ion-buttons slot="start">
-      <ion-back-button text="Zurück" defaultHref="/tabs/friends" color="dark"></ion-back-button>
+      <ion-back-button text="Zurück" defaultHref="/tabs/friends" color="secondary"></ion-back-button>
     </ion-buttons>
     <ion-title color="primary">Anfragen</ion-title>
     <ion-chip color="primary" slot="end" style="margin-right: 13px">
@@ -34,13 +34,13 @@
             <ion-col class="ion-no-padding ion-no-margin" style="display: flex">
               <div style="display: inline">
                 <ion-avatar style="height: 64px; width: 64px">
-                  <img style="aspect-ratio: 1/1" src="{{profilePicture(request.sender.$id, request.sender.pictureBreaker)}}">
+                  <img style="aspect-ratio: 1/1" src="{{profilePicture(request.sender.$id)}}">
                 </ion-avatar>
               </div>
               <div style="width: 100%; margin-left: 10px">
                 <ion-label color="secondary">
                   <h1><strong>{{request.sender.username}}</strong></h1>
-                  <p>Angefragt um: <br> <strong>{{updatedDate(request.sender.$updatedAt)}}</strong></p>
+                  <p>Angefragt um: <br> <strong>{{updatedDate(request.createdAt)}}</strong></p>
                 </ion-label>
               </div>
             </ion-col>
@@ -48,8 +48,8 @@
           <ion-row class="ion-no-margin ion-no-padding">
             <ion-col class="ion-no-padding ion-no-margin ion-margin-top">
               <div style="display: flex; align-items: center; justify-content: space-evenly">
-                <ion-button size="small" (click)="acceptRequest(request.sender.$id)" color="success" fill="outline">Annehmen</ion-button>
-                <ion-button size="small" (click)="declineRequest(request.contactId)" color="danger" fill="outline">Ablehnen</ion-button>
+                <ion-button [disabled]="isLoading" size="small" (click)="acceptRequest(request.sender.$id)" color="success" fill="outline">Annehmen</ion-button>
+                <ion-button [disabled]="isLoading" size="small" (click)="declineRequest(request.contactId)" color="danger" fill="outline">Ablehnen</ion-button>
               </div>
             </ion-col>
           </ion-row>

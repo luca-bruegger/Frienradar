@@ -4,6 +4,7 @@ import { AccountValidation } from '../../core/validation/account-validation';
 import { Account } from '../../store';
 import { ModalController } from '@ionic/angular';
 import { ResetPasswordComponent } from '../../component/reset-password/reset-password.component';
+import { first } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
@@ -52,7 +53,7 @@ export class LoginPage implements OnDestroy {
 
     this.loginInProgress = true;
     const model = this.isRegister ? new Account.Signup(this.formGroup.value) : new Account.Login(this.formGroup.value);
-    await this.store.dispatch(model).subscribe(async data => {
+    await this.store.dispatch(model).pipe(first()).subscribe(async data => {
       if (data.auth.user === null) {
         this.loginInProgress = false;
       }

@@ -50,7 +50,7 @@ export class AppInitService {
     OneSignal.setAppId(environment.oneSignalAppId);
     OneSignal.setExternalUserId(this.store.selectSnapshot(AccountState.user).$id);
 
-    OneSignal.setLogLevel(6, 0);
+    OneSignal.setLogLevel(0, 0);
 
     // NOTE: Update the setAppId value below with your OneSignal AppId.
     OneSignal.setNotificationOpenedHandler((jsonData) => {

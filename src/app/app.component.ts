@@ -76,6 +76,11 @@ export class AppComponent implements OnInit {
 
   private async showAds() {
     const { status } = await AdMob.trackingAuthorizationStatus();
+    const isCapacitor = this.platform.is('capacitor');
+
+    if (!isCapacitor) {
+      return;
+    }
 
     if (status === 'notDetermined') {
       /**
