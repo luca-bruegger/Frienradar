@@ -33,6 +33,7 @@ export class AppComponent implements OnInit {
   }
 
   async ngOnInit() {
+    return;
     await this.showAds();
     await this.appInitService.init();
     this.hasInitialized = true;
