@@ -87,7 +87,13 @@ export class AppInitService {
 
   private async setupAppStateListener() {
     App.addListener('appStateChange', async state => {
-      await this.checkPermissionChanges();
+      const { isActive } = state;
+      if (isActive) {
+        await this.checkPermissionChanges();
+        await this.locationService.watch();
+      } else {
+        await this.locationService.stop();
+      }
     });
   }
 

@@ -47,7 +47,6 @@ export class LocationService implements OnDestroy {
           backgroundTitle: 'Tracking You.',
           stale: false,
           distanceFilter: 25,
-          requestPermissions: true
         },
         (location, error) => {
           if (location && this.store.selectSnapshot(AccountState.isUserIsFullyRegistered)) {
@@ -62,9 +61,19 @@ export class LocationService implements OnDestroy {
   }
 
   async stop() {
+    console.log('stop location service', this.callbackId);
     await backgroundGeolocation.removeWatcher({
       id: this.callbackId
     });
     this.callbackId = null;
+  }
+
+  async getCurrentPosition() {
+    Geolocation.getCurrentPosition(this.geolocationOptions).then((position) => {
+      if (position && this.store.selectSnapshot(AccountState.isUserIsFullyRegistered)) {
+        const geohash = ngeohash.encode(position.coords.latitude, position.coords.longitude, GeohashLength.close);
+        this.store.dispatch(new Location.UpdatePosition(geohash));
+      }
+    });
   }
 }

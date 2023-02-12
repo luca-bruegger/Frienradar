@@ -14,6 +14,7 @@ import { AppInitService } from '../../core/service/app-init.service';
 import { AccountData } from '../../model/accountData';
 import { LocalPermission, LocalPermissionState } from '../local-permission';
 import UserPrefs = AccountModel.UserPrefs;
+import { LocationService } from '../../core/service/location.service';
 
 /* State Model */
 @Injectable()
@@ -142,7 +143,8 @@ export class AccountState {
               private store: Store,
               private router: Router,
               private appInitService: AppInitService,
-              private platform: Platform) {
+              private platform: Platform,
+              private locationService: LocationService) {
   }
 
   @Selector()
@@ -237,6 +239,8 @@ export class AccountState {
   ) {
     const user = this.store.selectSnapshot(AccountState.user);
     if (user.username !== null && user.username.length > 0) {
+      //TODO: check if user has already a location
+      await this.locationService.getCurrentPosition();
       await dispatch(new Account.InitializeEmptyDocuments({
         userId: user.$id
       }));
@@ -271,7 +275,8 @@ export class AccountState {
       });
       await this.updateProfilePicture(profilePicture, user.$id);
 
-      dispatch(new Account.Redirect({path: Path.additionalLoginData, forward: true, navigateRoot: true}));
+      await dispatch(new Account.Fetch());
+      await dispatch(new Account.Redirect({path: Path.additionalLoginData, forward: true, navigateRoot: true}));
 
       patchState({
         user,

@@ -3,6 +3,9 @@ import { ModalController } from '@ionic/angular';
 import { AccountValidation } from '../../core/validation/account-validation';
 import { Account as AccountModel } from '../../model/account';
 import { Picture } from '../../helper/picture';
+import { AccountState } from '../../store';
+import { Store } from '@ngxs/store';
+import { first } from 'rxjs/operators';
 
 @Component({
   selector: 'app-edit-user-profile',
@@ -10,12 +13,11 @@ import { Picture } from '../../helper/picture';
   styleUrls: ['./edit-user-profile.component.scss'],
 })
 export class EditUserProfileComponent implements OnInit {
-  @Input() user: AccountModel.User;
-
   formGroup = AccountValidation.editProfileFormGroup;
   formMessages = AccountValidation.formMessages;
 
-  constructor(private modalController: ModalController) {
+  constructor(private modalController: ModalController,
+              private store: Store) {
   }
 
   ngOnInit() {
@@ -40,10 +42,13 @@ export class EditUserProfileComponent implements OnInit {
   }
 
   private setInitialValues() {
-    this.formGroup.get('name').patchValue(this.user.name);
-    this.formGroup.get('email').patchValue(this.user.email);
-    this.formGroup.get('username').patchValue(this.user.username);
-    this.formGroup.get('profilePicture').patchValue(Picture.profilePictureViewURL(this.user.$id, Picture.cacheBreaker()));
-    this.formGroup.get('description').patchValue(this.user.description);
+    this.store.select(AccountState.user).subscribe(user => {
+      console.log(user);
+      this.formGroup.get('name').patchValue(user.name);
+      this.formGroup.get('email').patchValue(user.email);
+      this.formGroup.get('username').patchValue(user.username);
+      this.formGroup.get('profilePicture').patchValue(Picture.profilePictureViewURL(user.$id, Picture.cacheBreaker()));
+      this.formGroup.get('description').patchValue(user.description);
+    });
   }
 }

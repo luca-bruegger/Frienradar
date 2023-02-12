@@ -32,6 +32,7 @@ export class RadarDisplayComponent implements OnInit, OnChanges {
   constructor(private httpClient: HttpClient) {}
 
   async ngOnInit() {
+    this.geohash = null;
     if (!this.mapApiLoaded) {
       this.mapApiLoaded = await this.httpClient.jsonp(`https://maps.googleapis.com/maps/api/js?key=${environment.mapsKey}`, 'callback')
         .pipe(map(() => true), catchError(() => of(false)));
@@ -57,7 +58,7 @@ export class RadarDisplayComponent implements OnInit, OnChanges {
       if (changedGeohash && changedGeohash.currentValue && changedGeohash.currentValue.length > 0) {
         this.geohash = changedGeohash.currentValue;
       }
-
+      this.geohash = null;
       this.updateLocationBox();
       this.resetLocationBox();
     }
@@ -107,10 +108,6 @@ export class RadarDisplayComponent implements OnInit, OnChanges {
     this.mapOptions = prefersDark ? MapsHelper.getDarkOptions() : MapsHelper.getLightOptions();
     this.locationBoxOptions = prefersDark ? MapsHelper.getDarkBoxOptions() : MapsHelper.getLightBoxOptions();
     this.updateLocationBox();
-  }
-
-  getCurrentPosition() {
-
   }
 }
 

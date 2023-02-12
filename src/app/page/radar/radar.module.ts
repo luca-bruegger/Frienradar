@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { RadarPage } from './radar.page';
 
 import { RadarPageRoutingModule } from './radar-routing.module';
-import { ProfilePageModule } from '../profile/profile.module';
 import { GoogleMapsModule } from '@angular/google-maps';
 import { SharedModule } from '../../shared.module';
 import { RadarDisplayComponent } from '../../component/element/radar-display/radar-display.component';
@@ -17,7 +16,6 @@ import { RadarDisplayComponent } from '../../component/element/radar-display/rad
     FormsModule,
     IonicModule,
     RadarPageRoutingModule,
-    ProfilePageModule,
     GoogleMapsModule,
     SharedModule
   ],

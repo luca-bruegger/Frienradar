@@ -8,10 +8,6 @@ const routes: Routes = [
     component: TabsPage,
     children: [
       {
-        path: 'profile',
-        loadChildren: () => import('../page/profile/profile.module').then(m => m.ProfilePageModule)
-      },
-      {
         path: 'radar',
         loadChildren: () => import('../page/radar/radar.module').then(m => m.RadarPageModule)
       },

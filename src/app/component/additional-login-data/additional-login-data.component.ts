@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { Account, AccountState, GlobalActions } from '../../store';
-import { AbstractControl, FormControl, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { AccountValidation } from '../../core/validation/account-validation';
 import { Platform } from '@ionic/angular';
 import { LocalPermission, LocalPermissionState } from '../../store/local-permission';
@@ -9,8 +8,8 @@ import * as Filter from 'bad-words';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Account as AccountModel } from '../../model/account';
 import { AppInitService } from '../../core/service/app-init.service';
-import User = AccountModel.User;
 import OneSignal from 'onesignal-cordova-plugin';
+import User = AccountModel.User;
 
 @Component({
   selector: 'app-additional-login-data',

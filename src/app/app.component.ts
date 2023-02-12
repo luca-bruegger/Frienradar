@@ -1,4 +1,4 @@
-import { Component, NgZone, OnInit } from '@angular/core';
+import { Component, NgZone, OnInit, ViewChild } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { App, URLOpenListenerEvent } from '@capacitor/app';
 import { Path } from './helper/path';
@@ -33,9 +33,9 @@ export class AppComponent implements OnInit {
   }
 
   async ngOnInit() {
+    await this.showAds();
     await this.appInitService.init();
     this.hasInitialized = true;
-    await this.showAds();
     this.jumpTo();
     this.initializeDeeplinking();
     this.initializeGoogleAnalytics();

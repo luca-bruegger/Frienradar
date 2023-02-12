@@ -15,10 +15,14 @@ import { environment } from '../environments/environment';
 import { AppState } from './store';
 import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 import { HttpClientJsonpModule, HttpClientModule } from '@angular/common/http';
+import { MenuComponent } from './component/menu/menu.component';
+import { EditUserProfileComponent } from './component/edit-user-profile/edit-user-profile.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    MenuComponent,
+    EditUserProfileComponent
   ],
   imports: [
     BrowserModule,
@@ -39,17 +43,12 @@ import { HttpClientJsonpModule, HttpClientModule } from '@angular/common/http';
     environment.production ? [] : NgxsReduxDevtoolsPluginModule.forRoot()
   ],
   providers: [
-    {provide: RouteReuseStrategy, useClass: IonicRouteStrategy}
-    /*    {
-          provide: APP_INITIALIZER,
-          useFactory: appConfigFactory,
-          deps: [AppInitService],
-          multi: true
-        }*/
+    {
+      provide: RouteReuseStrategy,
+      useClass: IonicRouteStrategy
+    }
   ],
-  bootstrap: [AppComponent],
-  exports: [],
-  schemas: []
+  bootstrap: [AppComponent]
 })
 
 export class AppModule {
