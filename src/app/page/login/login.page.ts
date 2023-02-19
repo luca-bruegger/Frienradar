@@ -12,7 +12,7 @@ import { first } from 'rxjs/operators';
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage implements OnDestroy {
-  isRegister = true;
+  isRegister = false;
 
   formGroup = AccountValidation.loginFormGroup;
   formMessages = AccountValidation.formMessages;

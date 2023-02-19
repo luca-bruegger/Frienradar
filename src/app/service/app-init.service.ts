@@ -1,14 +1,13 @@
 import { Injectable } from '@angular/core';
-import { Account, AccountState } from '../../store';
 import { Store } from '@ngxs/store';
 import { LoadingController, Platform } from '@ionic/angular';
-import { UserRelation } from '../../store/contact';
 import { App } from '@capacitor/app';
-import { LocalPermission } from '../../store/local-permission';
 import { LocationService } from './location.service';
 import { RealtimeService } from './realtime.service';
 import OneSignal from 'onesignal-cordova-plugin';
-import { environment } from '../../../environments/environment';
+import { environment } from "../../environments/environment";
+import { Account, AccountState, UserRelation } from "../store";
+import { LocalPermission } from "../store/local-permission";
 
 @Injectable({
   providedIn: 'root'

@@ -10,11 +10,13 @@ import { NavController, Platform } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Location } from '../location';
 import { environment } from '../../../environments/environment';
-import { AppInitService } from '../../core/service/app-init.service';
 import { AccountData } from '../../model/accountData';
 import { LocalPermission, LocalPermissionState } from '../local-permission';
 import UserPrefs = AccountModel.UserPrefs;
-import { LocationService } from '../../core/service/location.service';
+import { AppInitService } from "../../service/app-init.service";
+import { LocationService } from "../../service/location.service";
+import { ApiService } from "../../service/api.service";
+import { first } from "rxjs/operators";
 
 /* State Model */
 @Injectable()
@@ -144,7 +146,8 @@ export class AccountState {
               private router: Router,
               private appInitService: AppInitService,
               private platform: Platform,
-              private locationService: LocationService) {
+              private locationService: LocationService,
+              private apiService: ApiService) {
   }
 
   @Selector()
@@ -293,15 +296,26 @@ export class AccountState {
     {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.Fetch
   ) {
-    await this.fetchSessionData(patchState);
-    const session = this.store.selectSnapshot(AccountState.session);
+    // await this.fetchSessionData(patchState);
+    // const session = this.store.selectSnapshot(AccountState.session);
+    //
+    // // If user could not be fetched on login, skip
+    // if (!session) {
+    //   return;
+    // }
+    //
+    // await this.fetchUserData(patchState);
 
-    // If user could not be fetched on login, skip
-    if (!session) {
-      return;
-    }
+    // fetch current user
+    this.apiService.get('/current_user').pipe(first()).subscribe((response) => {
+      console.log(response);
+    }, (error) => {
+      if (error.status === 401) {
+        this.store.dispatch(new Account.Redirect({path: Path.login, forward: false, navigateRoot: false}));
+      }
+      console.log(error);
+    });
 
-    await this.fetchUserData(patchState);
     this.appInitService.oneSignalInit();
     await this.checkPermissionChanges();
 
@@ -314,11 +328,11 @@ export class AccountState {
 
     const hasAllPermissions = mandatoryMobilePermissions || mandatoryWebPermissions;
 
-    if (fullyRegistered && hasAllPermissions) {
-      this.store.dispatch(new Account.Redirect({path: Path.default, forward: true, navigateRoot: true}));
-    } else {
-      this.store.dispatch(new Account.Redirect({path: Path.additionalLoginData, forward: true, navigateRoot: false}));
-    }
+    // if (fullyRegistered && hasAllPermissions) {
+    //   this.store.dispatch(new Account.Redirect({path: Path.default, forward: true, navigateRoot: true}));
+    // } else {
+    //   this.store.dispatch(new Account.Redirect({path: Path.additionalLoginData, forward: true, navigateRoot: false}));
+    // }
 
     return dispatch(new Location.FetchLastLocation({
       user: this.store.selectSnapshot(AccountState.user)
@@ -620,7 +634,8 @@ export class AccountState {
     // If session is already fetched, don't fetch again
     if (!session) {
       try {
-        session = await Appwrite.accountProvider().getSession('current') as Models.Session;
+
+        //session = await this.apiService.get('/current-user');
 
         patchState({
           session

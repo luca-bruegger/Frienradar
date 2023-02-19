@@ -1,18 +1,19 @@
-import { Component, NgZone, OnInit, ViewChild } from '@angular/core';
+import { Component, NgZone, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { App, URLOpenListenerEvent } from '@capacitor/app';
 import { Path } from './helper/path';
 import { Store } from '@ngxs/store';
-import { AppInitService } from './core/service/app-init.service';
 import { environment } from '../environments/environment';
 import { NavController, Platform } from '@ionic/angular';
 import {
   AdMob,
   AdMobBannerSize,
   BannerAdOptions,
-  BannerAdPluginEvents, BannerAdPosition,
+  BannerAdPluginEvents,
+  BannerAdPosition,
   BannerAdSize
 } from '@capacitor-community/admob';
+import { AppInitService } from "./service/app-init.service";
 
 @Component({
   selector: 'app-root',

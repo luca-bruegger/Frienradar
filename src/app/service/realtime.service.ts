@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Appwrite } from '../../helper/appwrite';
-import { AccountState, GlobalActions, UserRelation, UserRelationState } from '../../store';
 import { Store } from '@ngxs/store';
-import ContactModel from '../../model/contact';
-import FriendModel from '../../model/friend';
+import { Appwrite } from "../helper/appwrite";
+import { AccountState, GlobalActions, UserRelation, UserRelationState } from "../store";
+import ContactModel from "../model/contact";
+import FriendModel from "../model/friend";
 
 @Injectable({
   providedIn: 'root'

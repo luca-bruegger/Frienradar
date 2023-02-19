@@ -7,9 +7,9 @@ import { LocalPermission, LocalPermissionState } from '../../store/local-permiss
 import * as Filter from 'bad-words';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Account as AccountModel } from '../../model/account';
-import { AppInitService } from '../../core/service/app-init.service';
 import OneSignal from 'onesignal-cordova-plugin';
 import User = AccountModel.User;
+import { AppInitService } from "../../service/app-init.service";
 
 @Component({
   selector: 'app-additional-login-data',
