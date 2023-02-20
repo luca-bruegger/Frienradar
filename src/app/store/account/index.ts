@@ -12,11 +12,12 @@ import { Location } from '../location';
 import { environment } from '../../../environments/environment';
 import { AccountData } from '../../model/accountData';
 import { LocalPermission, LocalPermissionState } from '../local-permission';
+import { AppInitService } from '../../service/app-init.service';
+import { LocationService } from '../../service/location.service';
+import { ApiService } from '../../service/api.service';
+import { first } from 'rxjs/operators';
 import UserPrefs = AccountModel.UserPrefs;
-import { AppInitService } from "../../service/app-init.service";
-import { LocationService } from "../../service/location.service";
-import { ApiService } from "../../service/api.service";
-import { first } from "rxjs/operators";
+import { TokenService } from '../../service/token.service';
 
 /* State Model */
 @Injectable()
@@ -147,7 +148,8 @@ export class AccountState {
               private appInitService: AppInitService,
               private platform: Platform,
               private locationService: LocationService,
-              private apiService: ApiService) {
+              private apiService: ApiService,
+              private tokenService: TokenService) {
   }
 
   @Selector()
@@ -192,13 +194,27 @@ export class AccountState {
     action: Account.Login
   ) {
     const {email, password} = action.payload;
-    try {
-      const session = await Appwrite.accountProvider().createEmailSession(email, password);
-      await dispatch(new Account.Fetch());
-      return session;
-    } catch (e: any) {
-      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
-    }
+
+    this.apiService.post('/login', {
+      user: {
+        email,
+        password
+      }
+    }).pipe(first()).subscribe(async (response: any) => {
+      await this.tokenService.setTokenFromResponse(response);
+      return true;
+    }, (error) => {
+      console.log(error);
+      return false;
+    });
+
+    // try {
+    //   const session = await Appwrite.accountProvider().createEmailSession(email, password);
+    //   await dispatch(new Account.Fetch());
+    //   return session;
+    // } catch (e: any) {
+    //   this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
+    // }
   }
 
   @Action(Account.UpdateUsername)
@@ -296,23 +312,10 @@ export class AccountState {
     {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.Fetch
   ) {
-    // await this.fetchSessionData(patchState);
-    // const session = this.store.selectSnapshot(AccountState.session);
-    //
-    // // If user could not be fetched on login, skip
-    // if (!session) {
-    //   return;
-    // }
-    //
-    // await this.fetchUserData(patchState);
-
     // fetch current user
     this.apiService.get('/current_user').pipe(first()).subscribe((response) => {
       console.log(response);
     }, (error) => {
-      if (error.status === 401) {
-        this.store.dispatch(new Account.Redirect({path: Path.login, forward: false, navigateRoot: false}));
-      }
       console.log(error);
     });
 
@@ -629,7 +632,7 @@ export class AccountState {
   }
 
   private async fetchSessionData(patchState) {
-    let session = this.store.selectSnapshot(AccountState.session);
+    const session = this.store.selectSnapshot(AccountState.session);
 
     // If session is already fetched, don't fetch again
     if (!session) {

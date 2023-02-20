@@ -6,7 +6,7 @@ export const environment = {
   production: false,
   beta: false,
   test: false,
-  apiUrl: 'http://localhost:3000',
+  apiUrl: 'http://localhost:3000/api',
   mapsKey: 'AIzaSyBzaHPkOpQSETE6Q9RsIbKFL_LOL_f7xCU',
   oneSignalAppId: 'dbcfaa41-2e99-498a-8293-a3020ac85b2c',
   iosAdId: 'ca-app-pub-6953123179903035/3049634317',

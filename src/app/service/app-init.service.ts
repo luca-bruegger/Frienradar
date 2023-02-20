@@ -5,9 +5,10 @@ import { App } from '@capacitor/app';
 import { LocationService } from './location.service';
 import { RealtimeService } from './realtime.service';
 import OneSignal from 'onesignal-cordova-plugin';
-import { environment } from "../../environments/environment";
-import { Account, AccountState, UserRelation } from "../store";
-import { LocalPermission } from "../store/local-permission";
+import { environment } from '../../environments/environment';
+import { Account, AccountState, UserRelation } from '../store';
+import { LocalPermission } from '../store/local-permission';
+import { TokenService } from './token.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,19 +18,21 @@ export class AppInitService {
               private loadingController: LoadingController,
               private locationService: LocationService,
               private realtimeService: RealtimeService,
-              private platform: Platform) {
+              private platform: Platform,
+              private tokenService: TokenService) {
   }
 
   async init() {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async (resolve) => {
       const loadingSpinner = await this.createLoadingSpinner();
 
-      await this.setupAppStateListener();
-      await this.fetchUserFromApi().then(async (hasUser: boolean) => {
-        if (hasUser) {
-          await this.startServices();
-        }
-      });
+      await this.appstateListener();
+
+
+      if (await this.tokenService.isTokenValid()) {
+        await this.store.dispatch(new Account.Fetch());
+        await this.startServices();
+      }
 
       await loadingSpinner.dismiss();
       return resolve(undefined);
@@ -61,18 +64,6 @@ export class AppInitService {
     });
   }
 
-  private async fetchUserFromApi(): Promise<boolean> {
-    return new Promise(async (resolve, reject) => {
-      const dispatchResponse = await this.store.dispatch(new Account.Fetch()).toPromise();
-      if (dispatchResponse.auth.user) {
-        await this.fetchAdditionalUserData();
-        return resolve(true);
-      } else {
-        return resolve(false);
-      }
-    });
-  }
-
   private async createLoadingSpinner() {
     const spinner = await this.loadingController.create({
       message: 'Lädt ...',
@@ -84,9 +75,9 @@ export class AppInitService {
     return spinner;
   }
 
-  private async setupAppStateListener() {
+  private async appstateListener() {
     App.addListener('appStateChange', async state => {
-      const { isActive } = state;
+      const {isActive} = state;
       if (isActive) {
         await this.checkPermissionChanges();
         await this.locationService.watch();
@@ -94,10 +85,6 @@ export class AppInitService {
         await this.locationService.stop();
       }
     });
-  }
-
-  private async fetchAdditionalUserData() {
-    await this.store.dispatch(new UserRelation.Fetch()).toPromise();
   }
 
   private async checkPermissionChanges() {

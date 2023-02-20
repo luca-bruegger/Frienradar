@@ -1,11 +1,9 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { AccountValidation } from '../../core/validation/account-validation';
-import { Account as AccountModel } from '../../model/account';
 import { Picture } from '../../helper/picture';
 import { AccountState } from '../../store';
 import { Store } from '@ngxs/store';
-import { first } from 'rxjs/operators';
+import { AccountValidation } from '../../validation/account-validation';
 
 @Component({
   selector: 'app-edit-user-profile',

@@ -5,9 +5,8 @@ import * as ngeohash from 'ngeohash';
 import { BackgroundGeolocationPlugin } from '@capacitor-community/background-geolocation';
 import { registerPlugin } from '@capacitor/core';
 import { Platform } from '@ionic/angular';
-import { AccountState, Location } from "../store";
-import { GeohashLength } from "../component/element/radar-display/radar-display.component";
-const backgroundGeolocation = registerPlugin<BackgroundGeolocationPlugin>('BackgroundGeolocation');
+import { AccountState, Location } from '../store';
+import { GeohashLength } from '../component/element/radar-display/radar-display.component';
 
 @Injectable({
   providedIn: 'root'
@@ -41,6 +40,7 @@ export class LocationService implements OnDestroy {
         }
       });
     } else {
+      const backgroundGeolocation = registerPlugin<BackgroundGeolocationPlugin>('BackgroundGeolocation');
       await backgroundGeolocation.addWatcher(
         {
           backgroundMessage: 'Cancel to prevent battery drain.',
@@ -62,6 +62,7 @@ export class LocationService implements OnDestroy {
 
   async stop() {
     console.log('stop location service', this.callbackId);
+    const backgroundGeolocation = registerPlugin<BackgroundGeolocationPlugin>('BackgroundGeolocation');
     await backgroundGeolocation.removeWatcher({
       id: this.callbackId
     });

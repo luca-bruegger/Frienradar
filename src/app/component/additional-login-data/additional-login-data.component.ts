@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { Account, AccountState, GlobalActions } from '../../store';
-import { AccountValidation } from '../../core/validation/account-validation';
 import { Platform } from '@ionic/angular';
 import { LocalPermission, LocalPermissionState } from '../../store/local-permission';
 import * as Filter from 'bad-words';
@@ -9,7 +8,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Account as AccountModel } from '../../model/account';
 import OneSignal from 'onesignal-cordova-plugin';
 import User = AccountModel.User;
-import { AppInitService } from "../../service/app-init.service";
+import { AccountValidation } from '../../validation/account-validation';
+import { AppInitService } from '../../service/app-init.service';
 
 @Component({
   selector: 'app-additional-login-data',
@@ -43,8 +43,7 @@ export class AdditionalLoginDataComponent implements OnInit {
   constructor(private store: Store,
               private platform: Platform,
               private router: Router,
-              private route: ActivatedRoute,
-              private appInitService: AppInitService) {
+              private route: ActivatedRoute) {
 
   }
 

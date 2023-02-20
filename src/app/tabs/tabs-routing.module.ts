@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { TabsPage } from './tabs.page';
+import { AuthGuard } from '../helper/auth.guard';
 
 const routes: Routes = [
   {
@@ -9,19 +10,23 @@ const routes: Routes = [
     children: [
       {
         path: 'radar',
-        loadChildren: () => import('../page/radar/radar.module').then(m => m.RadarPageModule)
+        loadChildren: () => import('../page/radar/radar.module').then(m => m.RadarPageModule),
+        canActivate: [AuthGuard]
       },
       {
         path: 'friends',
-        loadChildren: () => import('../page/friends/friends.module').then(m => m.FriendsPageModule)
+        loadChildren: () => import('../page/friends/friends.module').then(m => m.FriendsPageModule),
+        canActivate: [AuthGuard]
       },
       {
         path: 'accounts',
-        loadChildren: () => import('../page/accounts/accounts.module').then(m => m.AccountsPageModule)
+        loadChildren: () => import('../page/accounts/accounts.module').then(m => m.AccountsPageModule),
+        canActivate: [AuthGuard]
       },
       {
         path: 'nearby',
-        loadChildren: () => import('../page/nearby/nearby.module').then(m => m.NearbyPageModule)
+        loadChildren: () => import('../page/nearby/nearby.module').then(m => m.NearbyPageModule),
+        canActivate: [AuthGuard]
       },
       {
         path: '',

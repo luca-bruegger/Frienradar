@@ -1,10 +1,10 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { AccountValidation } from '../../core/validation/account-validation';
 import { Account } from '../../store';
 import { ModalController } from '@ionic/angular';
 import { ResetPasswordComponent } from '../../component/reset-password/reset-password.component';
 import { first } from 'rxjs/operators';
+import { AccountValidation } from '../../validation/account-validation';
 
 @Component({
   selector: 'app-login',
@@ -46,10 +46,10 @@ export class LoginPage implements OnDestroy {
   }
 
   async signInUser() {
-    if (this.formGroup.invalid) {
-      this.formGroup.markAllAsTouched();
-      return;
-    }
+    // if (this.formGroup.invalid) {
+    //   this.formGroup.markAllAsTouched();
+    //   return;
+    // }
 
     this.loginInProgress = true;
     const model = this.isRegister ? new Account.Signup(this.formGroup.value) : new Account.Login(this.formGroup.value);

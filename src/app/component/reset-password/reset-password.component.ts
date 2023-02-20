@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { AccountValidation } from '../../core/validation/account-validation';
 import { Account } from '../../store';
 import { Store } from '@ngxs/store';
 import { ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Path } from '../../helper/path';
+import { AccountValidation } from '../../validation/account-validation';
 
 @Component({
   selector: 'app-reset-password',
