@@ -16,44 +16,30 @@ import { first } from 'rxjs/operators';
 export class UserElementComponent implements OnInit, OnChanges {
   @Input() contact = null;
   @Input() user = null;
-  @Input() contacts = null;
-  @Input() friends = null;
+  @Input() isSentTo = false;
+  @Input() isFriend = false;
+  @Input() isRequested = false;
   @Input() currentCacheBreaker = Picture.cacheBreaker();
-  user$: Promise<Partial<AccountModel.User>>;
-  isFriend = false;
   isLoading = false;
 
   constructor(private store: Store,
               private alertController: AlertController) {
   }
 
-  get isRequested() {
-    if (!this.contacts) {
-      return false;
-    }
-    return this.contacts.sentTo.map(contact => contact.recipientId).includes(this.user.$id);
-  }
-
-  get isSentTo() {
-    if (!this.contacts) {
-      return false;
-    }
-    return this.contacts.receivedFrom.map(contact => contact.senderId).includes(this.user.$id);
-  }
-
   async ngOnInit() {
-    const friendId = this.contact ? this.contact.friendId : this.user.$id;
-    this.isFriend = this.friends.map(friend => friend.friendId).includes(friendId);
-    this.user$ = new Promise<any>(async (resolve, reject) => {
-      const fetchedUser = this.user || await Appwrite.databasesProvider().getDocument(
-        environment.radarDatabaseId,
-        environment.geolocationsCollectionId,
-        this.contact.friendId
-      );
-      const user = Object.assign({}, fetchedUser, {selected:false});
-      user.username = await this.fetchUsername(fetchedUser.$id);
-      resolve(user);
-    });
+    // const friendId = this.contact ? this.contact.friendId : this.user.$id;
+    // this.isFriend = this.friends.map(friend => friend.friendId).includes(friendId);
+    // this.user$ = new Promise<any>(async (resolve, reject) => {
+    //   const fetchedUser = this.user || await Appwrite.databasesProvider().getDocument(
+    //     environment.radarDatabaseId,
+    //     environment.geolocationsCollectionId,
+    //     this.contact.friendId
+    //   );
+    //   const user = Object.assign({}, fetchedUser, {selected:false});
+    //   user.username = await this.fetchUsername(fetchedUser.$id);
+    //   resolve(user);
+    // });
+
   }
 
   async ngOnChanges(changes: SimpleChanges) {
@@ -63,11 +49,10 @@ export class UserElementComponent implements OnInit, OnChanges {
     }
   }
 
-  async requestUserContact(requestUserId) {
+  async requestUserContact(friendGuid) {
     this.isLoading = true;
-    this.store.dispatch(new UserRelation.Request({ requestUserId })).pipe(first()).subscribe(() => {
-      this.isLoading = false;
-    });
+    await this.store.dispatch(new UserRelation.Request({ friendGuid })).toPromise();
+    this.isLoading = false;
   }
 
   profilePicture(user) {
@@ -96,24 +81,17 @@ export class UserElementComponent implements OnInit, OnChanges {
           text: 'Zurückziehen',
           cssClass: 'primary',
           handler: async () => {
-            const contactId = this.contacts.sentTo.find(contact => contact.recipientId === this.user.$id).contactId;
+            // const contactId = this.contacts.sentTo.find(contact => contact.recipientId === this.user.$id).contactId;
             this.isLoading = true;
-            this.store.dispatch(new UserRelation.RemoveRequest({contactId})).pipe(first()).subscribe(() => {
-              this.isLoading = false;
-              this.store.dispatch(new GlobalActions.ShowToast({message: 'Anfrage zurückgezogen', color: 'primary'}));
-            });
+            // this.store.dispatch(new UserRelation.RemoveRequest({contactId})).pipe(first()).subscribe(() => {
+            //   this.isLoading = false;
+            //   this.store.dispatch(new GlobalActions.ShowToast({message: 'Anfrage zurückgezogen', color: 'primary'}));
+            // });
           }
         }
       ]
     });
 
     await alert.present();
-  }
-
-  private async fetchUsername(userId) {
-    const document = await Appwrite.databasesProvider().getDocument(environment.usersDatabaseId,
-      environment.usernameCollectionId,
-      userId);
-    return document.username;
   }
 }

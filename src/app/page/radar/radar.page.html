@@ -11,7 +11,7 @@
         <ion-title size="large" style="color: var(--ion-color-primary)">Radar</ion-title>
       </ion-toolbar>
     </ion-header>
-    <app-distance-change></app-distance-change>
+    <app-distance-change (distanceChange)="currentDistance = $event"></app-distance-change>
     <div class="ion-padding radar-wrapper" style="flex: 1">
       <app-radar-display [geohash]="geohash" [currentDistance]="currentDistance"></app-radar-display>
     </div>

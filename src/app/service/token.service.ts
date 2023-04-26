@@ -2,21 +2,20 @@ import { Injectable } from '@angular/core';
 import { StorageService } from './storage.service';
 import jwtDecode from 'jwt-decode';
 import { HttpResponse } from '@angular/common/http';
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TokenService {
+  tokenValidChange = new Subject<boolean>();
   private readonly tokenKey = 'token';
 
   constructor(private storageService: StorageService) {
   }
 
-  async setToken(token: string) {
-    await this.storageService.set(this.tokenKey, token);
-  }
-
   async getToken() {
+    this.tokenValidChange.next(await this.isTokenValid());
     return this.storageService.get(this.tokenKey);
   }
 
@@ -32,7 +31,13 @@ export class TokenService {
   }
 
   async setTokenFromResponse(response: HttpResponse<any>) {
+    this.tokenValidChange.next(true);
     const token = response.headers.get('Authorization');
     await this.storageService.set(this.tokenKey, token);
+  }
+
+  async removeToken() {
+    this.tokenValidChange.next(false);
+    await this.storageService.remove(this.tokenKey);
   }
 }

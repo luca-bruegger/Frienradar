@@ -1,56 +1,22 @@
-<ion-card color="vbright" class="ion-no-margin" *ngIf="user$ | async; let asyncUser;">
-  <ion-card-content style="display: flex; flex-direction: row; gap: 15px; flex-grow: 1">
-    <ion-grid class="ion-no-padding">
-      <ion-row class="ion-no-margin ion-no-padding">
-        <ion-col class="ion-no-padding ion-no-margin" style="display: flex; gap: 13px">
-          <div style="display: inline">
-            <ion-avatar style="height: 70px; width: 70px">
-              <ion-img style="aspect-ratio: 1/1" src="{{profilePicture(asyncUser)}}"></ion-img>
-            </ion-avatar>
-          </div>
-          <div style="width: 100%">
-            <ion-label color="secondary">
-              <h1><strong>{{asyncUser.username}}</strong></h1>
-              <div style="display: flex; flex-direction: row;">
-                <p style="width: 100%">Gesehen um: <br> <strong>{{lastSeen(asyncUser)}}</strong></p>
-              </div>
-            </ion-label>
-          </div>
-        </ion-col>
-      </ion-row>
-      <ion-row class="ion-margin-top">
-        <ion-col style="display: flex; justify-content: center">
-          <div *ngIf="!contact && !isLoading && !isFriend">
-            <ion-button shape="round" size="small" *ngIf="!isRequested && !isSentTo"
-                        (click)="requestUserContact(asyncUser.$id)" color="secondary">
-              Anfragen
-            </ion-button>
-            <ion-button shape="round" size="small" *ngIf="isRequested" color="bright" (click)="backOut()">
-              Zurückziehen
-            </ion-button>
-            <ion-button shape="round" size="small" *ngIf="isSentTo" color="warning"
-                        routerLink="/tabs/friends/requests">
-              Angefragt
-            </ion-button>
-          </div>
-          <div *ngIf="contact">
-            <ion-button shape="round" size="small" color="primary"
-                        routerLink="/tabs/friends/display/{{contact.friendId}}/{{contact.contactId}}/{{contact.since}}">
-              Anzeigen
-            </ion-button>
-          </div>
-          <div *ngIf="isLoading">
-            <ion-button shape="round" size="small" color="medium">
-              Lädt...
-            </ion-button>
-          </div>
-          <div *ngIf="isFriend && (user && user.$id)">
-            <ion-button shape="round" size="small" color="success">
-              Befreundet
-            </ion-button>
-          </div>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-  </ion-card-content>
-</ion-card>
+<ion-item>
+  <ion-avatar slot="start">
+    <ion-img src="{{user.attributes.profile_picture}}"></ion-img>
+  </ion-avatar>
+  <ion-label>
+    <h2><strong>{{user.attributes.username}}</strong></h2>
+  </ion-label>
+  <ion-button slot="end" shape="round" size="small" *ngIf="!isRequested && !isSentTo && !isFriend"
+              (click)="requestUserContact(user.attributes.guid)" color="bright">
+    Anfragen
+  </ion-button>
+  <ion-button disabled="true" slot="end" shape="round" size="small" *ngIf="isRequested && !isFriend" color="medium" (click)="backOut()">
+    <small>Anfrage gesendet</small>
+  </ion-button>
+  <ion-button slot="end" shape="round" size="small" *ngIf="isSentTo && !isFriend" color="primary"
+              routerLink="/tabs/friends/requests">
+    <small>Anfrage erhalten</small>
+  </ion-button>
+  <ion-button slot="end" shape="round" size="small" *ngIf="isFriend" color="dark">
+    Befreundet
+  </ion-button>
+</ion-item>

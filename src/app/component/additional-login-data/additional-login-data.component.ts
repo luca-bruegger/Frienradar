@@ -2,14 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { Account, AccountState, GlobalActions } from '../../store';
 import { Platform } from '@ionic/angular';
-import { LocalPermission, LocalPermissionState } from '../../store/local-permission';
-import * as Filter from 'bad-words';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Account as AccountModel } from '../../model/account';
 import OneSignal from 'onesignal-cordova-plugin';
-import User = AccountModel.User;
 import { AccountValidation } from '../../validation/account-validation';
+import { PermissionService } from '../../service/permission.service';
 import { AppInitService } from '../../service/app-init.service';
+import { Path } from '../../helper/path';
+import { LocationService } from '../../service/location.service';
 
 @Component({
   selector: 'app-additional-login-data',
@@ -17,34 +16,32 @@ import { AppInitService } from '../../service/app-init.service';
   styleUrls: ['./additional-login-data.component.scss'],
 })
 export class AdditionalLoginDataComponent implements OnInit {
-  filter = new Filter();
-
-  geolocationPermission = this.store.selectSnapshot(LocalPermissionState.geolocation);
-  photosPermission = this.store.selectSnapshot(LocalPermissionState.photo);
-  notificationPermission = this.store.selectSnapshot(LocalPermissionState.notification);
-  usernameSet = this.store.selectSnapshot(AccountState.username);
-
   isLoading: boolean;
 
   usernameFormControl = AccountValidation.usernameControl(true);
 
   time = 0;
   formMessages = AccountValidation.formMessages;
-  isMobile = this.platform.is('android') || this.platform.is('ios');
-  user: User = {} as User;
+  user: any = {};
   requestMailButtonDisabled = false;
   mandatoryAnimationClassEnabled = false;
-
-  private verificationData: {
-    secret: any;
-    userId: any;
-  };
 
   constructor(private store: Store,
               private platform: Platform,
               private router: Router,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              private permissionService: PermissionService,
+              private appInitService: AppInitService,
+              private locationService: LocationService) {
 
+  }
+
+  get isMobile() {
+    return this.appInitService.isMobile();
+  }
+
+  back() {
+    this.store.dispatch(new Account.Logout());
   }
 
   ngOnInit() {
@@ -62,19 +59,15 @@ export class AdditionalLoginDataComponent implements OnInit {
     });
 
     this.readRouteParams();
-    this.checkPermissions();
-    if (this.time === 60 && !this.user.emailVerification) {
+
+    if (this.time === 60 && !this.user.confirmed) {
       this.verifyEmail();
     }
   }
 
-  back() {
-    this.store.dispatch(new Account.Logout());
-  }
-
   verifyEmail() {
     this.startRequestMailButtonTimer();
-    this.store.dispatch(new Account.VerifyEmail()).toPromise().then(() => {
+    this.store.dispatch(new Account.SendVerificationEmail({email: this.user.email})).toPromise().then(() => {
       this.store.dispatch(new GlobalActions.ShowToast(({
         message: 'Email gesendet',
         color: 'success'
@@ -84,63 +77,55 @@ export class AdditionalLoginDataComponent implements OnInit {
 
 
   async finishAdditionalSetup() {
-    if (!this.user.emailVerification) {
-      this.store.dispatch(new GlobalActions.ShowToast({
-        message: 'Bestätige deine Email Adresse zum fortfahren',
-        color: 'danger'
-      }));
+    const valid = this.validateAdditionalLoginSteps();
 
-      this.animateButtons();
+    if (!valid) {
       return;
     }
-
-    const permissions = this.store.selectSnapshot(LocalPermissionState.hasMandatoryPermissions);
-    if (!permissions && this.isMobile || !this.geolocationPermission && !this.isMobile) {
-      this.store.dispatch(new GlobalActions.ShowToast({
-        message: 'Aktiviere die notwendigen Berechtigungen',
-        color: 'danger'
-      }));
-
-      this.animateButtons();
-      return;
-    }
-
-    if (this.usernameFormControl.invalid) {
-      this.usernameFormControl.markAsTouched();
-      return;
-    }
-
-    this.askForNotificationPermission();
 
     this.isLoading = true;
-    this.store.dispatch(new Account.UpdateUsername({
-      username: this.usernameFormControl.value,
-      userId: this.user.$id,
-      email: this.user.email
-    })).toPromise().then(async () => {
-      await this.store.dispatch(new Account.FinishAdditionalLogin());
-      this.isLoading = false;
-    });
+
+    if (this.user.username !== this.usernameFormControl.value) {
+      await this.store.dispatch(new Account.Update({
+        options: {
+          username: this.usernameFormControl.value
+        }
+      })).toPromise();
+    }
+
+    await this.locationService.fetchCurrentPosition();
+
+    this.store.dispatch(new GlobalActions.Redirect({
+      path: Path.default,
+      forward: true,
+      navigateRoot: false
+    }));
+    await this.store.dispatch(new GlobalActions.ShowToast({
+      message: 'Konfiguration erfolgreich abgeschlossen',
+      color: 'success'
+    }));
+
+    this.isLoading = false;
   }
 
   handleRefresh($event: any) {
-    setTimeout(() => {
-      this.user = this.store.selectSnapshot(AccountState.user);
-      this.store.dispatch(new LocalPermission.CheckGeolocation());
+    setTimeout(async () => {
+      await this.permissionService.checkPermissions(this.isMobile);
+      this.store.dispatch(new Account.Fetch({checkValidity: false}));
       $event.target.complete();
     }, 1000);
   }
 
   async requestGeolocationPermission() {
-    this.store.dispatch(new LocalPermission.RequestGeolocation());
+    await this.permissionService.requestGeolocation(this.isMobile);
   }
 
   async requestPhotoPermission() {
-    this.store.dispatch(new LocalPermission.RequestPhoto());
+    await this.permissionService.requestPhoto(this.isMobile);
   }
 
   async requestNotificationPermissions() {
-    this.store.dispatch(new LocalPermission.RequestNotification());
+    await this.permissionService.requestNotification(this.isMobile);
   }
 
   async clearParams() {
@@ -150,23 +135,25 @@ export class AdditionalLoginDataComponent implements OnInit {
     );
   }
 
-  private checkPermissions() {
-    this.checkGeolocationPermission();
-    this.checkPhotosPermission();
-    this.checkNotificationPermission();
-  }
-
   private readRouteParams() {
     this.route.queryParams.subscribe(async params => {
-      if (params && params.userId && params.secret && params.expire) {
-        this.checkIfResetIsExpired(params.expire);
-        this.verificationData = {
-          userId: params.userId,
-          secret: params.secret
-        };
+      if (params && params.confirmation_token) {
+
+        if (this.user.confirmed) {
+          await this.clearParams();
+          this.store.dispatch(new GlobalActions.ShowToast({
+            message: 'Email bereits bestätigt',
+            color: 'success'
+          }));
+          return;
+        }
+
+        const token = params.confirmation_token;
 
         await this.clearParams();
-        await this.store.dispatch(new Account.UpdateVerification(this.verificationData));
+        await this.store.dispatch(new Account.Verify({
+          token
+        })).toPromise();
       }
     });
   }
@@ -177,9 +164,7 @@ export class AdditionalLoginDataComponent implements OnInit {
     const currentDate = new Date();
 
     if (recoveryDateOneHourLater.getTime() - currentDate.getTime() < 0) {
-      this.store.dispatch(new Account.VerificationExpired({
-        message: 'Der Link ist abgelaufen. Bitte versuche es erneut.'
-      }));
+      // expired action
       return;
     }
   }
@@ -196,30 +181,6 @@ export class AdditionalLoginDataComponent implements OnInit {
     }, 1000);
   }
 
-  private checkPhotosPermission() {
-    this.store.select(LocalPermissionState.photo).subscribe((photo) => {
-      this.photosPermission = photo;
-    });
-
-    this.store.dispatch(new LocalPermission.CheckPhoto());
-  }
-
-  private checkNotificationPermission() {
-    this.store.select(LocalPermissionState.notification).subscribe((notification) => {
-      this.notificationPermission = notification;
-    });
-
-    this.store.dispatch(new LocalPermission.CheckNotification());
-  }
-
-  private checkGeolocationPermission() {
-    this.store.select(LocalPermissionState.geolocation).subscribe((geolocation) => {
-      this.geolocationPermission = geolocation;
-    });
-
-    this.store.dispatch(new LocalPermission.CheckGeolocation());
-  }
-
   private animateButtons() {
     if (!this.mandatoryAnimationClassEnabled) {
       this.mandatoryAnimationClassEnabled = true;
@@ -230,6 +191,39 @@ export class AdditionalLoginDataComponent implements OnInit {
   }
 
   private askForNotificationPermission() {
-    OneSignal.promptForPushNotificationsWithUserResponse(response => {});
+    OneSignal.promptForPushNotificationsWithUserResponse(response => {
+    });
+  }
+
+  private validateAdditionalLoginSteps() {
+    if (!this.user.confirmed) {
+      this.store.dispatch(new GlobalActions.ShowToast({
+        message: 'Bestätige deine Email Adresse zum fortfahren',
+        color: 'danger'
+      }));
+
+      this.animateButtons();
+      return false;
+    }
+
+    if (!this.permissionService.hasMandatoryPermissions(this.isMobile)) {
+      this.store.dispatch(new GlobalActions.ShowToast({
+        message: 'Aktiviere die notwendigen Berechtigungen',
+        color: 'danger'
+      }));
+
+      this.animateButtons();
+      return false;
+    }
+
+    if (this.usernameFormControl.invalid) {
+      this.usernameFormControl.markAsTouched();
+      return false;
+    }
+
+    if (this.isMobile) {
+      this.askForNotificationPermission();
+    }
+    return true;
   }
 }

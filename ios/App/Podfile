@@ -30,3 +30,8 @@ target 'Frienradar' do
   # pod 'Firebase/Messaging'
   # pod 'Wormholy', :configurations => ['Debug'] # Debug http requests
 end
+
+target 'OneSignalNotificationServiceExtension' do
+  use_frameworks!
+  pod 'OneSignalXCFramework', '>= 3.0.0', '< 4.0'
+end

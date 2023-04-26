@@ -1,22 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { UserRelationState, Location, LocationState, UserRelation } from '../../store';
-import { GeohashLength } from '../../component/element/radar-display/radar-display.component';
+import { AccountState, Location, LocationState, UserRelationState } from '../../store';
 import { document } from 'ngx-bootstrap/utils';
-import { Picture } from '../../helper/picture';
-
-class ReloadData {
-  percent: number;
-  reloadTime: number;
-  interval: number;
-}
-
-class ReloadDatas {
-  close: ReloadData;
-  nearby: ReloadData;
-  remote: ReloadData;
-  farAway: ReloadData;
-}
+import { InfiniteScrollCustomEvent } from '@ionic/angular';
 
 @Component({
   selector: 'app-nearby',
@@ -24,162 +10,95 @@ class ReloadDatas {
   styleUrls: ['./nearby.page.scss'],
 })
 export class NearbyPage implements OnInit {
-  nearbyUsersMap = new Map();
-  nearbyUsers = null;
-  contacts = null;
-  friends = null;
-  currentCacheBreaker = Picture.cacheBreaker();
+  currentPage = null;
+  selectedDistance = null;
 
-  reloadData: ReloadDatas = {
-    close: {
-      percent: 0,
-      reloadTime: 0,
-      interval: null
-    },
-    nearby: {
-      percent: 0,
-      reloadTime: 0,
-      interval: null
-    },
-    remote: {
-      percent: 0,
-      reloadTime: 0,
-      interval: null
-    },
-    farAway: {
-      percent: 0,
-      reloadTime: 0,
-      interval: null
-    }
-  };
+  constructor(private store: Store) {
+  }
 
-  distance: string;
-  autoReloadPercent = 0;
+  get preferredDistance() {
+    return this.store.selectSnapshot(AccountState.preferredDistance);
+  }
 
-  private geohashLength: number;
-  private geohash: string;
-  private autoReloadTime = 30;
+  get nearbyUsers() {
+    return this.store.selectSnapshot(LocationState.nearbyUsers);
+  }
 
-  constructor(private store: Store) {}
+  get friendRequests() {
+    return this.store.selectSnapshot(UserRelationState.receivedFriendRequests);
+  }
+
+  get friends() {
+    return this.store.selectSnapshot(UserRelationState.friends);
+  }
+
+  get requestedFriends() {
+    return this.store.selectSnapshot(UserRelationState.requestedFriends);
+  }
 
   get nearbyUsersAmount() {
-    return this.nearbyUsersMap.size;
+    return this.nearbyUsers && this.nearbyUsers[this.preferredDistance] ? this.nearbyUsers[this.preferredDistance].length : 0;
   }
 
-  get reloadPossible() {
-    return this.reloadData[this.distance].reloadTime === 0;
+  get nearbyUsersForCurrentDistance() {
+    if (this.nearbyUsers && this.nearbyUsers[this.preferredDistance]) {
+      return this.nearbyUsers[this.preferredDistance];
+    } else {
+      return null;
+    }
   }
 
-  ngOnInit() {
-    this.checkForNearbyUsersChanges();
-    this.checkForLocationChanges();
-    this.checkForContactRequestChanges();
-    this.startAutoReload();
+  get primaryColor() {
+    return getComputedStyle(document.body).getPropertyValue('--ion-color-bright');
+  }
+
+  async ngOnInit() {
+    await this.loadNearbyUsers(1, false);
   }
 
   identifyNearbyUser(index, nearbyUser) {
     return nearbyUser.$id;
   }
 
-  async distanceChanged(distance: string) {
-    this.distance = distance;
-    this.geohashLength = Number(GeohashLength[distance]);
-    await this.reloadNearbyUsers(this.geohashLength);
+  async fetchMoreNearbyUsers($event: any) {
+    await this.loadNearbyUsers(this.currentPage + 1, true);
+    await ($event as InfiniteScrollCustomEvent).target.complete();
   }
 
-  async refresh(event) {
-    const RELOAD_TIME = 10;
-    const reloadData: ReloadData = this.reloadData[this.distance] as ReloadData;
+  async distanceChanged(distance: number) {
+    this.selectedDistance = distance;
 
-    if (reloadData.interval) {
-      event.target.complete();
+    if (this.preferredDistance === distance) {
       return;
     }
 
-    await this.reloadNearbyUsers(this.geohashLength);
-
-    reloadData.reloadTime = RELOAD_TIME;
-    reloadData.percent = 100;
-    reloadData.interval = await setInterval(() => {
-      if (reloadData.reloadTime === RELOAD_TIME) {
-        event.target.complete();
-      }
-      reloadData.reloadTime -= 1;
-      reloadData.percent = (reloadData.reloadTime / RELOAD_TIME) * 100;
-      if (reloadData.reloadTime === 0) {
-        clearInterval(reloadData.interval);
-        reloadData.interval = null;
-      }
-    }, 1000);
+    this.currentPage = 1;
+    await this.loadNearbyUsers(this.currentPage, false);
   }
 
-  private async startAutoReload() {
-    let currentTime = 0;
-    const geohashLengthKeys = Object.keys(GeohashLength).filter(key => !isNaN(Number(key)));
-    setInterval(() => {
-      if (currentTime === this.autoReloadTime + 1) {
-        geohashLengthKeys.forEach(async key => {
-          await this.reloadNearbyUsers(key);
-        });
-        currentTime = 0;
-      }
-
-      this.autoReloadPercent = (currentTime / this.autoReloadTime) * 100;
-      currentTime += 1;
-    }, 1000);
+  async refresh(event) {
+    await this.loadNearbyUsers(1, false);
+    event.target.complete();
   }
 
-  private checkForContactRequestChanges() {
-    this.contacts = this.store.selectSnapshot(UserRelationState.contacts);
-    this.friends = this.store.selectSnapshot(UserRelationState.friends);
-
-    this.store.select(UserRelationState.contacts).subscribe(contactsChange => {
-      this.contacts = contactsChange;
-    });
-    this.store.select(UserRelationState.friends).subscribe(friendsChange => {
-      this.friends = friendsChange;
-    });
+  invitationRecieved(user: any) {
+    return this.friendRequests.filter(request => request.attributes.sender_guid === user.id).length > 0;
   }
 
-  private checkForLocationChanges() {
-    this.store.select(LocationState.geohash).subscribe((geohash) => {
-      this.geohash = geohash;
-      this.store.dispatch(new Location.FetchNearbyUser({
-        geohashLength: this.geohashLength,
-        geohash
-      }));
-    });
+  isFriend(user: any) {
+    return this.friends.filter(guid => guid === user.id).length > 0;
   }
 
-  private checkForNearbyUsersChanges() {
-    this.store.select(LocationState.nearbyUsers).subscribe(state => {
-      const distanceString = GeohashLength[this.geohashLength];
-
-      // Ignore first state change
-      if (!state[distanceString]) {
-        this.nearbyUsers = [];
-        return;
-      }
-
-      this.nearbyUsersMap.clear();
-      state[distanceString].forEach((user) => {
-        this.nearbyUsersMap.set(user.$id, user);
-        this.nearbyUsers = Array.from(this.nearbyUsersMap.values());
-      });
-    });
+  requestedInvitation(user: any) {
+    return this.requestedFriends.filter(guid => guid === user.id).length > 0;
   }
 
-  private async reloadNearbyUsers(geohashLength) {
-    await this.store.dispatch(new UserRelation.FetchFriends());
-    await this.store.dispatch(new Location.FetchNearbyUser({
-        geohashLength,
-        geohash: this.geohash
-      }
-    ));
-    this.currentCacheBreaker = Picture.cacheBreaker();
-  }
-
-  get primaryColor() {
-    return getComputedStyle(document.body).getPropertyValue('--ion-color-bright');
+  private async loadNearbyUsers(page = 1, append = false) {
+    this.currentPage = page;
+    await this.store.dispatch(new Location.FetchNearbyUsers({
+      page,
+      append,
+      distance: this.selectedDistance == null ? this.preferredDistance : this.selectedDistance
+    })).toPromise();
   }
 }

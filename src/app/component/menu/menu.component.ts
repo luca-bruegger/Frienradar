@@ -15,7 +15,6 @@ import { EditUserProfileComponent } from '../edit-user-profile/edit-user-profile
 })
 export class MenuComponent implements OnInit {
   @Select(AccountState.user) user$: Observable<Partial<AccountModel.User>>;
-  currentCacheBreaker = Picture.cacheBreaker();
 
   constructor(private alertController: AlertController,
               private modalController: ModalController,
@@ -43,15 +42,11 @@ export class MenuComponent implements OnInit {
     await modal.present();
   }
 
-  profilePicture(userId) {
-    return Picture.profilePictureViewURL(userId, this.currentCacheBreaker);
-  }
-
   openChangePassword() {
 
   }
 
-  signOut() {
-    this.store.dispatch(new Account.Logout());
+  async signOut() {
+    await this.store.dispatch(new Account.Logout()).toPromise();
   }
 }

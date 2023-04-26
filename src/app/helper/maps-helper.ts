@@ -13,7 +13,6 @@ export class MapsHelper {
   static getLightOptions() {
     return {
       disableDefaultUI: true,
-      gestureHandling: 'none',
       mapTypeId: 'roadmap',
       styles: [
         {
@@ -217,7 +216,6 @@ export class MapsHelper {
   static getDarkOptions() {
     return {
       disableDefaultUI: true,
-      gestureHandling: 'none',
       mapTypeId: 'roadmap',
       styles: [
         {

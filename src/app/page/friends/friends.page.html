@@ -18,7 +18,7 @@
     <ion-toolbar>
       <ion-title size="large" style="color: var(--ion-color-primary)">Freunde</ion-title>
       <ion-buttons collapse="true" slot="end" style="margin-right: 13px">
-        <ion-badge *ngIf="friendRequestsCount > 0" color="danger" style="right: -5px; top: 0px; z-index: 3; position: absolute; pointer-events: none">{{friendRequestsCount}}</ion-badge>
+        <ion-badge *ngIf="invitationCount > 0" color="danger" style="right: -5px; top: 0px; z-index: 3; position: absolute; pointer-events: none">{{invitationCount}}</ion-badge>
         <ion-button color="primary" routerLink="/tabs/friends/requests">
           <ion-icon name="mail" color="primary"></ion-icon>
         </ion-button>

@@ -20,6 +20,11 @@ export class StorageService {
     return storage.get(key);
   }
 
+  async remove(key: string) {
+    const storage = await this.defaultStorage();
+    return storage.remove(key);
+  }
+
   private async defaultStorage(): Promise<Storage> {
     if (this.storage) {
       return new Promise((resolve) => resolve(this.storage));

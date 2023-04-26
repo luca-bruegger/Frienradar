@@ -1,28 +1,23 @@
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
-import { Models, Permission, Role } from 'appwrite';
+import { Models } from 'appwrite';
 import { Appwrite } from 'src/app/helper/appwrite';
 import { GlobalActions } from '../global';
 import { Path } from '../../helper/path';
-import { Account as AccountModel } from '../../model/account';
-import { Picture } from '../../helper/picture';
-import { NavController, Platform } from '@ionic/angular';
-import { Router } from '@angular/router';
-import { Location } from '../location';
+import { Platform } from '@ionic/angular';
 import { environment } from '../../../environments/environment';
 import { AccountData } from '../../model/accountData';
-import { LocalPermission, LocalPermissionState } from '../local-permission';
 import { AppInitService } from '../../service/app-init.service';
 import { LocationService } from '../../service/location.service';
 import { ApiService } from '../../service/api.service';
-import { first } from 'rxjs/operators';
-import UserPrefs = AccountModel.UserPrefs;
+import { catchError, first, tap } from 'rxjs/operators';
 import { TokenService } from '../../service/token.service';
+import { PermissionService } from '../../service/permission.service';
 
 /* State Model */
 @Injectable()
 export class AccountStateModel {
-  user: AccountModel.User;
+  user;
   session: Models.Session;
   accountsData: [];
   username: string;
@@ -30,24 +25,11 @@ export class AccountStateModel {
 
 export namespace Account {
   /** Actions */
-  export class Signup {
-    static readonly type = '[Auth] Signup';
+  export class Register {
+    static readonly type = '[Auth] Register';
 
     constructor(
-      public payload: { email: string; password: string; name: string; profilePicture: string }
-    ) {
-    }
-  }
-
-  export class Fetch {
-    static readonly type = '[Auth] Fetch';
-  }
-
-  export class Update {
-    static readonly type = '[User] Update';
-
-    constructor(
-      public payload: { prefs?: AccountModel.UserPrefs; name?: string; profilePicture?: string }
+      public payload: { email: string; password: string; name: string; profilePicture: Blob }
     ) {
     }
   }
@@ -59,6 +41,13 @@ export namespace Account {
     }
   }
 
+  export class Fetch {
+    static readonly type = '[Auth] Fetch';
+
+    constructor(public payload: { checkValidity: boolean }) {
+    }
+  }
+
   export class SendResetEmail {
     static readonly type = '[Auth] Reset Password Email';
 
@@ -66,21 +55,31 @@ export namespace Account {
     }
   }
 
-  export class VerifyEmail {
-    static readonly type = '[Auth] Verify Email';
-  }
+  export class SendVerificationEmail {
+    static readonly type = '[Auth] Send Verification Email';
 
-  export class UpdateVerification {
-    static readonly type = '[Auth] Update Verification';
-
-    constructor(public payload: { userId: string; secret: string }) {
+    constructor(public payload: { email: string }) {
     }
   }
 
-  export class UpdateUsername {
-    static readonly type = '[Auth] Update Username';
+  export class Verify {
+    static readonly type = '[Auth] Verify';
 
-    constructor(public payload: { username: string; userId: string; email: string }) {
+    constructor(public payload: { token: string }) {
+    }
+  }
+
+  export class Update {
+    static readonly type = '[Auth] Update';
+
+    constructor(public payload: { options: any }) {
+    }
+  }
+
+  export class UpdateWithFormData {
+    static readonly type = '[Auth] Update with FormData';
+
+    constructor(public payload: { options: any }) {
     }
   }
 
@@ -98,34 +97,8 @@ export namespace Account {
     }
   }
 
-  export class VerificationExpired {
-    static readonly type = '[Auth] Reset Password expired';
-
-    constructor(public payload: { message: string }) {
-    }
-  }
-
   export class Logout {
     static readonly type = '[Auth] Logout';
-  }
-
-  export class InitializeEmptyDocuments {
-    static readonly type = '[Auth] Initialize Empty Documents';
-
-    constructor(public payload: { userId: string }) {
-    }
-  }
-
-  export class FinishAdditionalLogin {
-    static readonly type = '[Auth] Finish Additional Login';
-  }
-
-  /** Events */
-  export class Redirect {
-    static readonly type = '[Auth] Account Redirect';
-
-    constructor(public payload: { path: string; forward: boolean; navigateRoot: boolean }) {
-    }
   }
 }
 
@@ -141,15 +114,13 @@ export namespace Account {
 
 @Injectable()
 export class AccountState {
-  constructor(private navController: NavController,
-              private ngZone: NgZone,
-              private store: Store,
-              private router: Router,
+  constructor(private store: Store,
               private appInitService: AppInitService,
               private platform: Platform,
               private locationService: LocationService,
               private apiService: ApiService,
-              private tokenService: TokenService) {
+              private tokenService: TokenService,
+              private permissionService: PermissionService) {
   }
 
   @Selector()
@@ -163,8 +134,13 @@ export class AccountState {
   }
 
   @Selector()
-  static distance(state: AccountStateModel) {
-    return state.user.prefs.distance;
+  static preferredDistance(state: AccountStateModel) {
+    return state.user.preferred_distance;
+  }
+
+  @Selector()
+  static invitationCount(state: AccountStateModel) {
+    return state.user.invitation_count;
   }
 
   @Selector()
@@ -188,157 +164,52 @@ export class AccountState {
     return !!state.user;
   }
 
+  @Action(Account.Register)
+  async register(
+    {patchState, dispatch}: StateContext<AccountStateModel>,
+    action: Account.Register
+  ) {
+    const {email, password, name, profilePicture} = action.payload;
+
+    const formData = new FormData();
+    formData.append('profile_picture', profilePicture, profilePicture.type);
+    formData.append('email', email);
+    formData.append('password', password);
+    formData.append('name', name);
+
+    return this.apiService.post('/user', formData, true).pipe(tap(async (response: any) => {
+      console.log(response);
+      const user = response.body.data;
+      await this.tokenService.setTokenFromResponse(response);
+      patchState({
+        user
+      });
+      await dispatch(new GlobalActions.Redirect({path: Path.additionalLoginData, forward: true, navigateRoot: false}));
+    }), catchError(async (error) => {
+      this.store.dispatch(new GlobalActions.HandleLoginError({error: error.error.status as Error}));
+    }));
+  }
+
   @Action(Account.Login)
   async login(
     {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.Login
   ) {
     const {email, password} = action.payload;
-
-    this.apiService.post('/login', {
+    return this.apiService.post('/user/sign_in', {
       user: {
         email,
         password
       }
-    }).pipe(first()).subscribe(async (response: any) => {
+    }).pipe(tap(async (response: any) => {
+      const user = response.body.data;
       await this.tokenService.setTokenFromResponse(response);
-      return true;
-    }, (error) => {
-      console.log(error);
-      return false;
-    });
-
-    // try {
-    //   const session = await Appwrite.accountProvider().createEmailSession(email, password);
-    //   await dispatch(new Account.Fetch());
-    //   return session;
-    // } catch (e: any) {
-    //   this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
-    // }
-  }
-
-  @Action(Account.UpdateUsername)
-  async updateUsername(
-    {patchState, dispatch}: StateContext<AccountStateModel>,
-    action: Account.UpdateUsername
-  ) {
-    const {userId, username, email} = action.payload;
-    const user = this.store.selectSnapshot(AccountState.user);
-
-    try {
-      if (user.username !== username) {
-        await Appwrite.databasesProvider().createDocument(environment.usersDatabaseId, environment.usernameCollectionId, userId, {
-          email,
-          username
-        });
-        const updatedUser = {...user};
-        updatedUser.username = username;
-
-        patchState({
-          user: updatedUser
-        });
-      }
-    } catch (e: any) {
-      if (e.code === 409 && e.type === 'document_already_exists') {
-        this.store.dispatch(new GlobalActions.ShowToast({
-          message: 'Der Benutzername ist bereits vergeben',
-          color: 'danger'
-        }));
-        return;
-      }
-
-      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
-    }
-  }
-
-  @Action(Account.FinishAdditionalLogin)
-  async finishAdditionalLogin(
-    {patchState, dispatch}: StateContext<AccountStateModel>,
-    action: Account.FinishAdditionalLogin
-  ) {
-    const user = this.store.selectSnapshot(AccountState.user);
-    if (user.username !== null && user.username.length > 0) {
-      //TODO: check if user has already a location
-      await this.locationService.getCurrentPosition();
-      await dispatch(new Account.InitializeEmptyDocuments({
-        userId: user.$id
-      }));
-      await dispatch(new Account.Redirect({
-        path: Path.default,
-        forward: true,
-        navigateRoot: false
-      }));
-      await dispatch(new GlobalActions.ShowToast({
-        message: 'Konfiguration erfolgreich abgeschlossen',
-        color: 'success'
-      }));
-    }
-  }
-
-  @Action(Account.Signup)
-  async signup(
-    {patchState, dispatch}: StateContext<AccountStateModel>,
-    action: Account.Signup
-  ) {
-    const {email, password, name, profilePicture} = action.payload;
-    try {
-      const user = await Appwrite.accountProvider().create(
-        'unique()',
-        email,
-        password,
-        name
-      ) as AccountModel.User;
-      const session = await Appwrite.accountProvider().createEmailSession(email, password);
-      await Appwrite.accountProvider().updatePrefs({
-        distance: 'close'
-      });
-      await this.updateProfilePicture(profilePicture, user.$id);
-
-      await dispatch(new Account.Fetch());
-      await dispatch(new Account.Redirect({path: Path.additionalLoginData, forward: true, navigateRoot: true}));
-
+      await this.checkIfUserIsFullyRegistered(user);
       patchState({
-        user,
-        session,
+        user
       });
-      return user;
-    } catch (e: any) {
-      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
-    }
-  }
-
-  @Action(Account.Fetch)
-  async fetch(
-    {patchState, dispatch}: StateContext<AccountStateModel>,
-    action: Account.Fetch
-  ) {
-    // fetch current user
-    this.apiService.get('/current_user').pipe(first()).subscribe((response) => {
-      console.log(response);
-    }, (error) => {
-      console.log(error);
-    });
-
-    this.appInitService.oneSignalInit();
-    await this.checkPermissionChanges();
-
-    const fullyRegistered = this.store.selectSnapshot(AccountState.isUserIsFullyRegistered);
-    const geolocationPermission = this.store.selectSnapshot(LocalPermissionState.geolocation);
-    const photoPermission = this.store.selectSnapshot(LocalPermissionState.photo);
-
-    const mandatoryMobilePermissions = this.isMobile() && geolocationPermission && photoPermission;
-    const mandatoryWebPermissions = !this.isMobile() && geolocationPermission;
-
-    const hasAllPermissions = mandatoryMobilePermissions || mandatoryWebPermissions;
-
-    // if (fullyRegistered && hasAllPermissions) {
-    //   this.store.dispatch(new Account.Redirect({path: Path.default, forward: true, navigateRoot: true}));
-    // } else {
-    //   this.store.dispatch(new Account.Redirect({path: Path.additionalLoginData, forward: true, navigateRoot: false}));
-    // }
-
-    return dispatch(new Location.FetchLastLocation({
-      user: this.store.selectSnapshot(AccountState.user)
+    }), catchError(async (error) => {
+      dispatch(new GlobalActions.HandleLoginError({error}));
     }));
   }
 
@@ -347,29 +218,73 @@ export class AccountState {
     {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.Update
   ) {
-    const {prefs, profilePicture, name} = action.payload;
-    let user: AccountModel.User = this.store.selectSnapshot(AccountState.user);
-    let updatedUser = {} as AccountModel.User;
+    const {options} = action.payload;
 
-    if (!!name) {
-      updatedUser = await this.updateName(name);
-      user = {...user, ...updatedUser} as AccountModel.User;
+    return this.apiService.put('/current_user', {
+      user: options
+    }, false).pipe(tap((response: any) => {
+      patchState({
+        user: response.data
+      });
+    }), catchError(async (error) => {
+      dispatch(new GlobalActions.HandleError({error}));
+    }));
+  }
+
+  @Action(Account.UpdateWithFormData)
+  async updateWithFormData(
+    {patchState, dispatch}: StateContext<AccountStateModel>,
+    action: Account.UpdateWithFormData
+  ) {
+    const {options} = action.payload;
+
+    console.log(options);
+
+    const formData = new FormData();
+    if (options.profilePicture) {
+      formData.append('profile_picture', options.profilePicture, options.profilePicture.type);
+      delete options.profilePicture;
     }
 
-    if (!!prefs) {
-      const updatedPrefs = {...user.prefs, ...prefs};
-      updatedUser = await this.updateUserPrefs(updatedPrefs);
-      user = {...user, ...updatedUser} as AccountModel.User;
+    for (const key in options) {
+      if (options.hasOwnProperty(key)) {
+        const value = options[key];
+        formData.append(key, value);
+      }
     }
 
-    if (!!profilePicture) {
-      await this.updateProfilePicture(profilePicture, user.$id);
-    }
+    return this.apiService.put('/current_user/edited', formData, true).pipe(tap((response: any) => {
+      patchState({
+        user: response.data
+      });
+    }), catchError(async (error) => {
+      dispatch(new GlobalActions.HandleError({error}));
+    }));
+  }
 
-    patchState({
-      user
-    });
-    return user;
+  @Action(Account.Fetch)
+  async fetch(
+    {patchState, dispatch}: StateContext<AccountStateModel>,
+    action: Account.Fetch
+  ) {
+    const {checkValidity} = action.payload;
+
+    return this.apiService.get('/current_user').pipe(tap((response: any) => {
+      const user = JSON.parse(response).data;
+
+      if (checkValidity) {
+        this.checkIfUserIsFullyRegistered(user);
+      }
+
+      patchState({
+        user
+      });
+    }), catchError(async (error) => {
+      if (error.status === 401 || error.status === 404) {
+        await this.tokenService.removeToken();
+        await dispatch(new GlobalActions.Redirect({path: Path.login, forward: false, navigateRoot: true}));
+      }
+    }));
   }
 
   @Action(Account.Logout)
@@ -377,16 +292,14 @@ export class AccountState {
     {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.Logout
   ) {
-    try {
-      await Appwrite.accountProvider().deleteSession('current');
-      patchState({
-        user: null,
-        session: null
-      });
-      dispatch(new Account.Redirect({path: Path.login, forward: false, navigateRoot: true}));
-    } catch (e: any) {
-      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
-    }
+    return this.apiService.delete('/user/sign_out').pipe(tap(async (response) => {
+      await this.tokenService.removeToken();
+      await dispatch(new GlobalActions.Redirect({path: Path.login, forward: false, navigateRoot: true}));
+    }), catchError(async (error) => {
+      if (error.status === 401) {
+        await dispatch(new GlobalActions.Redirect({path: Path.login, forward: false, navigateRoot: true}));
+      }
+    }));
   }
 
   @Action(Account.SendResetEmail)
@@ -394,17 +307,12 @@ export class AccountState {
     {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.SendResetEmail
   ) {
-    const email = action.payload;
-    try {
-      await Appwrite.accountProvider().createRecovery(email, `${environment.appUrl}/reset-password`);
-
-      await this.store.dispatch(new GlobalActions.ShowToast({
-        message: 'Mail gesendet. Bitte prüfe deine E-Mails.',
-        color: 'success'
-      }));
-    } catch (e: any) {
-      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
-    }
+    console.log('send reset email');
+    this.apiService.get('/user/send_restore_mail').pipe(first()).subscribe(async (response) => {
+      console.log(response);
+    }, (error) => {
+      console.log(error);
+    });
   }
 
   @Action(Account.ResetPassword)
@@ -416,80 +324,48 @@ export class AccountState {
     try {
       await Appwrite.accountProvider().updateRecovery(userId, secret, password, confirmPassword);
 
-      await this.store.dispatch(new GlobalActions.ShowToast({
+      await dispatch(new GlobalActions.ShowToast({
         message: 'Passwort erfolgreich zurückgesetzt. Bitte melde dich an.',
         color: 'success'
       }));
-      this.store.dispatch(new Account.Redirect({path: Path.login, forward: false, navigateRoot: false}));
+      dispatch(new GlobalActions.Redirect({path: Path.login, forward: false, navigateRoot: false}));
     } catch (e: any) {
-      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
+      dispatch(new GlobalActions.HandleError({error: e as Error}));
     }
   }
 
-  @Action(Account.UpdateVerification)
-  async updateVerification(
+  @Action(Account.Verify)
+  async verify(
     {patchState, dispatch}: StateContext<AccountStateModel>,
-    action: Account.UpdateVerification
+    action: Account.Verify
   ) {
-    const {userId, secret} = action.payload;
-    try {
-      await Appwrite.accountProvider().updateVerification(userId, secret);
-      const verifiedUser = await Appwrite.accountProvider().get() as AccountModel.User;
-      const user = this.store.selectSnapshot(AccountState.user);
-      const updatedUser = Object.assign({...user}, {...verifiedUser});
+    const {token} = action.payload;
+
+    return this.apiService.get(`/user/confirmation?confirmation_token=${token}`).pipe(tap((response: any) => {
+      console.log(response);
+      const user = { ...this.store.selectSnapshot(AccountState.user)};
+      user.confirmed = true;
 
       patchState({
-        user: updatedUser
+        user
       });
-
-      await this.store.dispatch(new GlobalActions.ShowToast({
-        message: 'Email erfolgreich verifiziert.',
-        color: 'success'
-      }));
-    } catch (e: any) {
-      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
-    }
-  }
-
-  @Action(Account.Redirect)
-  redirect(ctx: StateContext<AccountStateModel>, action: Account.Redirect) {
-    const {path, forward, navigateRoot} = action.payload;
-    const currentUrl = this.router.url;
-
-    if (currentUrl.includes(path)) {
-      return;
-    }
-
-    this.ngZone.run(async () => {
-      if (navigateRoot) {
-        await this.navController.navigateRoot([path]);
-      }
-
-      if (forward) {
-        await this.navController.navigateForward([path]);
-      } else {
-        await this.navController.navigateBack([path]);
-      }
-    });
-  }
-
-  @Action(Account.VerificationExpired)
-  verificationExpired(ctx: StateContext<AccountStateModel>, action: Account.VerificationExpired) {
-    const {message} = action.payload;
-    this.store.dispatch(new GlobalActions.ShowToast({
-      message,
-      color: 'danger'
+    }), catchError(async (error) => {
+      console.log(error);
     }));
-    this.store.dispatch(new Account.Redirect({path: Path.login, forward: false, navigateRoot: false}));
   }
 
-  @Action(Account.VerifyEmail)
-  async verifyUserEmail({patchState, dispatch}: StateContext<AccountStateModel>, action: Account.VerificationExpired) {
-    try {
-      await Appwrite.accountProvider().createVerification(`${environment.appUrl}/additional-login-data`);
-    } catch (e: any) {
-      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
-    }
+  @Action(Account.SendVerificationEmail)
+  async sendVerificationEmail({patchState, dispatch}: StateContext<AccountStateModel>, action: Account.SendVerificationEmail) {
+    const {email} = action.payload;
+    return this.apiService.post('/user/confirmation', {
+      user: {
+        email
+      }
+    }).pipe(tap((response: any) => {
+      console.log(response);
+    }), catchError(async (error) => {
+      console.log(error);
+    }));
   }
 
   @Action(Account.UpdateAccountsData)
@@ -515,220 +391,22 @@ export class AccountState {
     }
   }
 
-  @Action(Account.InitializeEmptyDocuments)
-  async initializeEmptyDocuments({
-                                   patchState,
-                                   dispatch
-                                 }: StateContext<AccountStateModel>, action: Account.InitializeEmptyDocuments) {
-    const {userId} = action.payload;
-    try {
-      await Appwrite.databasesProvider().createDocument(
-        environment.usersDatabaseId,
-        environment.accountsCollectionId,
-        userId, {
-          accounts: []
-        });
-    } catch (e: any) {
-      console.log(e);
+  private async checkIfUserIsFullyRegistered(user: any) {
+    await this.permissionService.checkPermissions(this.appInitService.isMobile());
+    const permitted = this.permissionService.hasMandatoryPermissions(this.appInitService.isMobile());
+
+    if (user.confirmed && permitted && user.username && user.username.length > 0) {
+      this.store.dispatch(new GlobalActions.Redirect({
+        path: Path.default,
+        forward: true,
+        navigateRoot: true
+      }));
+    } else {
+      this.store.dispatch(new GlobalActions.Redirect({
+        path: Path.additionalLoginData,
+        forward: true,
+        navigateRoot: false
+      }));
     }
-  }
-
-  private async updateName(name: string) {
-    try {
-      return await Appwrite.accountProvider().updateName(name) as AccountModel.User;
-    } catch (e: any) {
-      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
-    }
-  }
-
-  private async updateProfilePicture(profilePictureString: string, userId) {
-    try {
-      const picture = await Picture.convertToPicture(profilePictureString) as unknown as File;
-      const updatedPicture = await Appwrite.storageProvider().createFile('profile-picture', userId, picture,
-        [
-          Permission.read(Role.users()),
-          Permission.delete(Role.user(userId)),
-          Permission.write(Role.user(userId)),
-        ]);
-      return await updatedPicture;
-    } catch (e: any) {
-      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
-    }
-  }
-
-  private async updateUserPrefs(userPrefs: AccountModel.UserPrefs) {
-    try {
-      return await Appwrite.accountProvider().updatePrefs(userPrefs) as AccountModel.User;
-    } catch (e: any) {
-      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
-    }
-  }
-
-  private async getUsername(user: Models.Account<unknown> & { prefs: UserPrefs; username: string }) {
-    try {
-      const document = await Appwrite.databasesProvider().getDocument(
-        environment.usersDatabaseId,
-        environment.usernameCollectionId,
-        user.$id
-      );
-      return document.username;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  private async getDescription(user: Models.Account<unknown> & { prefs: UserPrefs; username: string }) {
-    try {
-      const document = await Appwrite.databasesProvider().getDocument(
-        environment.usersDatabaseId,
-        environment.descriptionCollectionId,
-        user.$id
-      );
-      return document.value;
-    } catch (e) {
-      if (e.code === 404 && e.type === 'document_not_found') {
-        await Appwrite.databasesProvider().createDocument(
-          environment.usersDatabaseId,
-          environment.descriptionCollectionId,
-          user.$id, {
-            value: ''
-          });
-        return;
-      }
-      return null;
-    }
-  }
-
-  private async fetchUserData(patchState) {
-    const user = this.store.selectSnapshot(AccountState.user);
-    let userCopy = {...user};
-
-    // If user is already fetched, don't fetch again
-    if (!user) {
-      try {
-        userCopy = await Appwrite.accountProvider().get() as AccountModel.User;
-      } catch (e: any) {
-        return;
-      }
-    }
-
-    await this.fetchUserAccountsData(userCopy, patchState);
-    // load username if username is not set
-    if (!userCopy.username) {
-      userCopy.username = await this.getUsername(userCopy);
-    }
-
-    // load description if description is not set
-    if (!userCopy.description) {
-      userCopy.description = await this.getDescription(userCopy);
-    }
-
-    // update user in state if user differs from current user
-    if (userCopy !== user) {
-      patchState({
-        user: userCopy
-      });
-    }
-  }
-
-  private async fetchSessionData(patchState) {
-    const session = this.store.selectSnapshot(AccountState.session);
-
-    // If session is already fetched, don't fetch again
-    if (!session) {
-      try {
-
-        //session = await this.apiService.get('/current-user');
-
-        patchState({
-          session
-        });
-      } catch (e: any) {
-        if (!Path.unauthorizedRoutes.includes(this.router.url.split('?')[0])) {
-          console.log('Session expired');
-          this.store.dispatch(new Account.Redirect({path: Path.login, forward: false, navigateRoot: false}));
-        }
-        return;
-      }
-    }
-  }
-
-  private async fetchUserAccountsData(userCopy, patchState) {
-    const accountsData = this.store.selectSnapshot(AccountState.accountsData);
-    // If user is already fetched, don't fetch again
-    if (!accountsData) {
-      try {
-        const response = await Appwrite.databasesProvider().getDocument(
-          environment.usersDatabaseId,
-          environment.accountsCollectionId,
-          userCopy.$id
-        );
-
-        const fetchedAccountsData = response.accounts as string[];
-        const preparedAccountsData: AccountData[] = [];
-
-        fetchedAccountsData.forEach((accountData: string) => {
-          const [key, username] = accountData.split(':');
-          preparedAccountsData.push({key, username});
-        });
-
-        patchState({
-          accountsData: preparedAccountsData
-        });
-      } catch (e: any) {
-        return;
-      }
-    }
-  }
-
-  private async checkPermissionChanges() {
-    await this.checkGeolocationPermission();
-    if (!this.isMobile()) {
-      return;
-    }
-    await this.checkPhotosPermission();
-    await this.checkNotificationPermission();
-  }
-
-  private checkPhotosPermission() {
-    return new Promise(async (resolve) => {
-      this.store.select(LocalPermissionState.photo).subscribe((photo) => {
-        if (photo === null) {
-          return;
-        }
-        resolve(photo);
-      });
-      await this.store.dispatch(new LocalPermission.CheckPhoto());
-    });
-  }
-
-  private checkNotificationPermission() {
-    return new Promise(async (resolve) => {
-      this.store.select(LocalPermissionState.notification).subscribe((notification) => {
-        if (notification === null) {
-          return;
-        }
-        resolve(notification);
-      });
-      await this.store.dispatch(new LocalPermission.CheckNotification());
-    });
-  }
-
-  private checkGeolocationPermission() {
-    return new Promise(async (resolve) => {
-      this.store.select(LocalPermissionState.geolocation).subscribe((geolocation) => {
-
-        if (geolocation === null) {
-          return;
-        }
-        resolve(geolocation);
-      });
-      await this.store.dispatch(new LocalPermission.CheckGeolocation());
-    });
-  }
-
-
-  private isMobile() {
-    return this.platform.is('android') || this.platform.is('ios') && this.platform.is('cordova');
   }
 }

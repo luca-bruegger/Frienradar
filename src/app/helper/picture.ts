@@ -29,7 +29,7 @@ export class Picture {
   }
 
   static profilePictureViewURL(userId: string, currentPictureBreaker: string): string {
-    return `${environment.endpoint}/storage/buckets/profile-picture/files/${userId}/view?project=${environment.project}#breaker=${currentPictureBreaker}`;
+    return 'assets/images/blank.png';
   }
 
   static cacheBreaker(): string {

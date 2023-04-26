@@ -13,11 +13,12 @@ import { first } from 'rxjs/operators';
   styleUrls: ['./friend-requests.component.scss'],
 })
 export class FriendRequestsComponent implements OnInit {
-  requests: {
-    sender: any;
-    contactId: string;
-    createdAt: string;
-  }[] = null;
+  // requests: {
+  //   sender: any;
+  //   contactId: string;
+  //   createdAt: string;
+  // }[] = null;
+  requests = null;
   isLoading = false;
   currentCacheBreaker = Picture.cacheBreaker();
 
@@ -26,20 +27,15 @@ export class FriendRequestsComponent implements OnInit {
               private loadingController: LoadingController) {
   }
 
-  ngOnInit() {
-    this.store.select(UserRelationState.requested).subscribe(requested => {
-      this.requests = [];
-      if (requested) {
-        requested.forEach(async (request: any) => {
-          const user = await this.fetchUser(request.senderId);
-          user.username = await this.fetchUsername(user.$id);
-          this.requests.push({
-            sender: user,
-            contactId: request.contactId,
-            createdAt: request.createdAt
-          });
-        });
-      }
+  async ngOnInit() {
+    this.requests = this.store.selectSnapshot(UserRelationState.receivedFriendRequests);
+
+    if (this.requests === null) {
+      await this.store.dispatch(new UserRelation.FetchFriendRequests()).toPromise();
+    }
+
+    this.store.select(UserRelationState.receivedFriendRequests).subscribe((requests: any) => {
+      this.requests = requests;
     });
   }
 
@@ -54,8 +50,7 @@ export class FriendRequestsComponent implements OnInit {
     return Picture.profilePictureViewURL(userId, this.currentCacheBreaker);
   }
 
-  async declineRequest(contactId) {
-    this.isLoading = true;
+  async declineRequest(invitationId) {
     const spinner = await this.loadingController.create({
       message: 'Wird Abgelehnt...',
       spinner: 'crescent',
@@ -63,14 +58,15 @@ export class FriendRequestsComponent implements OnInit {
     });
 
     await spinner.present();
-    await this.store.dispatch(new UserRelation.RemoveRequest({contactId})).pipe(first()).subscribe(async () => {
-      this.isLoading = false;
-      await spinner.dismiss();
-    });
+
+    await this.store.dispatch(new UserRelation.RejectInvitation({
+      invitationId
+    })).toPromise();
+
+    await spinner.dismiss();
   }
 
-  async acceptRequest(senderId) {
-    this.isLoading = true;
+  async acceptRequest(invitationId) {
     const spinner = await this.loadingController.create({
       message: 'Wird Angenommen...',
       spinner: 'crescent',
@@ -78,10 +74,8 @@ export class FriendRequestsComponent implements OnInit {
     });
 
     await spinner.present();
-    await this.store.dispatch(new UserRelation.AddFriend({senderId})).pipe(first()).subscribe(async () => {
-      this.isLoading = false;
-      await spinner.dismiss();
-    });
+    await this.store.dispatch(new UserRelation.AcceptInvitation({invitationId})).toPromise();
+    await spinner.dismiss();
   }
 
   updatedDate(updatedAt) {
@@ -93,11 +87,34 @@ export class FriendRequestsComponent implements OnInit {
     }).replace(',', '');
   }
 
-  handleRefresh(event) {
+  refreshInvitations(event) {
     setTimeout(() => {
-      this.store.dispatch(new UserRelation.Fetch());
+      this.store.dispatch(new UserRelation.FetchFriendRequests());
       event.target.complete();
     }, 2000);
+  }
+
+  rejectInvitation(invitationId: number, username: string) {
+    this.alertController.create({
+      header: 'Einladung ablehnen',
+      message: `Möchtest du die Einladung wirklich von ${username} wirklich ablehnen?`,
+      buttons: [
+        {
+          text: 'Abbrechen',
+          role: 'cancel'
+        },
+        {
+          text: 'Ablehnen',
+          handler: async () => {
+            await this.declineRequest(invitationId);
+          }
+        }
+      ]
+    }).then(alert => alert.present());
+  }
+
+  async acceptInvitation(invitationId: number) {
+    await this.acceptRequest(invitationId);
   }
 
   private async fetchUsername(userId) {

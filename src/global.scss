@@ -106,3 +106,20 @@ html, body {
 ion-img {
   pointer-events: none;
 }
+
+.ngx-ic-move {
+  border: none !important;
+}
+
+.ngx-ic-cropper::after {
+  border: 1px solid var(--ion-color-primary) !important;
+}
+
+.ngx-ic-square {
+  background-color: #03B6DD !important;
+  width: 10px !important;
+  height: 10px !important;
+  opacity: 1 !important;
+  border: none !important;
+  border-radius: 4px;
+}

@@ -3,12 +3,12 @@ import { Store } from '@ngxs/store';
 import { LoadingController, Platform } from '@ionic/angular';
 import { App } from '@capacitor/app';
 import { LocationService } from './location.service';
-import { RealtimeService } from './realtime.service';
 import OneSignal from 'onesignal-cordova-plugin';
 import { environment } from '../../environments/environment';
 import { Account, AccountState, UserRelation } from '../store';
-import { LocalPermission } from '../store/local-permission';
 import { TokenService } from './token.service';
+import { PermissionService } from './permission.service';
+import { ActionCableService } from './action-cable.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,40 +17,54 @@ export class AppInitService {
   constructor(private store: Store,
               private loadingController: LoadingController,
               private locationService: LocationService,
-              private realtimeService: RealtimeService,
               private platform: Platform,
-              private tokenService: TokenService) {
+              private tokenService: TokenService,
+              private permissionService: PermissionService,
+              private actionCableService: ActionCableService) {
   }
 
-  async init() {
+  isMobile() {
+    return this.platform.is('android') || this.platform.is('ios') && this.platform.is('cordova');
+  }
+
+  async init(): Promise<boolean> {
     return new Promise(async (resolve) => {
       const loadingSpinner = await this.createLoadingSpinner();
 
       await this.appstateListener();
+      const tokenValid = await this.tokenService.isTokenValid();
 
-
-      if (await this.tokenService.isTokenValid()) {
-        await this.store.dispatch(new Account.Fetch());
-        await this.startServices();
+      if (tokenValid) {
+        await this.fetchCurrentUser();
+        await this.fetchUserRelation();
+        const user = this.store.selectSnapshot(AccountState.user);
+        await this.startServices(user, await this.tokenService.getToken());
+        await this.fetchUserData();
       }
 
       await loadingSpinner.dismiss();
-      return resolve(undefined);
+      return resolve(tokenValid);
     });
   }
 
-  async startServices() {
-    this.realtimeService.watch();
+  async startServices(user, token) {
     await this.locationService.watch();
+    this.oneSignalInit(user);
+    this.connectToActionCable(token, user.guid);
   }
 
-  oneSignalInit() {
+  private oneSignalInit(user) {
     if (!this.platform.is('cordova')) {
       return;
     }
 
     OneSignal.setAppId(environment.oneSignalAppId);
-    OneSignal.setExternalUserId(this.store.selectSnapshot(AccountState.user).$id);
+    console.log('OneSignal SETUP ---------------------');
+    console.log('OneSignal User ID: ', user.guid);
+    OneSignal.setExternalUserId(user.guid);
+    OneSignal.promptForPushNotificationsWithUserResponse((accepted) => {
+      console.log('User accepted notifications: ' + accepted);
+    });
 
     OneSignal.setLogLevel(0, 0);
 
@@ -59,8 +73,9 @@ export class AppInitService {
       console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
     });
 
-    OneSignal.setNotificationWillShowInForegroundHandler((jsonData) => {
-      console.log('notificationWillShowInForegroundHandler: ' + JSON.stringify(jsonData));
+    OneSignal.setNotificationWillShowInForegroundHandler((notificationReceivedEvent) => {
+      notificationReceivedEvent.complete(null);
+      console.log('notificationWillShowInForegroundHandler: ' + JSON.stringify(notificationReceivedEvent));
     });
   }
 
@@ -78,18 +93,32 @@ export class AppInitService {
   private async appstateListener() {
     App.addListener('appStateChange', async state => {
       const {isActive} = state;
-      if (isActive) {
-        await this.checkPermissionChanges();
+      if (isActive && this.store.selectSnapshot(AccountState.user) !== null) {
+        await this.permissionService.checkPermissions(this.isMobile());
         await this.locationService.watch();
+        await this.fetchCurrentUser();
       } else {
         await this.locationService.stop();
       }
     });
   }
 
-  private async checkPermissionChanges() {
-    this.store.dispatch(new LocalPermission.CheckGeolocation());
-    this.store.dispatch(new LocalPermission.CheckPhoto());
-    this.store.dispatch(new LocalPermission.CheckNotification());
+  private async fetchCurrentUser() {
+    await this.store.dispatch(new Account.Fetch({
+      checkValidity: true
+    })).toPromise();
+  }
+
+  private connectToActionCable(token: string, guid: string) {
+    this.actionCableService.connect(token, guid);
+  }
+
+  private async fetchUserData() {
+    await this.store.dispatch(new UserRelation.FetchFriendRequests()).toPromise();
+  }
+
+  private async fetchUserRelation() {
+    await this.store.dispatch(new UserRelation.FetchInvitations({page: 1})).toPromise();
+    await this.store.dispatch(new UserRelation.FetchFriends({page: 1})).toPromise();
   }
 }

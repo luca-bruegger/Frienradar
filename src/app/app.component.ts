@@ -4,7 +4,7 @@ import { App, URLOpenListenerEvent } from '@capacitor/app';
 import { Path } from './helper/path';
 import { Store } from '@ngxs/store';
 import { environment } from '../environments/environment';
-import { NavController, Platform } from '@ionic/angular';
+import { MenuController, NavController, Platform } from '@ionic/angular';
 import {
   AdMob,
   AdMobBannerSize,
@@ -13,7 +13,8 @@ import {
   BannerAdPosition,
   BannerAdSize
 } from '@capacitor-community/admob';
-import { AppInitService } from "./service/app-init.service";
+import { AppInitService } from './service/app-init.service';
+import { TokenService } from './service/token.service';
 
 @Component({
   selector: 'app-root',
@@ -21,25 +22,28 @@ import { AppInitService } from "./service/app-init.service";
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent implements OnInit {
-  hasInitialized = false;
   isBeta = environment.beta;
   bannerLoaded = false;
+  tokenValid = null;
 
   constructor(private router: Router,
               private navController: NavController,
               private zone: NgZone,
               private store: Store,
               private appInitService: AppInitService,
-              private platform: Platform) {
+              private platform: Platform,
+              private menuController: MenuController,
+              private tokenService: TokenService) {
   }
 
   async ngOnInit() {
     await this.showAds();
-    await this.appInitService.init();
-    this.hasInitialized = true;
+
+    this.tokenValid = await this.appInitService.init();
     this.jumpTo();
     this.initializeDeeplinking();
     this.initializeGoogleAnalytics();
+    this.initializeTokenChange();
   }
 
   private jumpTo() {
@@ -121,5 +125,11 @@ export class AppComponent implements OnInit {
 
     await AdMob.showBanner(options);
     this.bannerLoaded = true;
+  }
+
+  private initializeTokenChange() {
+    this.tokenService.tokenValidChange.subscribe((tokenValid) => {
+      this.tokenValid = tokenValid;
+    });
   }
 }

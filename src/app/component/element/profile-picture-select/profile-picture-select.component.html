@@ -1,10 +1,34 @@
 <div class="profile-picture">
-  <div class="img-wrapper">
+
+  <!-- Only display the profile Picture -->
+  <div class="img-wrapper" *ngIf="displayOnly">
     <ion-avatar>
-      <ion-img src="{{profilePicture}}"></ion-img>
+      <ion-img src="{{displayOnly ? profilePicture : croppedPicture}}"></ion-img>
     </ion-avatar>
   </div>
-  <ion-button *ngIf="!displayOnly" fill="clear" (click)="displayImagePicker()" class="ion-margin-top ion-padding-horizontal">
-    <ion-label color="tertiary">Profilbild ändern</ion-label>
-  </ion-button>
+
+  <!-- Show cropper if user wants to change profile picture -->
+  <div *ngIf="!displayOnly" class="img-change-wrapper">
+    <strong>Vorschau</strong>
+    <div class="img-preview">
+      <div class="img-wrapper" style="{{!displayOnly && imageSelected ? 'margin-left: 16px' :''}}">
+        <ion-avatar>
+          <ion-img src="{{croppedPicture}}"></ion-img>
+        </ion-avatar>
+      </div>
+      <image-cropper *ngIf="imageSelected"
+                     imageURL="{{profilePicture}}"
+                     [maintainAspectRatio]="true"
+                     [aspectRatio]="1"
+                     (imageCropped)="imageCropped($event)"
+                     [cropperMinWidth]="170"
+                     [cropperMinHeight]="170"
+      ></image-cropper>
+    </div>
+
+    <ion-button fill="clear" (click)="displayImagePicker()"
+                class="ion-margin-top ion-padding-horizontal">
+      <ion-label color="tertiary">Profilbild ändern</ion-label>
+    </ion-button>
+  </div>
 </div>

@@ -6,6 +6,11 @@ export const environment = {
   production: false,
   beta: true,
   test: false,
+
+  apiUrl: 'http://staging-api.frienradar.com:3000',
+  iosAdId: 'ca-app-pub-6953123179903035/3049634317',
+  androidAdId: 'ca-app-pub-6953123179903035/9676252847',
+
   endpoint: 'https://beta.api.frienradar.com/v1',
   project: '638b8a8bda11a2ebe8fc',
   mapsKey: 'AIzaSyBI6AT9M_Nz_Y-_Xpql_Q28twKOO0jzu_8',
@@ -17,7 +22,7 @@ export const environment = {
   usernameCollectionId: 'usernames',
   usersDatabaseId: 'users',
   accountsCollectionId: 'accounts',
-  oneSignalAppId: 'dbcfaa41-2e99-498a-8293-a3020ac85b2c'
+  oneSignalAppId: 'dbcfaa41-2e99-498a-8293-a3020ac85b2c',
 };
 
 /*

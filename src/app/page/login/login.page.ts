@@ -1,17 +1,20 @@
-import { Component, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { Account } from '../../store';
-import { ModalController } from '@ionic/angular';
+import { IonInput, ModalController } from '@ionic/angular';
 import { ResetPasswordComponent } from '../../component/reset-password/reset-password.component';
-import { first } from 'rxjs/operators';
 import { AccountValidation } from '../../validation/account-validation';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
 })
-export class LoginPage implements OnDestroy {
+export class LoginPage implements OnInit, OnDestroy {
+  @ViewChild('emailInput', { static: true }) emailInput: IonInput;
+  @ViewChild('passwordInput', { static: true }) passwordInput: IonInput;
+
   isRegister = false;
 
   formGroup = AccountValidation.loginFormGroup;
@@ -31,6 +34,12 @@ export class LoginPage implements OnDestroy {
     this.loginInProgress = false;
   }
 
+  async ngOnInit() {
+    this.profilePicture = null;
+    this.changeLoginType(false);
+    await this.listenForIosAutofill();
+  }
+
   changeLoginType(isRegister: boolean) {
     if (isRegister) {
       this.formGroup.addControl('name', AccountValidation.nameControl);
@@ -46,18 +55,20 @@ export class LoginPage implements OnDestroy {
   }
 
   async signInUser() {
-    // if (this.formGroup.invalid) {
-    //   this.formGroup.markAllAsTouched();
-    //   return;
-    // }
+    if (this.formGroup.invalid && (environment.production || environment.beta)) {
+      this.formGroup.markAllAsTouched();
+      return;
+    }
 
     this.loginInProgress = true;
-    const model = this.isRegister ? new Account.Signup(this.formGroup.value) : new Account.Login(this.formGroup.value);
-    await this.store.dispatch(model).pipe(first()).subscribe(async data => {
-      if (data.auth.user === null) {
-        this.loginInProgress = false;
-      }
-    });
+
+    if (this.isRegister) {
+      await this.store.dispatch(new Account.Register(this.formGroup.value)).toPromise();
+    } else {
+      await this.store.dispatch(new Account.Login(this.formGroup.value)).toPromise();
+    }
+
+    this.loginInProgress = false;
   }
 
   async resetPassword() {
@@ -68,8 +79,7 @@ export class LoginPage implements OnDestroy {
     await modal.present();
   }
 
-  setProfilePicture(profilePicture: string) {
-    this.profilePicture = profilePicture;
+  setProfilePicture(profilePicture: Blob) {
     this.formGroup.get('profilePicture').setValue(profilePicture);
   }
 
@@ -80,5 +90,22 @@ export class LoginPage implements OnDestroy {
 
     const formcontrol = this.formGroup.get(name);
     return formcontrol.hasError(validationType) && (formcontrol.dirty || formcontrol.touched);
+  }
+
+  private async listenForIosAutofill() {
+    const nativeEmailInput = await this.emailInput.getInputElement();
+    const nativePasswordInput = await this.passwordInput.getInputElement();
+
+    nativeEmailInput.addEventListener('change', (ev: Event) => {
+      requestAnimationFrame(() => {
+        this.formGroup.get('email').patchValue((ev.target as HTMLInputElement).value);
+      });
+    });
+
+    nativePasswordInput.addEventListener('change', (ev: Event) => {
+      requestAnimationFrame(() => {
+        this.formGroup.get('password').patchValue((ev.target as HTMLInputElement).value);
+      });
+    });
   }
 }

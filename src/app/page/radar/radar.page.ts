@@ -9,6 +9,7 @@ import { AccountState, GlobalActions, LocationState } from '../../store';
 })
 export class RadarPage {
   geohash: string;
+  currentDistance = this.store.selectSnapshot(AccountState.preferredDistance);
 
   constructor(private store: Store) {
     this.store.select(LocationState.geohash).subscribe(state => {
@@ -16,10 +17,6 @@ export class RadarPage {
         this.geohash = state;
       }
     });
-  }
-
-  get currentDistance() {
-    return this.store.selectSnapshot(AccountState.distance);
   }
 
   get isRegionalChatAvailable() {

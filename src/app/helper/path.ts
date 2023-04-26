@@ -5,13 +5,13 @@ export class Path {
   static additionalLoginData = '/additional-login-data';
 
   static unauthorizedRoutes = [
-    Path.login,
-    Path.resetPassword,
-    Path.additionalLoginData
+    /\/login.*/,
+    /\/reset-password.*/,
+    /\/additional-login-data.*/
   ];
 
   static setJumpTo(url: string) {
-    if (this.unauthorizedRoutes.includes(url)) {
+    if (this.unauthorizedRoutes.some(route => route.test(url))) {
       return;
     }
 

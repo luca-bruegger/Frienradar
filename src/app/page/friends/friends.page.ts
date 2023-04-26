@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { UserRelation, UserRelationState } from '../../store';
+import { AccountState, UserRelation, UserRelationState } from '../../store';
 import { Store } from '@ngxs/store';
 import FriendModel from '../../model/friend';
 import { Picture } from '../../helper/picture';
@@ -10,8 +10,8 @@ import { Picture } from '../../helper/picture';
   styleUrls: ['./friends.page.scss'],
 })
 export class FriendsPage implements OnInit {
-  friends: FriendModel[] = null;
-  friendRequestsCount: number = null;
+  friends: string[] = [];
+  invitationCount: number = null;
   reloadTime = 0;
   percent = 0;
   currentCacheBreaker = Picture.cacheBreaker();
@@ -24,18 +24,11 @@ export class FriendsPage implements OnInit {
     return this.reloadTime === 0;
   }
 
-  get count() {
-    return this.friends.length;
-  }
-
   ngOnInit() {
-    this.store.select(UserRelationState.requestedCount).subscribe(count => {
-      this.friendRequestsCount = count;
+    this.store.select(UserRelationState.receivedFriendRequests).subscribe(requests => {
+      this.invitationCount = requests.length;
     });
 
-    this.store.select(UserRelationState.friends).subscribe(friends => {
-      this.friends = friends;
-    });
   }
 
   async refresh(event: any) {
@@ -45,8 +38,6 @@ export class FriendsPage implements OnInit {
       event.target.complete();
       return;
     }
-
-    await this.store.dispatch(new UserRelation.FetchFriends());
 
     this.reloadTime = RELOAD_TIME;
     this.percent = 100;

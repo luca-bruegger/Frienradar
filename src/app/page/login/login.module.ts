@@ -11,6 +11,7 @@ import { PasswordStrengthMeterModule } from 'angular-password-strength-meter';
 import { ResetPasswordComponent } from '../../component/reset-password/reset-password.component';
 import { ProfilePictureSelectComponent } from '../../component/element/profile-picture-select/profile-picture-select.component';
 import { AdditionalLoginDataComponent } from '../../component/additional-login-data/additional-login-data.component';
+import { ImageCropperModule } from 'ngx-image-cropper';
 
 @NgModule({
   imports: [
@@ -19,7 +20,8 @@ import { AdditionalLoginDataComponent } from '../../component/additional-login-d
     IonicModule,
     LoginPageRoutingModule,
     ReactiveFormsModule,
-    PasswordStrengthMeterModule.forRoot()
+    PasswordStrengthMeterModule.forRoot(),
+    ImageCropperModule
   ],
   declarations: [
     LoginPage,

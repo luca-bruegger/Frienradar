@@ -10,7 +10,9 @@
   </ion-toolbar>
 </ion-header>
 <ion-content fullscreen="true" color="light" [formGroup]="formGroup" class="ion-padding-top">
-  <app-profile-picture-select [profilePicture]="this.formGroup.get('profilePicture').value" (profilePictureChange)="formGroup.get('profilePicture').patchValue($event)"></app-profile-picture-select>
+  <div class="ion-margin-horizontal">
+    <app-profile-picture-select [profilePicture]="this.formGroup.get('profilePicture').value" (profilePictureChange)="updateProfilePicture($event)"></app-profile-picture-select>
+  </div>
   <ng-container *ngFor="let validation of formMessages.profilePicture">
     <div class="error-message"
          *ngIf="formGroup.get('profilePicture').hasError(validation.type) && (formGroup.get('profilePicture').dirty || formGroup.get('profilePicture').touched)">
@@ -18,7 +20,7 @@
     </div>
   </ng-container>
   <div style="border-top: 1px solid #e0e0e0" class="ion-padding-top ion-padding-end">
-    <div style="margin-left: 20px">
+    <div class="ion-margin-horizontal">
       <ion-note>
         <span>Dein Name ist nur für dich sichtbar.</span>
       </ion-note>
@@ -33,9 +35,9 @@
         {{ validation.message }}
       </div>
     </ng-container>
-    <div style="margin-left: 20px;" class="ion-margin-top">
+    <div class="ion-margin-horizontal ion-margin-top">
       <ion-note>
-        <span>Der Benutzername wird für die Anzeige in der App verwendet. Dieser ist für dich, aber auch andere sichtbar.</span>
+        <span>Der Benutzername wird für die Anzeige in der App verwendet. Dieser ist für dich, aber auch andere Benutzer sichtbar.</span>
       </ion-note>
     </div>
     <ion-item color="light" lines="none" counter="{{formGroup.get('username').enabled}}">

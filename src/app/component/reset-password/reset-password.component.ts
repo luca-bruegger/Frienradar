@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { Account } from '../../store';
+import { Account, GlobalActions } from '../../store';
 import { Store } from '@ngxs/store';
 import { ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
@@ -69,7 +69,7 @@ export class ResetPasswordComponent implements OnInit {
 
   dismiss() {
     this.modalController.dismiss();
-    this.store.dispatch(new Account.Redirect({
+    this.store.dispatch(new GlobalActions.Redirect({
       path: Path.login,
       forward: false,
       navigateRoot: false
@@ -127,9 +127,7 @@ export class ResetPasswordComponent implements OnInit {
     const currentDate = new Date();
 
     if (recoveryDateOneHourLater.getTime() - currentDate.getTime() < 0) {
-      this.store.dispatch(new Account.VerificationExpired({
-        message: 'Der Link ist abgelaufen. Bitte versuche es erneut.'
-      }));
+      // expired action
       return;
     }
   }

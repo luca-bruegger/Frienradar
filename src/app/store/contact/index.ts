@@ -9,61 +9,88 @@ import { Query } from 'appwrite';
 import { environment } from '../../../environments/environment';
 import ContactModel from '../../model/contact';
 import FriendModel from '../../model/friend';
+import { catchError, tap } from 'rxjs/operators';
+import { Path } from '../../helper/path';
+import { ApiService } from '../../service/api.service';
+import friend from '../../model/friend';
 
 /* State Model */
 @Injectable()
 export class UserRelationStateModel {
-  contactRequest: ContactModel;
-  friends: FriendModel[];
-  isLoadingContactRequest: boolean;
-  isAddingFriend: boolean;
+  receivedFriendRequests: any[];
+  requestedFriends: string[];
+  friends: string[];
 }
 
 export namespace UserRelation {
   /** Actions */
-  export class Fetch {
-    static readonly type = '[UserRelation] Fetch';
+  export class FetchInvitations {
+    static readonly type = '[UserRelation] Fetch Invitations';
+
+    constructor(public payload: { page: number }) {
+    }
   }
 
   export class Request {
     static readonly type = '[UserRelation] Request';
 
-    constructor(public payload: { requestUserId: string }) {
+    constructor(public payload: { friendGuid: string }) {
+    }
+  }
+
+  export class AppendFriendRequest {
+    static readonly type = '[UserRelation] Append Friend Request';
+
+    constructor(public payload: { invitation: any }) {
+    }
+  }
+
+  export class AppendRequestedFriend {
+    static readonly type = '[UserRelation] Append Requested Friend';
+
+    constructor(public payload: { userGuid: string }) {
+    }
+  }
+
+  export class RemoveFriendRequest {
+    static readonly type = '[UserRelation] Remove Friend Request';
+
+    constructor(public payload: { userGuid: string }) {
     }
   }
 
   export class FetchFriends {
     static readonly type = '[UserRelation] Fetch Friends';
 
+    constructor(public payload: { page: number }) {
+    }
+  }
+
+  export class FetchFriendRequests {
+    static readonly type = '[UserRelation] Fetch Friend Requests';
+
     constructor() {
     }
   }
 
-  export class RemoveRequest {
-    static readonly type = '[UserRelation] Remove Request';
+  export class RejectInvitation {
+    static readonly type = '[UserRelation] Reject Invitation';
 
-    constructor(public payload: { contactId: string }) {
+    constructor(public payload: { invitationId: string }) {
     }
   }
 
-  export class PatchContacts {
-    static readonly type = '[UserRelation] Patch Contacts';
+  export class AcceptInvitation {
+    static readonly type = '[UserRelation] Accept Invitation';
 
-    constructor(public payload: { contacts: ContactModel }) {
-    }
-  }
-
-  export class UpdateRequested {
-    static readonly type = '[UserRelation] Update Requested';
-
-    constructor(public payload: { requested: string[] }) {
+    constructor(public payload: { invitationId: string }) {
     }
   }
 
   export class AddFriend {
     static readonly type = '[UserRelation] Add Friend';
 
-    constructor(public payload: { senderId: string }) {
+    constructor(public payload: { friendGuid: string }) {
     }
   }
 }
@@ -71,13 +98,9 @@ export namespace UserRelation {
 @State<UserRelationStateModel>({
   name: 'userRelation',
   defaults: {
-    contactRequest: {
-      receivedFrom: [],
-      sentTo: []
-    },
-    friends: [],
-    isLoadingContactRequest: false,
-    isAddingFriend: false
+    receivedFriendRequests: null,
+    requestedFriends: null,
+    friends: null,
   }
 })
 
@@ -86,27 +109,18 @@ export class UserRelationState {
   constructor(private navController: NavController,
               private ngZone: NgZone,
               private store: Store,
+              private apiService: ApiService,
               private router: Router) {
   }
 
   @Selector()
-  static contacts(state: UserRelationStateModel) {
-    return state.contactRequest;
+  static receivedFriendRequests(state: UserRelationStateModel) {
+    return state.receivedFriendRequests;
   }
 
   @Selector()
-  static requestedCount(state: UserRelationStateModel) {
-    return state.contactRequest.receivedFrom.length;
-  }
-
-  @Selector()
-  static requested(state: UserRelationStateModel) {
-    return state.contactRequest.receivedFrom;
-  }
-
-  @Selector()
-  static sentTo(state: UserRelationStateModel) {
-    return state.contactRequest.sentTo;
+  static requestedFriends(state: UserRelationStateModel) {
+    return state.requestedFriends;
   }
 
   @Selector()
@@ -114,37 +128,76 @@ export class UserRelationState {
     return state.friends;
   }
 
-  @Selector()
-  static isLoadingContactRequest(state: UserRelationStateModel) {
-    return state.isLoadingContactRequest;
+  @Action(UserRelation.FetchFriendRequests)
+  async fetchFriendRequests(
+    {patchState, dispatch}: StateContext<UserRelationStateModel>,
+    action: UserRelation.FetchFriendRequests
+  ) {
+    return this.apiService.get('/invitations').pipe(tap(async (response: any) => {
+      const invitations = JSON.parse(response).data;
+
+      patchState({
+          receivedFriendRequests: invitations
+        }
+      );
+    }), catchError(async (error) => {
+      console.log(error);
+    }));
   }
 
-  @Action(UserRelation.UpdateRequested)
-  async updateRequested(
+  @Action(UserRelation.FetchInvitations)
+  async fetchInvitations(
     {patchState, dispatch}: StateContext<UserRelationStateModel>,
-    action: UserRelation.UpdateRequested
+    action: UserRelation.FetchInvitations
   ) {
-    const {requested} = action.payload;
-    const filteredRequested = requested.filter((item) => item !== '');
+    const {page} = action.payload;
+    return this.apiService.get(`/requested_users?page=${page}`).pipe(tap(async (response: any) => {
+      const requestedFriends = JSON.parse(response).data.map((item) => item.id);
+
+      patchState({
+        requestedFriends
+      });
+    }), catchError(async (error) => {
+      console.log(error);
+    }));
+  }
+
+  @Action(UserRelation.AppendFriendRequest)
+  async appendFriendRequest(
+    {patchState, dispatch}: StateContext<UserRelationStateModel>,
+    action: UserRelation.AppendFriendRequest
+  ) {
+    const {invitation} = action.payload;
+    const requests = [...this.store.selectSnapshot(UserRelationState.receivedFriendRequests), invitation];
+
     patchState({
-      contactRequest: {
-        requested: filteredRequested
-      } as unknown as ContactModel
+      receivedFriendRequests: requests
     });
   }
 
-  @Action(UserRelation.Fetch)
-  async fetch(
+  @Action(UserRelation.AppendRequestedFriend)
+  async appendRequestedFriend(
     {patchState, dispatch}: StateContext<UserRelationStateModel>,
-    action: UserRelation.Fetch
+    action: UserRelation.AppendRequestedFriend
   ) {
-    const userId = this.store.selectSnapshot(AccountState.user).$id;
+    const {userGuid} = action.payload;
+    const requestedFriends = [...this.store.selectSnapshot(UserRelationState.requestedFriends), userGuid];
 
-    const contacts = await this.fetchContacts(userId);
-    const friends = await this.fetchFriendsFromUserById(userId) as FriendModel[];
     patchState({
-      contactRequest: contacts,
-      friends
+      requestedFriends
+    });
+  }
+
+  @Action(UserRelation.RemoveFriendRequest)
+  async removeFriendRequest(
+    {patchState, dispatch}: StateContext<UserRelationStateModel>,
+    action: UserRelation.RemoveFriendRequest
+  ) {
+    const {userGuid} = action.payload;
+    const requestedFriends = this.store.selectSnapshot(UserRelationState.requestedFriends).filter((item) => item !== userGuid);
+
+    patchState({
+      requestedFriends
     });
   }
 
@@ -153,48 +206,68 @@ export class UserRelationState {
     {patchState, dispatch}: StateContext<UserRelationStateModel>,
     action: UserRelation.Request
   ) {
-    const {requestUserId} = action.payload;
-    const currentUserId = this.store.selectSnapshot(AccountState.user).$id;
+    const {friendGuid} = action.payload;
+    const data = {
+      invitation: {
+        friend_guid: friendGuid
+      }
+    };
 
-    const data = JSON.stringify({
-      sender: currentUserId,
-      recipient: requestUserId
-    });
-
-    try {
-      return await Appwrite.functionsProvider().createExecution('contact-requests', data).then((execution) => {
-        if (execution.response === '') {
-          return;
-        }
-
-        const error = JSON.parse(execution.response).error;
-        console.log(error);
-        if (error) {
-          throw error;
-        }
-        return execution;
-      });
-    } catch (e: any) {
-      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
-    }
+    return this.apiService.post('/invitations', data).pipe(tap(async (response) => {
+      console.log(response);
+    }), catchError(async (error) => {
+      this.store.dispatch(new GlobalActions.HandleError({error}));
+      console.log(error);
+    }));
   }
 
-  @Action(UserRelation.RemoveRequest)
-  async removeRequest(
+  @Action(UserRelation.RejectInvitation)
+  async rejectInvitation(
     {patchState, dispatch}: StateContext<UserRelationStateModel>,
-    action: UserRelation.RemoveRequest
+    action: UserRelation.RejectInvitation
   ) {
-    const {contactId} = action.payload;
+    const {invitationId} = action.payload;
 
-    try {
-      return await Appwrite.databasesProvider().deleteDocument(
-        environment.radarDatabaseId,
-        environment.contactsCollectionId,
-        contactId
-      );
-    } catch (e: any) {
-      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
-    }
+    return this.apiService.delete(`/invitations/${invitationId}`).pipe(tap(() => {
+      const invitations = this.store.selectSnapshot(UserRelationState.receivedFriendRequests);
+      const filteredInvitations = invitations.filter((invitation) => invitation.id !== invitationId);
+
+      patchState({
+        receivedFriendRequests: filteredInvitations
+      });
+    }), catchError(async (error) => {
+      console.log(error);
+    }));
+  }
+
+  @Action(UserRelation.AcceptInvitation)
+  async acceptInvitation(
+    {patchState, dispatch}: StateContext<UserRelationStateModel>,
+    action: UserRelation.AcceptInvitation
+  ) {
+    const {invitationId} = action.payload;
+
+    return this.apiService.put('/invitations/accept', {
+      id: invitationId
+    }).pipe(tap(async (response: any) => {
+      const { sender_guid, sender_username } = response.data;
+      const friendRequests = this.store.selectSnapshot(UserRelationState.receivedFriendRequests).filter((item) => item.attributes.sender_guid != sender_guid);
+      console.log(friendRequests);
+      patchState({
+        receivedFriendRequests: friendRequests
+      });
+
+      dispatch(new UserRelation.AddFriend({
+        friendGuid: sender_guid
+      }));
+
+      dispatch(new GlobalActions.ShowToast({
+        message: 'Du bist nun befreundet mit ' + sender_username,
+        color: 'success'
+      }));
+    }), catchError(async (error) => {
+      console.log(error);
+    }));
   }
 
   @Action(UserRelation.AddFriend)
@@ -202,33 +275,13 @@ export class UserRelationState {
     {patchState, dispatch}: StateContext<UserRelationStateModel>,
     action: UserRelation.AddFriend
   ) {
-    const {senderId} = action.payload;
-    const userId = this.store.selectSnapshot(AccountState.user).$id;
+    const {friendGuid} = action.payload;
 
-    const data = JSON.stringify({
-      senderId,
-      recipientId: userId
+    const friends = [...this.store.selectSnapshot(UserRelationState.friends) || [], friendGuid];
+
+    patchState({
+      friends
     });
-
-    try {
-      patchState({
-        isAddingFriend: true
-      });
-      const execution = await Appwrite.functionsProvider().createExecution('add-friend', data) as any;
-      patchState({
-        isAddingFriend: true
-      });
-      if (execution.response === '') {
-        return;
-      }
-
-      const error = JSON.parse(execution.response).error;
-      if (error) {
-        throw error;
-      }
-    } catch (e: any) {
-      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
-    }
   }
 
   @Action(UserRelation.FetchFriends)
@@ -236,168 +289,14 @@ export class UserRelationState {
     {patchState, dispatch}: StateContext<UserRelationStateModel>,
     action: UserRelation.FetchFriends
   ) {
-    const userId = this.store.selectSnapshot(AccountState.user).$id;
-    const friends = await this.fetchFriendsFromUserById(userId) as FriendModel[];
-    patchState({
-      friends
-    });
-    return friends;
-  }
+    const {page} = action.payload;
+    return this.apiService.get(`/friends?page=${page}`).pipe(tap(async (response: any) => {
+      const friends = JSON.parse(response).data.map((item) => item.id);
 
-  @Action(UserRelation.PatchContacts)
-  async patchContacts(
-    {patchState, dispatch}: StateContext<UserRelationStateModel>,
-    action: UserRelation.PatchContacts
-  ) {
-    const {contacts} = action.payload;
-    patchState({contactRequest: contacts});
-  }
-
-  private async fetchContacts(userId: string) {
-    try {
-      const query = `query ListContacts(
-              $databaseId: String!
-              $collectionId: String!
-              $queries: [String]
-            ) {
-              databasesListDocuments(
-                databaseId: $databaseId
-                collectionId: $collectionId
-                queries: $queries
-              ) {
-                documents {
-                  data
-                  _id
-                  _createdAt
-                }
-              }
-            }`;
-
-
-      const recipientDataResponse = await Appwrite.graphQLProvider().query({
-        query,
-        variables: {
-          databaseId: environment.radarDatabaseId,
-          collectionId: environment.contactsCollectionId,
-          queries: [
-            Query.equal('sender', userId),
-          ]
-        }
-      }) as { data: { databasesListDocuments: { documents: { data: string; _id: string; _createdAt: string }[]; total: number } }; errors: any };
-
-      const recipients = recipientDataResponse.data.databasesListDocuments.documents.map((item) => {
-        const {data, _id, _createdAt} = item;
-        const parsedData = JSON.parse(data);
-
-        return {
-          recipientId: parsedData.recipient,
-          contactId: _id,
-          createdAt: _createdAt
-        };
+      patchState({
+        friends
       });
-
-      const senderDataResponse = await Appwrite.graphQLProvider().query({
-        query,
-        variables: {
-          databaseId: environment.radarDatabaseId,
-          collectionId: environment.contactsCollectionId,
-          queries: [
-            Query.equal('recipient', userId),
-          ]
-        }
-      }) as { data: { databasesListDocuments: { documents: { data: string; _id: string; _createdAt: string }[]; total: number } }; errors: any };
-
-      const senders = senderDataResponse.data.databasesListDocuments.documents.map((item) => {
-        const {data, _id, _createdAt} = item;
-        const parsedData = JSON.parse(data);
-
-        return {
-          senderId: parsedData.sender,
-          contactId: _id,
-          createdAt: _createdAt
-        };
-      });
-
-      return {
-        sentTo: recipients,
-        receivedFrom: senders
-      };
-    } catch (e: any) {
-      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
-    }
-  }
-
-  private async fetchFriendsFromUserById(userId: string) {
-    try {
-      let friends: FriendModel[];
-
-      const query = `query ListFriends(
-              $databaseId: String!
-              $collectionId: String!
-              $queries: [String]
-            ) {
-              databasesListDocuments(
-                databaseId: $databaseId
-                collectionId: $collectionId
-                queries: $queries
-              ) {
-                documents {
-                  data
-                  _id
-                  _createdAt
-                }
-              }
-            }`;
-
-
-      const friendAResponse = await Appwrite.graphQLProvider().query({
-        query,
-        variables: {
-          databaseId: environment.usersDatabaseId,
-          collectionId: environment.friendsCollectionId,
-          queries: [
-            Query.equal('friendA', userId),
-          ]
-        }
-      }) as { data: { databasesListDocuments: { documents: { data: string; _id: string; _createdAt: string }[]; total: number } }; errors: any };
-
-      friends = friendAResponse.data.databasesListDocuments.documents.map((item) => {
-        const {friendB} = JSON.parse(item.data);
-        return {
-          friendId: friendB,
-          // eslint-disable-next-line no-underscore-dangle
-          contactId: item._id,
-          // eslint-disable-next-line no-underscore-dangle
-          since: item._createdAt
-        } as FriendModel;
-      });
-
-      const friendBResponse = await Appwrite.graphQLProvider().query({
-        query,
-        variables: {
-          databaseId: environment.usersDatabaseId,
-          collectionId: environment.friendsCollectionId,
-          queries: [
-            Query.equal('friendB', userId),
-          ]
-        }
-      }) as { data: { databasesListDocuments: { documents: { data: string; _id: string; _createdAt: string }[]; total: number } }; errors: any };
-
-      friends = friends.concat(friendBResponse.data.databasesListDocuments.documents.map((item) => {
-        const {friendA} = JSON.parse(item.data);
-
-        return {
-          friendId: friendA,
-          // eslint-disable-next-line no-underscore-dangle
-          contactId: item._id,
-          // eslint-disable-next-line no-underscore-dangle
-          since: item._createdAt
-        };
-      }));
-
-      return friends;
-    } catch (e: any) {
-      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
-    }
-  }
+    }), catchError(async (error) => {
+      console.log(error);
+    }));  }
 }

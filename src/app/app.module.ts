@@ -19,6 +19,8 @@ import { MenuComponent } from './component/menu/menu.component';
 import { EditUserProfileComponent } from './component/edit-user-profile/edit-user-profile.component';
 import { IonicStorageModule } from '@ionic/storage-angular';
 import { Interceptor } from './interceptor/http.interceptor';
+import { ImageCropperModule } from 'ngx-image-cropper';
+import { HammerModule } from '../../node_modules/@angular/platform-browser';
 
 @NgModule({
   declarations: [
@@ -37,11 +39,13 @@ import { Interceptor } from './interceptor/http.interceptor';
     PasswordStrengthMeterModule.forRoot(),
     TabsPageModule,
     LoginPageModule,
+    HammerModule,
     NgxIntlTelInputModule,
     NgxsModule.forRoot(AppState, {
       developmentMode: !environment.production
     }),
     HttpClientModule,
+    ImageCropperModule,
     HttpClientJsonpModule,
     environment.production ? [] : NgxsReduxDevtoolsPluginModule.forRoot()
   ],

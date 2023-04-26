@@ -35,10 +35,10 @@ export class AuthGuard implements CanLoad, CanActivate {
   private async handle(segments: UrlSegment[]) {
     const isAuthenticated = await this.tokenService.isTokenValid();
     const path = '/' + segments[0].path;
-    const unauthorizedPath = Path.unauthorizedRoutes.includes(path);
+    const unauthorizedPath = Path.unauthorizedRoutes.some(route => route.test(path));
 
     if (isAuthenticated && unauthorizedPath) {
-      await this.navController.navigateBack([Path.getJumpTo()]);
+      await this.navController.navigateBack([Path.default]);
       return false;
     } else if (!isAuthenticated && !unauthorizedPath) {
       await this.navController.navigateRoot([Path.login]);
