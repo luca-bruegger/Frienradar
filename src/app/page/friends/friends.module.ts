@@ -8,6 +8,7 @@ import { FriendRequestsComponent } from '../../component/friend-requests/friend-
 import { NgCircleProgressModule } from 'ng-circle-progress';
 import { NearbyPageModule } from '../nearby/nearby.module';
 import { FriendsDisplayComponent } from '../../component/friends-display/friends-display.component';
+import { SharedModule } from '../../shared.module';
 
 @NgModule({
   imports: [
@@ -23,7 +24,8 @@ import { FriendsDisplayComponent } from '../../component/friends-display/friends
       innerStrokeColor: '#c7c7c7',
       animationDuration: 300,
     }),
-    NearbyPageModule
+    NearbyPageModule,
+    SharedModule
   ],
   declarations: [
     FriendsPage,

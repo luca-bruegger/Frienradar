@@ -3,23 +3,15 @@ import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { GlobalActions } from '../global';
 import { NavController } from '@ionic/angular';
 import { Router } from '@angular/router';
-import { Appwrite } from '../../helper/appwrite';
-import { AccountState } from '../account';
-import { Query } from 'appwrite';
-import { environment } from '../../../environments/environment';
-import ContactModel from '../../model/contact';
-import FriendModel from '../../model/friend';
 import { catchError, tap } from 'rxjs/operators';
-import { Path } from '../../helper/path';
 import { ApiService } from '../../service/api.service';
-import friend from '../../model/friend';
 
 /* State Model */
 @Injectable()
 export class UserRelationStateModel {
   receivedFriendRequests: any[];
   requestedFriends: string[];
-  friends: string[];
+  friends: any[];
 }
 
 export namespace UserRelation {
@@ -34,7 +26,7 @@ export namespace UserRelation {
   export class Request {
     static readonly type = '[UserRelation] Request';
 
-    constructor(public payload: { friendGuid: string }) {
+    constructor(public payload: { friendId: string }) {
     }
   }
 
@@ -90,8 +82,12 @@ export namespace UserRelation {
   export class AddFriend {
     static readonly type = '[UserRelation] Add Friend';
 
-    constructor(public payload: { friendGuid: string }) {
-    }
+    constructor(public payload: { username: string; profile_picture: string; id: string }) {}
+  }
+
+  export class ResetState {
+    static readonly type = '[UserRelation] Reset State';
+
   }
 }
 
@@ -100,7 +96,7 @@ export namespace UserRelation {
   defaults: {
     receivedFriendRequests: null,
     requestedFriends: null,
-    friends: null,
+    friends: []
   }
 })
 
@@ -134,7 +130,8 @@ export class UserRelationState {
     action: UserRelation.FetchFriendRequests
   ) {
     return this.apiService.get('/invitations').pipe(tap(async (response: any) => {
-      const invitations = JSON.parse(response).data;
+      const data = JSON.parse(response).data;
+      const invitations = data.map((item) => item.attributes);
 
       patchState({
           receivedFriendRequests: invitations
@@ -206,19 +203,19 @@ export class UserRelationState {
     {patchState, dispatch}: StateContext<UserRelationStateModel>,
     action: UserRelation.Request
   ) {
-    const {friendGuid} = action.payload;
+    const {friendId} = action.payload;
     const data = {
       invitation: {
-        friend_guid: friendGuid
+        friend_id: friendId
       }
     };
 
-    return this.apiService.post('/invitations', data).pipe(tap(async (response) => {
+    return this.apiService.post('/invitations', data).toPromise().then(async (response) => {
       console.log(response);
-    }), catchError(async (error) => {
-      this.store.dispatch(new GlobalActions.HandleError({error}));
+    }).catch(async (error) => {
+      dispatch(new GlobalActions.HandleError({error}));
       console.log(error);
-    }));
+    });
   }
 
   @Action(UserRelation.RejectInvitation)
@@ -250,19 +247,21 @@ export class UserRelationState {
     return this.apiService.put('/invitations/accept', {
       id: invitationId
     }).pipe(tap(async (response: any) => {
-      const { sender_guid, sender_username } = response.data;
-      const friendRequests = this.store.selectSnapshot(UserRelationState.receivedFriendRequests).filter((item) => item.attributes.sender_guid != sender_guid);
+      const { id, username, profile_picture } = response.data;
+      const friendRequests = this.store.selectSnapshot(UserRelationState.receivedFriendRequests).filter((item) => item.sender_id != id);
       console.log(friendRequests);
       patchState({
         receivedFriendRequests: friendRequests
       });
 
       dispatch(new UserRelation.AddFriend({
-        friendGuid: sender_guid
+        id,
+        username,
+        profile_picture
       }));
 
       dispatch(new GlobalActions.ShowToast({
-        message: 'Du bist nun befreundet mit ' + sender_username,
+        message: 'Du bist nun befreundet mit ' + username,
         color: 'success'
       }));
     }), catchError(async (error) => {
@@ -275,9 +274,13 @@ export class UserRelationState {
     {patchState, dispatch}: StateContext<UserRelationStateModel>,
     action: UserRelation.AddFriend
   ) {
-    const {friendGuid} = action.payload;
+    const { username, profile_picture, id} = action.payload;
 
-    const friends = [...this.store.selectSnapshot(UserRelationState.friends) || [], friendGuid];
+    const friends = [...this.store.selectSnapshot(UserRelationState.friends) || [], {
+      username,
+      profile_picture,
+      id
+    }];
 
     patchState({
       friends
@@ -291,12 +294,25 @@ export class UserRelationState {
   ) {
     const {page} = action.payload;
     return this.apiService.get(`/friends?page=${page}`).pipe(tap(async (response: any) => {
-      const friends = JSON.parse(response).data.map((item) => item.id);
+      const friends = JSON.parse(response).data.map((item) => item.attributes);
 
       patchState({
         friends
       });
     }), catchError(async (error) => {
       console.log(error);
-    }));  }
+    }));
+  }
+
+  @Action(UserRelation.ResetState)
+  async resetState(
+    {patchState, dispatch}: StateContext<UserRelationStateModel>,
+    action: UserRelation.FetchFriends
+  ) {
+    patchState({
+      receivedFriendRequests: null,
+      requestedFriends: null,
+      friends: []
+    });
+  }
 }

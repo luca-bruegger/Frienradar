@@ -1,4 +1,4 @@
-import { Component, NgZone, OnInit } from '@angular/core';
+import { AfterViewInit, Component, NgZone, OnInit, ViewChild } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { App, URLOpenListenerEvent } from '@capacitor/app';
 import { Path } from './helper/path';
@@ -13,7 +13,7 @@ import {
   BannerAdPosition,
   BannerAdSize
 } from '@capacitor-community/admob';
-import { AppInitService } from './service/app-init.service';
+import { AppService } from './service/app.service';
 import { TokenService } from './service/token.service';
 
 @Component({
@@ -21,7 +21,8 @@ import { TokenService } from './service/token.service';
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, AfterViewInit {
+  @ViewChild('main-content') mainContent: any;
   isBeta = environment.beta;
   bannerLoaded = false;
   tokenValid = null;
@@ -30,7 +31,7 @@ export class AppComponent implements OnInit {
               private navController: NavController,
               private zone: NgZone,
               private store: Store,
-              private appInitService: AppInitService,
+              private appService: AppService,
               private platform: Platform,
               private menuController: MenuController,
               private tokenService: TokenService) {
@@ -38,12 +39,14 @@ export class AppComponent implements OnInit {
 
   async ngOnInit() {
     await this.showAds();
-
-    this.tokenValid = await this.appInitService.init();
+    this.tokenValid = await this.appService.init();
     this.jumpTo();
     this.initializeDeeplinking();
     this.initializeGoogleAnalytics();
     this.initializeTokenChange();
+  }
+
+  async ngAfterViewInit() {
   }
 
   private jumpTo() {
@@ -104,19 +107,36 @@ export class AppComponent implements OnInit {
       requestTrackingAuthorization: true,
       initializeForTesting: !environment.production,
     });
+    this.appService.adsShown = true;
 
     AdMob.addListener(BannerAdPluginEvents.Loaded, () => {
       // Subscribe Banner Event Listener
     });
 
     AdMob.addListener(BannerAdPluginEvents.SizeChanged, (size: AdMobBannerSize) => {
-      // Subscribe Change Banner Size
+      const appMargin = size.height;
+      const root = document.documentElement;
+      const app: HTMLElement = document.querySelector('ion-router-outlet');
+
+      if (appMargin === 0) {
+        app.style.marginBottom = '0px';
+        root.style.setProperty('--content-ad-padding-bottom', app.style.marginBottom);
+        return;
+      }
+
+      if (appMargin > 0) {
+        const body = document.querySelector('body');
+        const bodyStyles = window.getComputedStyle(body);
+        const safeAreaBottom = bodyStyles.getPropertyValue('--ion-safe-area-bottom');
+        root.style.setProperty('--content-ad-padding-bottom', appMargin + 30 + 'px');
+        app.style.marginBottom = `calc(${safeAreaBottom} + ${appMargin - 20 }px)`;
+      }
     });
     const isIos = this.platform.is('ios');
 
     const options: BannerAdOptions = {
       adId: isIos ? environment.iosAdId : environment.androidAdId,
-      adSize: BannerAdSize.BANNER,
+      adSize: BannerAdSize.ADAPTIVE_BANNER,
       position: BannerAdPosition.BOTTOM_CENTER,
       margin: 0,
       isTesting: !environment.production,

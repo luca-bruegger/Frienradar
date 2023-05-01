@@ -6,7 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import OneSignal from 'onesignal-cordova-plugin';
 import { AccountValidation } from '../../validation/account-validation';
 import { PermissionService } from '../../service/permission.service';
-import { AppInitService } from '../../service/app-init.service';
+import { AppService } from '../../service/app.service';
 import { Path } from '../../helper/path';
 import { LocationService } from '../../service/location.service';
 
@@ -31,7 +31,7 @@ export class AdditionalLoginDataComponent implements OnInit {
               private router: Router,
               private route: ActivatedRoute,
               private permissionService: PermissionService,
-              private appInitService: AppInitService,
+              private appInitService: AppService,
               private locationService: LocationService) {
 
   }
@@ -83,35 +83,33 @@ export class AdditionalLoginDataComponent implements OnInit {
       return;
     }
 
-    this.isLoading = true;
 
     if (this.user.username !== this.usernameFormControl.value) {
+      this.isLoading = true;
       await this.store.dispatch(new Account.Update({
         options: {
           username: this.usernameFormControl.value
         }
       })).toPromise();
+      await this.appInitService.redirectAfterSignIn();
+      this.isLoading = false;
     }
 
-    await this.locationService.fetchCurrentPosition();
-
+    await this.store.dispatch(new GlobalActions.ShowToast({
+      message: 'Konfiguration erfolgreich abgeschlossen',
+      color: 'success'
+    }));
     this.store.dispatch(new GlobalActions.Redirect({
       path: Path.default,
       forward: true,
       navigateRoot: false
     }));
-    await this.store.dispatch(new GlobalActions.ShowToast({
-      message: 'Konfiguration erfolgreich abgeschlossen',
-      color: 'success'
-    }));
-
-    this.isLoading = false;
   }
 
   handleRefresh($event: any) {
     setTimeout(async () => {
       await this.permissionService.checkPermissions(this.isMobile);
-      this.store.dispatch(new Account.Fetch({checkValidity: false}));
+      this.store.dispatch(new Account.Fetch());
       $event.target.complete();
     }, 1000);
   }

@@ -1,62 +1,39 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { GlobalActions, UserRelation } from '../../../store';
-import { Picture } from '../../../helper/picture';
-import { AlertController } from '@ionic/angular';
-import { Appwrite } from '../../../helper/appwrite';
-import { environment } from '../../../../environments/environment';
-import { Account as AccountModel } from '../../../model/account';
-import { first } from 'rxjs/operators';
+import { UserRelation } from '../../../store';
+import { AlertController, NavController } from '@ionic/angular';
 
 @Component({
   selector: 'app-user-element',
   templateUrl: './user-element.component.html',
   styleUrls: ['./user-element.component.scss'],
 })
-export class UserElementComponent implements OnInit, OnChanges {
-  @Input() contact = null;
+export class UserElementComponent {
+  @Input() friendPreview = false;
   @Input() user = null;
   @Input() isSentTo = false;
   @Input() isFriend = false;
   @Input() isRequested = false;
-  @Input() currentCacheBreaker = Picture.cacheBreaker();
+  @Input() isLastElement = false;
   isLoading = false;
 
   constructor(private store: Store,
-              private alertController: AlertController) {
+              private alertController: AlertController,
+              private navController: NavController) {
   }
 
   async ngOnInit() {
-    // const friendId = this.contact ? this.contact.friendId : this.user.$id;
-    // this.isFriend = this.friends.map(friend => friend.friendId).includes(friendId);
-    // this.user$ = new Promise<any>(async (resolve, reject) => {
-    //   const fetchedUser = this.user || await Appwrite.databasesProvider().getDocument(
-    //     environment.radarDatabaseId,
-    //     environment.geolocationsCollectionId,
-    //     this.contact.friendId
-    //   );
-    //   const user = Object.assign({}, fetchedUser, {selected:false});
-    //   user.username = await this.fetchUsername(fetchedUser.$id);
-    //   resolve(user);
-    // });
 
   }
 
-  async ngOnChanges(changes: SimpleChanges) {
-    if (changes.friends && changes.friends.currentValue) {
-      const friendId = this.contact ? this.contact.friendId : this.user.$id;
-      this.isFriend = changes.friends.currentValue.map(friend => friend.friendId).includes(friendId);
+  async requestUserContact(friendId) {
+    if (this.isLoading) {
+      return;
     }
-  }
 
-  async requestUserContact(friendGuid) {
     this.isLoading = true;
-    await this.store.dispatch(new UserRelation.Request({ friendGuid })).toPromise();
+    await this.store.dispatch(new UserRelation.Request({ friendId })).toPromise();
     this.isLoading = false;
-  }
-
-  profilePicture(user) {
-    return Picture.profilePictureViewURL(user.$id, this.currentCacheBreaker);
   }
 
   lastSeen(user) {
@@ -93,5 +70,17 @@ export class UserElementComponent implements OnInit, OnChanges {
     });
 
     await alert.present();
+  }
+
+  showFriendPreview(id) {
+    if (!this.friendPreview) {
+      return;
+    }
+
+    this.navController.navigateForward(`tabs/friends/display/${id}`);
+  }
+
+  navigateToFriends() {
+    this.navController.navigateForward('/tabs/friends');
   }
 }

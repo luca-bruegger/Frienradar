@@ -1,18 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountPresets } from '../../helper/accountPresets';
 import { Store } from '@ngxs/store';
-import { Account, AccountState } from '../../store';
+import { AccountState, SocialAccounts, SocialAccountsState } from '../../store';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AccountData } from '../../model/accountData';
-import { AlertController, LoadingController } from '@ionic/angular';
+import { AlertController, LoadingController, NavController } from '@ionic/angular';
 
 @Component({
-  selector: 'app-accounts',
-  templateUrl: './accounts.page.html',
-  styleUrls: ['./accounts.page.scss'],
+  selector: 'app-social-accounts',
+  templateUrl: './social-accounts.page.html',
+  styleUrls: ['./social-accounts.page.scss']
 })
-export class AccountsPage implements OnInit {
-
+export class SocialAccountsPage implements OnInit {
   isLoading = false;
   accountPresets = AccountPresets.set;
   selectedPresetName = '';
@@ -25,7 +24,8 @@ export class AccountsPage implements OnInit {
   constructor(private store: Store,
               private formBuilder: FormBuilder,
               private loadingController: LoadingController,
-              private alertController: AlertController) {
+              private alertController: AlertController,
+              private navController: NavController) {
   }
 
   get searchedAccounts() {
@@ -33,6 +33,10 @@ export class AccountsPage implements OnInit {
       const i = this.accountsData.findIndex(e => e.key === preset.key);
       return i === -1;
     });
+  }
+
+  get userAccounts() {
+    return this.store.selectSnapshot(SocialAccountsState.all);
   }
 
   get connectedAccounts() {
@@ -67,7 +71,7 @@ export class AccountsPage implements OnInit {
       username: this.accountsFormGroup.get(account.key).value
     } as AccountData);
 
-    await this.store.dispatch(new Account.UpdateAccountsData({accountsData: this.accountsData}));
+    //await this.store.dispatch(new SocialAccounts.UpdateAccountsData({accountsData: this.accountsData}));
     this.isChangingAccount = false;
     await spinner.dismiss();
     this.selectedPresetName = '';
@@ -95,7 +99,7 @@ export class AccountsPage implements OnInit {
       username: this.accountsFormGroup.get(accountPreset.key).value
     } as AccountData;
 
-    await this.store.dispatch(new Account.UpdateAccountsData({accountsData: this.accountsData}));
+    //await this.store.dispatch(new Account.UpdateAccountsData({accountsData: this.accountsData}));
     this.isChangingAccount = false;
     await spinner.dismiss();
     this.selectedPresetName = '';
@@ -131,7 +135,7 @@ export class AccountsPage implements OnInit {
           role: 'confirm',
           handler: () => {
             this.accountsData = this.accountsData.filter(e => e.key !== accountData.key);
-            this.store.dispatch(new Account.UpdateAccountsData({accountsData: this.accountsData}));
+            //this.store.dispatch(new Account.UpdateAccountsData({accountsData: this.accountsData}));
             this.selectedPresetName = '';
             this.accountsFormGroup.get(accountData.key).setValue('');
           },
@@ -143,6 +147,19 @@ export class AccountsPage implements OnInit {
 
   openExternalLink(param: any) {
     window.open(param, '_system');
+  }
+
+  createNewSocialAccount() {
+    this.navController.navigateForward('/tabs/social-accounts/create');
+  }
+
+  openSocialAccountSettings() {
+
+  }
+
+  async refresh($event: any) {
+    await this.store.dispatch(new SocialAccounts.Fetch()).toPromise();
+    $event.target.complete();
   }
 
   private generateFormGroup() {

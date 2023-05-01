@@ -7,21 +7,12 @@ export const environment = {
   beta: false,
   test: true,
   endpoint: 'https://dev.api.frienradar.com/v1',
-  project: '633467240f7db9ae07d7',
   mapsKey: 'AIzaSyBzaHPkOpQSETE6Q9RsIbKFL_LOL_f7xCU',
-  radarDatabaseId: 'radar',
-  geolocationsCollectionId: 'geolocations',
-  contactsCollectionId: 'contacts',
   appUrl: 'https://frienradar.com',
   googleAnalyticsId: '',
-  usernameCollectionId: 'usernames',
-  usersDatabaseId: 'users',
-  accountsCollectionId: 'accounts',
   oneSignalAppId: 'dbcfaa41-2e99-498a-8293-a3020ac85b2c',
-  friendsCollectionId: 'friends',
   iosAdId: 'ca-app-pub-6953123179903035/3049634317',
   androidAdId: 'ca-app-pub-6953123179903035/9676252847',
-  descriptionCollectionId: 'description'
 };
 
 /*

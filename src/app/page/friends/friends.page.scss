@@ -1,3 +1,9 @@
 ion-content {
   --offset-top: 0px;
+  --padding-bottom: var(--content-ad-padding-bottom, 0px);
+}
+
+ion-list {
+  border-radius: 8px;
+  overflow: hidden;
 }

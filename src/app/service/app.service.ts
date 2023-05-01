@@ -5,15 +5,19 @@ import { App } from '@capacitor/app';
 import { LocationService } from './location.service';
 import OneSignal from 'onesignal-cordova-plugin';
 import { environment } from '../../environments/environment';
-import { Account, AccountState, UserRelation } from '../store';
+import { Account, AccountState, GlobalActions, Location, UserRelation } from '../store';
 import { TokenService } from './token.service';
 import { PermissionService } from './permission.service';
 import { ActionCableService } from './action-cable.service';
+import { Path } from '../helper/path';
+import { SocialAccounts } from '../store/social-accounts';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AppInitService {
+export class AppService {
+  adsShown = false;
+
   constructor(private store: Store,
               private loadingController: LoadingController,
               private locationService: LocationService,
@@ -36,10 +40,7 @@ export class AppInitService {
 
       if (tokenValid) {
         await this.fetchCurrentUser();
-        await this.fetchUserRelation();
-        const user = this.store.selectSnapshot(AccountState.user);
-        await this.startServices(user, await this.tokenService.getToken());
-        await this.fetchUserData();
+        await this.redirectAfterSignIn();
       }
 
       await loadingSpinner.dismiss();
@@ -47,10 +48,42 @@ export class AppInitService {
     });
   }
 
-  async startServices(user, token) {
+  async startServices(token) {
+    const user = this.store.selectSnapshot(AccountState.user);
+
+    await this.locationService.fetchCurrentPosition();
     await this.locationService.watch();
     this.oneSignalInit(user);
-    this.connectToActionCable(token, user.guid);
+    await this.connectToActionCable(token, user.id);
+  }
+
+  async redirectAfterSignIn() {
+    const fullyRegistered = await this.isRegistrationCompleted();
+
+    if (fullyRegistered) {
+      await this.startServices(await this.tokenService.getToken());
+      await this.fetchUserRelation();
+      await this.fetchUserData();
+      await this.redirectToDefault();
+    } else {
+      await this.redirectToAdditionalLogin();
+    }
+  }
+
+  async stop() {
+    await this.locationService.stop();
+    await this.actionCableService.disconnect();
+    await this.store.dispatch(new Account.ResetState());
+    await this.store.dispatch(new Location.ResetState());
+    await this.store.dispatch(new UserRelation.ResetState());
+  }
+
+  private async isRegistrationCompleted() {
+    const user = this.store.selectSnapshot(AccountState.user);
+    await this.permissionService.checkPermissions(this.isMobile());
+    const permitted = this.permissionService.hasMandatoryPermissions(this.isMobile());
+
+    return user.confirmed && permitted && user.username && user.username.length > 0 || false;
   }
 
   private oneSignalInit(user) {
@@ -59,23 +92,15 @@ export class AppInitService {
     }
 
     OneSignal.setAppId(environment.oneSignalAppId);
-    console.log('OneSignal SETUP ---------------------');
-    console.log('OneSignal User ID: ', user.guid);
-    OneSignal.setExternalUserId(user.guid);
-    OneSignal.promptForPushNotificationsWithUserResponse((accepted) => {
-      console.log('User accepted notifications: ' + accepted);
-    });
+    OneSignal.setExternalUserId(user.id);
 
     OneSignal.setLogLevel(0, 0);
 
-    // NOTE: Update the setAppId value below with your OneSignal AppId.
-    OneSignal.setNotificationOpenedHandler((jsonData) => {
-      console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
+    OneSignal.setNotificationOpenedHandler((openedEvent) => {
     });
 
     OneSignal.setNotificationWillShowInForegroundHandler((notificationReceivedEvent) => {
       notificationReceivedEvent.complete(null);
-      console.log('notificationWillShowInForegroundHandler: ' + JSON.stringify(notificationReceivedEvent));
     });
   }
 
@@ -104,13 +129,11 @@ export class AppInitService {
   }
 
   private async fetchCurrentUser() {
-    await this.store.dispatch(new Account.Fetch({
-      checkValidity: true
-    })).toPromise();
+    await this.store.dispatch(new Account.Fetch()).toPromise();
   }
 
-  private connectToActionCable(token: string, guid: string) {
-    this.actionCableService.connect(token, guid);
+  private async connectToActionCable(token: string, userId: string) {
+    await this.actionCableService.connect(token, userId);
   }
 
   private async fetchUserData() {
@@ -120,5 +143,22 @@ export class AppInitService {
   private async fetchUserRelation() {
     await this.store.dispatch(new UserRelation.FetchInvitations({page: 1})).toPromise();
     await this.store.dispatch(new UserRelation.FetchFriends({page: 1})).toPromise();
+    await this.store.dispatch(new SocialAccounts.Fetch()).toPromise();
+  }
+
+  private async redirectToDefault() {
+    this.store.dispatch(new GlobalActions.Redirect({
+      path: Path.default,
+      forward: true,
+      navigateRoot: true
+    }));
+  }
+
+  private async redirectToAdditionalLogin() {
+    this.store.dispatch(new GlobalActions.Redirect({
+      path: Path.additionalLoginData,
+      forward: true,
+      navigateRoot: false
+    }));
   }
 }

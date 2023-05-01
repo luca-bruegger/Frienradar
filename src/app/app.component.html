@@ -4,7 +4,7 @@
   </h1>
 </div>
 
-<ion-app class="{{bannerLoaded ? 'app-margin' : ''}}" *ngIf="tokenValid !== null">
+<ion-app>
   <ion-split-pane contentId="main-content" when="true">
     <ion-menu [disabled]="!tokenValid" menuId="profile-menu" contentId="main-content" type="push" side="end" style="height: 100%">
       <app-menu style="height: 100%"></app-menu>

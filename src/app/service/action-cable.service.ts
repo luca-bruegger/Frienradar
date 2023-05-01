@@ -10,13 +10,17 @@ import { GlobalActions, UserRelation } from '../store';
 export class ActionCableService {
   private cable: Consumer = null;
 
+  get isCableConnected() {
+    return this.cable && this.cable.connection.isOpen();
+  }
+
   constructor(private store: Store) {
   }
 
-  subscribeInvitations(guid: string) {
+  subscribeInvitations(userId: string) {
     this.cable.subscriptions.create({
       channel: 'InvitationsChannel',
-      guid
+      id: userId
     }, {
       connected: () => {
         console.log('connected');
@@ -24,33 +28,32 @@ export class ActionCableService {
       received: (params) => {
         console.log(params);
         console.log('received', params.data);
-        const invitation = {
-          type: 'invitation',
-          id: params.data.id,
-          attributes: params.data
-        };
 
         if (params.type == 'sent') {
-          this.store.dispatch(new UserRelation.AppendRequestedFriend({ userGuid: params.data.friend_guid }));
+          this.store.dispatch(new UserRelation.AppendRequestedFriend({ userGuid: params.data.friend_id }));
           this.store.dispatch(new GlobalActions.ShowToast({
             message: 'Anfrage gesendet an ' + params.data.friend_username,
             color: 'success'
           }));
         } else if (params.type == 'received') {
-          this.store.dispatch(new UserRelation.AppendFriendRequest({ invitation }));
+          this.store.dispatch(new UserRelation.AppendFriendRequest({ invitation: params.data }));
           this.store.dispatch(new GlobalActions.ShowToast({
             message: 'Anfrage erhalten von ' + params.data.sender_username,
             color: 'success'
           }));
         } else if (params.type == 'accepted') {
-          this.store.dispatch(new UserRelation.RemoveFriendRequest({ userGuid: params.data.friend_guid }));
-          this.store.dispatch(new UserRelation.AddFriend({ friendGuid: params.data.friend_guid }));
+          this.store.dispatch(new UserRelation.RemoveFriendRequest({ userGuid: params.data.friend_id }));
+          this.store.dispatch(new UserRelation.AddFriend({
+            id: params.data.id,
+            username: params.data.username,
+            profile_picture: params.data.profile_picture
+          }));
           this.store.dispatch(new GlobalActions.ShowToast({
-            message: params.data.friend_username + ' hat die Anfrage angenommen',
+            message: params.data.username + ' hat die Anfrage angenommen',
             color: 'success'
           }));
         } else if (params.type == 'rejected') {
-          this.store.dispatch(new UserRelation.RemoveFriendRequest({ userGuid: params.data.friend_guid }));
+          this.store.dispatch(new UserRelation.RemoveFriendRequest({ userGuid: params.data.friend_id }));
           this.store.dispatch(new GlobalActions.ShowToast({
             message: params.data.friend_username + ' hat die Anfrage abgelehnt',
             color: 'danger'
@@ -63,16 +66,16 @@ export class ActionCableService {
     });
   }
 
-  async connect(token: string, guid: string) {
+  async connect(token: string, userId: string) {
     if (this.cable) {
       return;
     }
 
-    const socketHostUrl = environment.socketHost + '?access_token=' + token.split(' ')[1] + '&guid=' + guid;
+    const socketHostUrl = environment.socketHost + '?access_token=' + token.split(' ')[1];
 
     this.cable = createConsumer(socketHostUrl);
 
-    this.subscribeInvitations(guid);
+    this.subscribeInvitations(userId);
   }
 
   async disconnect() {

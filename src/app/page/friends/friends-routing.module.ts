@@ -15,7 +15,7 @@ const routes: Routes = [
     component: FriendRequestsComponent
   },
   {
-    path: 'display/:id/:contactId/:since',
+    path: 'display/:id',
     component: FriendsDisplayComponent
   }
 ];

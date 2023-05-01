@@ -6,9 +6,9 @@ import { TabsPage } from './tabs.page';
 
 import { TabsPageRoutingModule } from './tabs-routing.module';
 import { NearbyPageModule } from '../page/nearby/nearby.module';
-import { AccountsPageModule } from '../page/accounts/accounts.module';
 import { RadarPageModule } from '../page/radar/radar.module';
 import { FriendsPageModule } from '../page/friends/friends.module';
+import { SocialAccountsPageModule } from '../page/social-accounts/social-accounts.module';
 
 @NgModule({
   imports: [
@@ -17,7 +17,7 @@ import { FriendsPageModule } from '../page/friends/friends.module';
     IonicModule,
     TabsPageRoutingModule,
     FriendsPageModule,
-    AccountsPageModule,
+    SocialAccountsPageModule,
     NearbyPageModule,
     RadarPageModule,
   ],

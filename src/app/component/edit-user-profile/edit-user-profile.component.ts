@@ -84,7 +84,7 @@ export class EditUserProfileComponent implements OnInit {
       this.formGroup.get('email').patchValue(user.email);
       this.formGroup.get('username').patchValue(user.username);
       this.formGroup.get('profilePicture').patchValue(user.profile_picture);
-      this.formGroup.get('description').patchValue(user.description);
+      //this.formGroup.get('description').patchValue(user.description);
     });
   }
 }

@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Picture } from '../../helper/picture';
-import { Appwrite } from '../../helper/appwrite';
-import { environment } from '../../../environments/environment';
 import { AlertController, NavController } from '@ionic/angular';
+import { ApiService } from '../../service/api.service';
+import { catchError, first } from 'rxjs/operators';
 
 @Component({
   selector: 'app-friends-display',
@@ -11,42 +10,26 @@ import { AlertController, NavController } from '@ionic/angular';
   styleUrls: ['./friends-display.component.scss'],
 })
 export class FriendsDisplayComponent implements OnInit {
-  currentCacheBreaker = Picture.cacheBreaker();
-  userId = null;
-  contactId = null;
-  user$;
-  private since: string;
+  user = null;
 
   constructor(private activatedRoute: ActivatedRoute,
               private navController: NavController,
-              private alertController: AlertController) {
+              private alertController: AlertController,
+              private apiService: ApiService) {
   }
 
   async ngOnInit() {
-    this.userId = this.activatedRoute.snapshot.paramMap.get('id');
-    this.contactId = this.activatedRoute.snapshot.paramMap.get('contactId');
-    this.since = this.activatedRoute.snapshot.paramMap.get('since');
-
-    this.user$ = new Promise<any>(async (resolve, reject) => {
-      const fetchedUser = await Appwrite.databasesProvider().getDocument(
-        environment.radarDatabaseId,
-        environment.geolocationsCollectionId,
-        this.userId
-      );
-      const user = Object.assign({}, fetchedUser, {selected: false});
-      user.username = await this.fetchUsername(fetchedUser.$id);
-      user.description = await this.fetchDescription(fetchedUser.$id);
-      user.accounts = await this.fetchAccounts(fetchedUser.$id);
-      resolve(user);
+    const userId = this.activatedRoute.snapshot.paramMap.get('id');
+    this.apiService.get(`/profiles/${userId}`).pipe(first()).subscribe(async (response: any) => {
+      this.user = JSON.parse(response).data;
+      console.log('Profile', this.user);
+    }), catchError(async error => {
+      console.error(error);
     });
   }
 
-  profilePicture() {
-    return Picture.profilePictureViewURL(this.userId, this.currentCacheBreaker);
-  }
-
   lastSeen() {
-    return new Date(this.since).toLocaleString([], {
+    return new Date(this.user.friend_since).toLocaleString([], {
       day: '2-digit',
       month: 'short',
       hour: '2-digit',
@@ -80,9 +63,7 @@ export class FriendsDisplayComponent implements OnInit {
                   text: 'Entfernen',
                   cssClass: 'danger',
                   handler: async () => {
-                    await Appwrite.databasesProvider().deleteDocument(environment.usersDatabaseId,
-                      environment.friendsCollectionId,
-                      this.contactId);
+                    // TODO: delete invitation
                     await this.navController.navigateBack('/tabs/friends');
                   }
                 }
@@ -96,28 +77,5 @@ export class FriendsDisplayComponent implements OnInit {
     });
 
     await alert.present();
-  }
-
-  private async fetchUsername(userId) {
-    const document = await Appwrite.databasesProvider().getDocument(environment.usersDatabaseId,
-      environment.usernameCollectionId,
-      userId);
-    return document.username;
-  }
-
-  private async fetchDescription(userId) {
-    const document = await Appwrite.databasesProvider().getDocument(environment.usersDatabaseId,
-      environment.descriptionCollectionId,
-      userId);
-    return document.value;
-  }
-
-  private async fetchAccounts(userId) {
-    console.log(userId);
-    const document = await Appwrite.databasesProvider().getDocument(environment.usersDatabaseId,
-      environment.accountsCollectionId,
-      userId);
-    console.log(document);
-    return document;
   }
 }

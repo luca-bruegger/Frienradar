@@ -76,18 +76,17 @@ export class ResetPasswordComponent implements OnInit {
     }));
   }
 
-  sendResetEmail() {
+  async sendResetEmail() {
     if (this.emailFormControl.invalid) {
       this.emailFormControl.markAsTouched();
       return;
     }
 
     this.resetInProgress = true;
+    await this.store.dispatch(new Account.SendResetEmail(this.emailFormControl.value)).toPromise();
+    this.resetInProgress = false;
 
-    this.store.dispatch(new Account.SendResetEmail(this.emailFormControl.value)).subscribe(async data => {
-      this.resetInProgress = false;
-      this.dismiss();
-    });
+    this.dismiss();
   }
 
   resetPassword() {

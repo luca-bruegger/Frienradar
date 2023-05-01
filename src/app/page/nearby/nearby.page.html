@@ -49,8 +49,8 @@
   <app-distance-change *ngIf="nearbyUsersAmount > 0" (distanceChange)="distanceChanged($event)"></app-distance-change>
 
   <ion-list *ngIf="nearbyUsersAmount > 0" class="ion-margin ion-no-padding">
-    <app-user-element *ngFor="let user of nearbyUsersForCurrentDistance; trackBy:identifyNearbyUser"
-                      [user]="user" [isSentTo]="invitationRecieved(user)" [isRequested]="requestedInvitation(user)" [isFriend]="isFriend(user)"></app-user-element>
+    <app-user-element *ngFor="let user of nearbyUsersForCurrentDistance; let i = index; trackBy:identifyNearbyUser"
+                      [user]="user" [isSentTo]="invitationReceived(user)" [isRequested]="requestedInvitation(user)" [isFriend]="isFriend(user)" [isLastElement]="nearbyUsersForCurrentDistance.length - 1 === i"></app-user-element>
   </ion-list>
   <ion-infinite-scroll (ionInfinite)="fetchMoreNearbyUsers($event)">
     <ion-infinite-scroll-content loadingText="Wird geladen..." loadingSpinner="crescent"></ion-infinite-scroll-content>

@@ -4,6 +4,7 @@ import { ModalController, NavController, ToastController } from '@ionic/angular'
 import { AccountStateModel } from '../account';
 import { Path } from '../../helper/path';
 import { Router } from '@angular/router';
+import { TokenService } from '../../service/token.service';
 
 export class GlobalStateModel {
 
@@ -20,7 +21,7 @@ export namespace GlobalActions {
     constructor(public payload: { error: Error }) {}
   }
 
-  export class HandleLoginError {
+  export class HandleAuthError {
     static readonly type = '[GlobalActions] Handle Login Error';
     constructor(public payload: { error: Error }) {}
   }
@@ -52,7 +53,8 @@ export class GlobalState {
               private modalController: ModalController,
               private navController: NavController,
               private ngZone: NgZone,
-              private router: Router) {
+              private router: Router,
+              private tokenService: TokenService) {
   }
 
   @Action(GlobalActions.ShowToast)
@@ -70,8 +72,8 @@ export class GlobalState {
   }
 
   @Action(GlobalActions.ResetBackendUnderMaintenance)
-  async resetBackendUnderMaintenance(ctx: StateContext<AccountStateModel>, action: GlobalActions.ResetBackendUnderMaintenance) {
-    this.store.dispatch(new GlobalActions.ShowToast({
+  async resetBackendUnderMaintenance({dispatch}: StateContext<AccountStateModel>, action: GlobalActions.ResetBackendUnderMaintenance) {
+    dispatch(new GlobalActions.ShowToast({
       message: 'Verbindung wiederhergestellt.',
       color: 'success'
     }));
@@ -82,7 +84,7 @@ export class GlobalState {
 
   @Action(GlobalActions.HandleError)
   async handleError(
-    {patchState}: StateContext<GlobalStateModel>,
+    {patchState, dispatch}: StateContext<GlobalStateModel>,
     action: GlobalActions.HandleError
   ) {
     const { error } = action.payload as { error: any };
@@ -91,12 +93,13 @@ export class GlobalState {
       return;
     }
 
-    if (error.code === 401 && error.type === 'general_unauthorized_scope' && error.type === 'user_unauthorized') {
-      this.store.dispatch(new GlobalActions.Redirect({path: Path.login, forward: true, navigateRoot: false}));
+    if (error.status === 401 || error.status === 404) {
+      await this.tokenService.removeToken();
+      dispatch(new GlobalActions.Redirect({path: Path.login, forward: false, navigateRoot: true}));
       return;
     }
 
-    this.store.dispatch(
+    dispatch(
       new GlobalActions.ShowToast({
         message: error.error.message || error.statusText,
         color: 'danger',
@@ -104,10 +107,10 @@ export class GlobalState {
     );
   }
 
-  @Action(GlobalActions.HandleLoginError)
+  @Action(GlobalActions.HandleAuthError)
   async handleLoginError(
-    {patchState}: StateContext<GlobalStateModel>,
-    action: GlobalActions.HandleLoginError
+    {patchState, dispatch}: StateContext<GlobalStateModel>,
+    action: GlobalActions.HandleAuthError
   ) {
     const { error } = action.payload as { error: any };
 
@@ -115,12 +118,7 @@ export class GlobalState {
       return;
     }
 
-    if (error.code === 401 && error.type === 'general_unauthorized_scope' && error.type === 'user_unauthorized') {
-      this.store.dispatch(new GlobalActions.Redirect({path: Path.login, forward: true, navigateRoot: false}));
-      return;
-    }
-
-    this.store.dispatch(
+    dispatch(
       new GlobalActions.ShowToast({
         message: error.error,
         color: 'danger',

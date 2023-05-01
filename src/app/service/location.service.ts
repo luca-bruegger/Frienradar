@@ -13,8 +13,8 @@ import { Location } from '../store';
 export class LocationService implements OnDestroy {
   private geolocationOptions: PositionOptions = {
     enableHighAccuracy: true,
-    timeout: 5000,
-    maximumAge: 5000
+    timeout: 2000,
+    maximumAge: 10000
   };
 
   private callbackId: string;
@@ -47,14 +47,14 @@ export class LocationService implements OnDestroy {
     }
 
     // if (!this.platform.is('capacitor')) {
-      Geolocation.watchPosition(this.geolocationOptions, (position) => {
-        if (position) {
-          const geohash = ngeohash.encode(position.coords.latitude, position.coords.longitude, this.DEFAULT_GEOHASH_LENGTH);
-          this.updatePosition(geohash);
-        }
-      }).then((id) => {
-        this.callbackId = id;
-      });
+    Geolocation.watchPosition(this.geolocationOptions, (position) => {
+      if (position) {
+        const geohash = ngeohash.encode(position.coords.latitude, position.coords.longitude, this.DEFAULT_GEOHASH_LENGTH);
+        this.updatePosition(geohash);
+      }
+    }).then((id) => {
+      this.callbackId = id;
+    });
     // } else {
     //   await this.backgroundGeolocation.addWatcher(
     //     {
@@ -96,7 +96,7 @@ export class LocationService implements OnDestroy {
     return new Promise<string>(async (resolve, reject) => {
       const id = await Geolocation.watchPosition(this.geolocationOptions, (position, err) => {
         Geolocation.clearWatch({id});
-        if(err) {
+        if (err) {
           reject(err);
           return;
         }
@@ -107,15 +107,15 @@ export class LocationService implements OnDestroy {
 
   async fetchCurrentPosition() {
     const geohash = await this.getCurrentGeohash();
-    this.updatePosition(geohash);
+    await this.updatePosition(geohash);
   }
 
-  private updatePosition(geohash: string) {
+  private async updatePosition(geohash: string) {
     if (this.geohash === geohash) {
       return;
     }
 
     this.geohash = geohash;
-    this.store.dispatch(new Location.UpdatePosition(geohash));
+    await this.store.dispatch(new Location.UpdatePosition(geohash)).toPromise();
   }
 }

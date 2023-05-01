@@ -1,23 +1,22 @@
 import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { Models } from 'appwrite';
-import { Appwrite } from 'src/app/helper/appwrite';
 import { GlobalActions } from '../global';
 import { Path } from '../../helper/path';
 import { Platform } from '@ionic/angular';
-import { environment } from '../../../environments/environment';
 import { AccountData } from '../../model/accountData';
-import { AppInitService } from '../../service/app-init.service';
+import { AppService } from '../../service/app.service';
 import { LocationService } from '../../service/location.service';
 import { ApiService } from '../../service/api.service';
 import { catchError, first, tap } from 'rxjs/operators';
 import { TokenService } from '../../service/token.service';
 import { PermissionService } from '../../service/permission.service';
+import { User } from '../../model/user';
 
 /* State Model */
 @Injectable()
 export class AccountStateModel {
-  user;
+  user: User;
   session: Models.Session;
   accountsData: [];
   username: string;
@@ -44,8 +43,6 @@ export namespace Account {
   export class Fetch {
     static readonly type = '[Auth] Fetch';
 
-    constructor(public payload: { checkValidity: boolean }) {
-    }
   }
 
   export class SendResetEmail {
@@ -90,15 +87,12 @@ export namespace Account {
     }
   }
 
-  export class UpdateAccountsData {
-    static readonly type = '[Auth] Update Accounts Data';
-
-    constructor(public payload: { accountsData: AccountData[] }) {
-    }
-  }
-
   export class Logout {
     static readonly type = '[Auth] Logout';
+  }
+
+  export class ResetState {
+    static readonly type = '[Auth] Reset State';
   }
 }
 
@@ -115,7 +109,7 @@ export namespace Account {
 @Injectable()
 export class AccountState {
   constructor(private store: Store,
-              private appInitService: AppInitService,
+              private appInitService: AppService,
               private platform: Platform,
               private locationService: LocationService,
               private apiService: ApiService,
@@ -154,12 +148,6 @@ export class AccountState {
   }
 
   @Selector()
-  static isUserIsFullyRegistered(state: AccountStateModel) {
-    const user = state.user;
-    return !!user && user.emailVerification && user.username && user.username.length > 0;
-  }
-
-  @Selector()
   static isAuthenticated(state: AccountStateModel): boolean {
     return !!state.user;
   }
@@ -177,17 +165,17 @@ export class AccountState {
     formData.append('password', password);
     formData.append('name', name);
 
-    return this.apiService.post('/user', formData, true).pipe(tap(async (response: any) => {
-      console.log(response);
+    return this.apiService.post('/user', formData, true).toPromise().then(async (response: any) => {
       const user = response.body.data;
       await this.tokenService.setTokenFromResponse(response);
+
       patchState({
         user
       });
       await dispatch(new GlobalActions.Redirect({path: Path.additionalLoginData, forward: true, navigateRoot: false}));
-    }), catchError(async (error) => {
-      this.store.dispatch(new GlobalActions.HandleLoginError({error: error.error.status as Error}));
-    }));
+    }, async (error) => {
+      dispatch(new GlobalActions.HandleAuthError({error}));
+    });
   }
 
   @Action(Account.Login)
@@ -196,21 +184,22 @@ export class AccountState {
     action: Account.Login
   ) {
     const {email, password} = action.payload;
+
     return this.apiService.post('/user/sign_in', {
       user: {
         email,
         password
       }
-    }).pipe(tap(async (response: any) => {
+    }).toPromise().then(async (response: any) => {
       const user = response.body.data;
       await this.tokenService.setTokenFromResponse(response);
-      await this.checkIfUserIsFullyRegistered(user);
+
       patchState({
         user
       });
-    }), catchError(async (error) => {
-      dispatch(new GlobalActions.HandleLoginError({error}));
-    }));
+    }, async (error) => {
+      dispatch(new GlobalActions.HandleAuthError({error}));
+    });
   }
 
   @Action(Account.Update)
@@ -222,13 +211,13 @@ export class AccountState {
 
     return this.apiService.put('/current_user', {
       user: options
-    }, false).pipe(tap((response: any) => {
+    }, false).toPromise().then((response: any) => {
       patchState({
         user: response.data
       });
-    }), catchError(async (error) => {
+    }, async (error) => {
       dispatch(new GlobalActions.HandleError({error}));
-    }));
+    });
   }
 
   @Action(Account.UpdateWithFormData)
@@ -267,23 +256,14 @@ export class AccountState {
     {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.Fetch
   ) {
-    const {checkValidity} = action.payload;
-
     return this.apiService.get('/current_user').pipe(tap((response: any) => {
       const user = JSON.parse(response).data;
-
-      if (checkValidity) {
-        this.checkIfUserIsFullyRegistered(user);
-      }
 
       patchState({
         user
       });
     }), catchError(async (error) => {
-      if (error.status === 401 || error.status === 404) {
-        await this.tokenService.removeToken();
-        await dispatch(new GlobalActions.Redirect({path: Path.login, forward: false, navigateRoot: true}));
-      }
+      dispatch(new GlobalActions.HandleError({error}));
     }));
   }
 
@@ -294,11 +274,10 @@ export class AccountState {
   ) {
     return this.apiService.delete('/user/sign_out').pipe(tap(async (response) => {
       await this.tokenService.removeToken();
+      await this.appInitService.stop();
       await dispatch(new GlobalActions.Redirect({path: Path.login, forward: false, navigateRoot: true}));
     }), catchError(async (error) => {
-      if (error.status === 401) {
-        await dispatch(new GlobalActions.Redirect({path: Path.login, forward: false, navigateRoot: true}));
-      }
+      dispatch(new GlobalActions.HandleAuthError({error}));
     }));
   }
 
@@ -309,9 +288,9 @@ export class AccountState {
   ) {
     console.log('send reset email');
     this.apiService.get('/user/send_restore_mail').pipe(first()).subscribe(async (response) => {
-      console.log(response);
+      dispatch(new GlobalActions.ShowToast({message: 'Email gesendet', color: 'success'}));
     }, (error) => {
-      console.log(error);
+      dispatch(new GlobalActions.HandleAuthError({error}));
     });
   }
 
@@ -321,17 +300,7 @@ export class AccountState {
     action: Account.ResetPassword
   ) {
     const {secret, userId, password, confirmPassword} = action.payload;
-    try {
-      await Appwrite.accountProvider().updateRecovery(userId, secret, password, confirmPassword);
 
-      await dispatch(new GlobalActions.ShowToast({
-        message: 'Passwort erfolgreich zurückgesetzt. Bitte melde dich an.',
-        color: 'success'
-      }));
-      dispatch(new GlobalActions.Redirect({path: Path.login, forward: false, navigateRoot: false}));
-    } catch (e: any) {
-      dispatch(new GlobalActions.HandleError({error: e as Error}));
-    }
   }
 
   @Action(Account.Verify)
@@ -342,71 +311,46 @@ export class AccountState {
     const {token} = action.payload;
 
     return this.apiService.get(`/user/confirmation?confirmation_token=${token}`).pipe(tap((response: any) => {
-      console.log(response);
-      const user = { ...this.store.selectSnapshot(AccountState.user)};
+      const user = {...this.store.selectSnapshot(AccountState.user)};
       user.confirmed = true;
+
+      dispatch(new GlobalActions.ShowToast({message: 'Email bestätigt', color: 'success'}));
 
       patchState({
         user
       });
     }), catchError(async (error) => {
-      console.log(error);
+      dispatch(new GlobalActions.HandleAuthError({error}));
     }));
   }
 
   @Action(Account.SendVerificationEmail)
-  async sendVerificationEmail({patchState, dispatch}: StateContext<AccountStateModel>, action: Account.SendVerificationEmail) {
+  async sendVerificationEmail({
+                                patchState,
+                                dispatch
+                              }: StateContext<AccountStateModel>, action: Account.SendVerificationEmail) {
     const {email} = action.payload;
     return this.apiService.post('/user/confirmation', {
       user: {
         email
       }
     }).pipe(tap((response: any) => {
-      console.log(response);
+      dispatch(new GlobalActions.ShowToast({message: 'Email gesendet', color: 'success'}));
     }), catchError(async (error) => {
-      console.log(error);
+      dispatch(new GlobalActions.HandleAuthError({error}));
     }));
   }
 
-  @Action(Account.UpdateAccountsData)
-  async updateAccountsData({
-                             patchState,
-                             dispatch
-                           }: StateContext<AccountStateModel>, action: Account.UpdateAccountsData) {
-    const {accountsData} = action.payload;
-    const preparedAccountsData = [];
-
-    accountsData.forEach((accountData: AccountData) => {
-      preparedAccountsData.push(accountData.key + ':' + accountData.username);
+  @Action(Account.ResetState)
+  async resetState({
+                      patchState,
+                      dispatch
+                     }: StateContext<AccountStateModel>, action: Account.ResetState) {
+    patchState({
+      user: null,
+      session: null,
+      username: null,
+      accountsData: null
     });
-
-    try {
-      await Appwrite.databasesProvider().updateDocument(
-        environment.usersDatabaseId,
-        environment.accountsCollectionId,
-        this.store.selectSnapshot(AccountState.user).$id,
-        {accounts: preparedAccountsData});
-    } catch (e: any) {
-      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
-    }
-  }
-
-  private async checkIfUserIsFullyRegistered(user: any) {
-    await this.permissionService.checkPermissions(this.appInitService.isMobile());
-    const permitted = this.permissionService.hasMandatoryPermissions(this.appInitService.isMobile());
-
-    if (user.confirmed && permitted && user.username && user.username.length > 0) {
-      this.store.dispatch(new GlobalActions.Redirect({
-        path: Path.default,
-        forward: true,
-        navigateRoot: true
-      }));
-    } else {
-      this.store.dispatch(new GlobalActions.Redirect({
-        path: Path.additionalLoginData,
-        forward: true,
-        navigateRoot: false
-      }));
-    }
   }
 }

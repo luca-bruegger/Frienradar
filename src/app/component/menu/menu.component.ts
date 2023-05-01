@@ -1,12 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Select, Store } from '@ngxs/store';
+import { Store } from '@ngxs/store';
 import { Account, AccountState } from '../../store';
-import { Observable } from 'rxjs';
-import { Account as AccountModel } from '../../model/account';
-import { Picture } from '../../helper/picture';
 import { AlertController, ModalController } from '@ionic/angular';
 import { SettingsComponent } from '../element/settings/settings.component';
 import { EditUserProfileComponent } from '../edit-user-profile/edit-user-profile.component';
+import { ActionCableService } from '../../service/action-cable.service';
 
 @Component({
   selector: 'app-menu',
@@ -14,11 +12,19 @@ import { EditUserProfileComponent } from '../edit-user-profile/edit-user-profile
   styleUrls: ['./menu.component.scss'],
 })
 export class MenuComponent implements OnInit {
-  @Select(AccountState.user) user$: Observable<Partial<AccountModel.User>>;
+
+  get user() {
+    return this.store.selectSnapshot(AccountState.user);
+  }
+
+  get connectionStatus() {
+    return this.actionCableService.isCableConnected;
+  }
 
   constructor(private alertController: AlertController,
               private modalController: ModalController,
-              private store: Store) {}
+              private store: Store,
+              private actionCableService: ActionCableService) {}
 
   async ngOnInit() {
   }

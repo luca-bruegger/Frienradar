@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { AccountState } from '../../../store';
-import { Picture } from '../../../helper/picture';
 import { Camera, ImageOptions } from '@capacitor/camera';
 import { ImageCroppedEvent } from 'ngx-image-cropper';
 
@@ -43,14 +42,12 @@ export class ProfilePictureSelectComponent implements OnChanges, OnInit {
       this.profilePicture = changes.profilePicture.currentValue;
       return;
     }
-
-    this.profilePicture = Picture.profilePictureViewURL(user.$id, Picture.cacheBreaker());
   }
 
   displayImagePicker() {
     const imagePickerOptions = {
-      width: 500,
-      height: 500,
+      width: 1000,
+      height: 1000,
       allowVideo: false,
       resultType: 'dataUrl',
       webUseInput: true,
@@ -81,8 +78,8 @@ export class ProfilePictureSelectComponent implements OnChanges, OnInit {
 
   private async compressImage(imageString: string) {
     // Default image sizes
-    const width = 170;
-    const height = 170;
+    const width = 1000;
+    const height = 1000;
 
     const image = await this.addImageSource(imageString);
     const scaleFactor = width / image.naturalWidth;

@@ -5,6 +5,7 @@ import { IonInput, ModalController } from '@ionic/angular';
 import { ResetPasswordComponent } from '../../component/reset-password/reset-password.component';
 import { AccountValidation } from '../../validation/account-validation';
 import { environment } from '../../../environments/environment';
+import { AppService } from '../../service/app.service';
 
 @Component({
   selector: 'app-login',
@@ -26,7 +27,8 @@ export class LoginPage implements OnInit, OnDestroy {
   profilePicture = null;
 
   constructor(private store: Store,
-              private modalController: ModalController) {
+              private modalController: ModalController,
+              private appService: AppService) {
   }
 
   ngOnDestroy() {
@@ -68,6 +70,8 @@ export class LoginPage implements OnInit, OnDestroy {
       await this.store.dispatch(new Account.Login(this.formGroup.value)).toPromise();
     }
 
+    console.log('redirecting');
+    await this.appService.redirectAfterSignIn();
     this.loginInProgress = false;
   }
 

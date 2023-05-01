@@ -19,8 +19,8 @@ const routes: Routes = [
         canActivate: [AuthGuard]
       },
       {
-        path: 'accounts',
-        loadChildren: () => import('../page/accounts/accounts.module').then(m => m.AccountsPageModule),
+        path: 'social-accounts',
+        loadChildren: () => import('../page/social-accounts/social-accounts.module').then(m => m.SocialAccountsPageModule),
         canActivate: [AuthGuard]
       },
       {

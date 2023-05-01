@@ -19,25 +19,10 @@
       {{ validation.message }}
     </div>
   </ng-container>
-  <div style="border-top: 1px solid #e0e0e0" class="ion-padding-top ion-padding-end">
-    <div class="ion-margin-horizontal">
-      <ion-note>
-        <span>Dein Name ist nur für dich sichtbar.</span>
-      </ion-note>
-    </div>
-    <ion-item color="light" lines="none">
-      <ion-label style="width: 80px; padding-right: 5px">Name</ion-label>
-      <ion-input style="border-bottom: 1px solid var(--ion-color-bright)" formControlName="name"></ion-input>
-    </ion-item>
-    <ng-container *ngFor="let validation of formMessages.name">
-      <div class="error-message"
-           *ngIf="formGroup.get('name').hasError(validation.type) && (formGroup.get('name').dirty || formGroup.get('name').touched)">
-        {{ validation.message }}
-      </div>
-    </ng-container>
+  <div style="border-top: 1px solid #e0e0e0" class="ion-padding-end">
     <div class="ion-margin-horizontal ion-margin-top">
       <ion-note>
-        <span>Der Benutzername wird für die Anzeige in der App verwendet. Dieser ist für dich, aber auch andere Benutzer sichtbar.</span>
+        <span>Der Benutzername wird für die Anzeige in der App verwendet. <strong>Dieser ist für dich, aber auch andere Benutzer sichtbar.</strong></span>
       </ion-note>
     </div>
     <ion-item color="light" lines="none" counter="{{formGroup.get('username').enabled}}">
@@ -48,6 +33,21 @@
       <ng-container *ngFor="let validation of formMessages.username">
         <div class="error-message"
              *ngIf="formGroup.get('username').hasError(validation.type) && (formGroup.get('username').dirty || formGroup.get('username').touched)">
+          {{ validation.message }}
+        </div>
+      </ng-container>
+      <div class="ion-margin-horizontal ion-padding-top">
+        <ion-note>
+          <span>Dein Name ist <strong>nur für dich</strong> sichtbar.</span>
+        </ion-note>
+      </div>
+      <ion-item color="light" lines="none">
+        <ion-label style="width: 80px; padding-right: 5px">Name</ion-label>
+        <ion-input style="border-bottom: 1px solid var(--ion-color-bright)" formControlName="name"></ion-input>
+      </ion-item>
+      <ng-container *ngFor="let validation of formMessages.name">
+        <div class="error-message"
+             *ngIf="formGroup.get('name').hasError(validation.type) && (formGroup.get('name').dirty || formGroup.get('name').touched)">
           {{ validation.message }}
         </div>
       </ng-container>

@@ -1,5 +1,6 @@
 ion-content {
   --offset-top: 0px;
+  --padding-bottom: var(--content-ad-padding-bottom, 0px);
 }
 
 .align-center {

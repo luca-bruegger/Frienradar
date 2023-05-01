@@ -38,9 +38,14 @@ export namespace Location {
         page: number;
         append: boolean;
         distance: number;
+        geohash: string;
       }
     ) {
     }
+  }
+
+  export class ResetState {
+    static readonly type = '[Location] Reset State';
   }
 }
 
@@ -91,16 +96,16 @@ export class LocationState {
 
     return this.apiService.put('/geolocations/' + user.geolocation_id, {
       geohash
-    }).pipe(tap((response: any) => {
+    }).toPromise().then((response: any) => {
       geohash = response.data.geohash;
 
       patchState({
         geohash
       });
-    }), catchError((error: any) => {
+    }, async (error) => {
       console.log(error);
       return error;
-    }));
+    });
   }
 
   @Action(Location.FetchNearbyUsers)
@@ -108,8 +113,8 @@ export class LocationState {
                       patchState,
                       dispatch
                     }: StateContext<LocationStateModel>, action: Location.FetchNearbyUsers) {
-    const { page, append, distance } = action.payload;
-    return this.apiService.get(`/nearby_users?page=${page}&distance=${distance}`).pipe(tap(async (response: any) => {
+    const { page, append, distance, geohash } = action.payload;
+    return this.apiService.get(`/nearby_users?page=${page}&distance=${distance}&geohash=${geohash}`).pipe(tap(async (response: any) => {
       const users = JSON.parse(response).data;
 
       await dispatch(new UserRelation.FetchFriends({ page: 1}));
@@ -131,6 +136,22 @@ export class LocationState {
       console.log(error);
       return error;
     }));
+  }
+
+  @Action(Location.ResetState)
+  async resetState(
+    {patchState, dispatch}: StateContext<LocationStateModel>,
+    action: Location.ResetState
+  ) {
+    patchState({
+      geohash: null,
+      nearbyUsers: {
+        0: null,
+        1: null,
+        2: null,
+        3: null
+      }
+    });
   }
 
 }

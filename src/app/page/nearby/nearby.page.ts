@@ -42,7 +42,7 @@ export class NearbyPage implements OnInit {
 
   get nearbyUsersForCurrentDistance() {
     if (this.nearbyUsers && this.nearbyUsers[this.preferredDistance]) {
-      return this.nearbyUsers[this.preferredDistance];
+      return this.nearbyUsers[this.preferredDistance].map(nearbyUser => nearbyUser.attributes);
     } else {
       return null;
     }
@@ -81,12 +81,12 @@ export class NearbyPage implements OnInit {
     event.target.complete();
   }
 
-  invitationRecieved(user: any) {
-    return this.friendRequests.filter(request => request.attributes.sender_guid === user.id).length > 0;
+  invitationReceived(user: any) {
+    return this.friendRequests.filter(request => request.sender_id === user.id).length > 0;
   }
 
   isFriend(user: any) {
-    return this.friends.filter(guid => guid === user.id).length > 0;
+    return this.friends.filter(friend => friend.id === user.id).length > 0;
   }
 
   requestedInvitation(user: any) {
@@ -98,7 +98,8 @@ export class NearbyPage implements OnInit {
     await this.store.dispatch(new Location.FetchNearbyUsers({
       page,
       append,
-      distance: this.selectedDistance == null ? this.preferredDistance : this.selectedDistance
+      distance: this.selectedDistance == null ? this.preferredDistance : this.selectedDistance,
+      geohash: this.store.selectSnapshot(LocationState.geohash)
     })).toPromise();
   }
 }

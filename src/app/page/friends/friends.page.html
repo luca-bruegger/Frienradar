@@ -30,17 +30,6 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <ion-card color="light" class="ion-no-margin ion-margin-horizontal ion-margin-top" *ngIf="!reloadPossible">
-    <ion-card-content>
-      <ion-progress-bar [value]="(100 - percent) /100"></ion-progress-bar>
-      <div style="text-align: center; margin-top: 10px">
-        <ion-label>
-          <strong>{{reloadTime}} Sekunden </strong> <br> bis zur nächsten manuellen Aktualisierung
-        </ion-label>
-      </div>
-    </ion-card-content>
-  </ion-card>
-
   <div *ngIf="friends.length === 0" style="position:absolute; top: 50%; left: 50%; display: flex; flex-direction: column; text-align: center; align-items: center; transform: translate(-50%, -50%);">
     <ion-label>Du hast zurzeit noch keine Freunde. Es wird Zeit dies zu ändern :)</ion-label>
     <ion-button color="secondary" expand="block" routerLink="/tabs/nearby" class="ion-margin-top">
@@ -48,15 +37,7 @@
       <ion-label>Benutzer in der Nähe</ion-label>
     </ion-button>
   </div>
-
-  <div *ngIf="friends.length > 0" class="ion-padding-horizontal ion-padding-top">
-    <ion-grid class="ion-no-padding">
-      <ion-row style="gap: 10px">
-        <ion-col size="12" size-lg="5" size-xl="3" size-md="5" size-sm="8" push-xl="1.5" push-lg="1" push-md="1"
-                 push-sm="2"  *ngFor="let friend of friends;">
-          <app-user-element [contact]="friend" [friends]="friends" [currentCacheBreaker]="currentCacheBreaker"></app-user-element>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-  </div>
+  <ion-list  *ngIf="friends.length > 0" class="ion-margin ion-no-padding">
+    <app-user-element *ngFor="let friend of friends; let i = index" [user]="friend" [friendPreview]="true" [isLastElement]="friends.length -1 === i"></app-user-element>
+  </ion-list>
 </ion-content>

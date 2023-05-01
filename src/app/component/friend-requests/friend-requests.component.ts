@@ -1,11 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { UserRelation, UserRelationState } from '../../store';
 import { Store } from '@ngxs/store';
-import { Appwrite } from '../../helper/appwrite';
-import { environment } from '../../../environments/environment';
 import { Picture } from '../../helper/picture';
 import { AlertController, LoadingController } from '@ionic/angular';
-import { first } from 'rxjs/operators';
 
 @Component({
   selector: 'app-friend-requests',
@@ -37,13 +34,6 @@ export class FriendRequestsComponent implements OnInit {
     this.store.select(UserRelationState.receivedFriendRequests).subscribe((requests: any) => {
       this.requests = requests;
     });
-  }
-
-  async fetchUser(contactId: any) {
-    return await Appwrite.databasesProvider().getDocument(
-      environment.radarDatabaseId,
-      environment.geolocationsCollectionId,
-      contactId);
   }
 
   profilePicture(userId) {
@@ -115,12 +105,5 @@ export class FriendRequestsComponent implements OnInit {
 
   async acceptInvitation(invitationId: number) {
     await this.acceptRequest(invitationId);
-  }
-
-  private async fetchUsername(userId) {
-    const document = await Appwrite.databasesProvider().getDocument(environment.usersDatabaseId,
-      environment.usernameCollectionId,
-      userId);
-    return document.username;
   }
 }

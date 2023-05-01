@@ -18,13 +18,8 @@ ion-tab-bar {
   overflow: visible;
 }
 
-ion-tabs {
-  padding-bottom: 60px;
-}
-
 .ios :host {
   ion-tabs {
-    padding-bottom: 90px;
   }
 
   ion-tab-button {

@@ -12,19 +12,10 @@ export const environment = {
   iosAdId: 'ca-app-pub-6953123179903035/3049634317',
   androidAdId: 'ca-app-pub-6953123179903035/9676252847',
   socketHost: 'ws://192.168.1.148:3000/cable',
-
   endpoint: 'https://dev.api.frienradar.com/v1',
   project: '633467240f7db9ae07d7',
-  radarDatabaseId: 'radar',
-  geolocationsCollectionId: 'geolocations',
-  contactsCollectionId: 'contacts',
   appUrl: 'https://frienradar.com',
-  googleAnalyticsId: '',
-  usernameCollectionId: 'usernames',
-  usersDatabaseId: 'users',
-  accountsCollectionId: 'accounts',
-  friendsCollectionId: 'friends',
-  descriptionCollectionId: 'description',
+  googleAnalyticsId: ''
 };
 
 /*

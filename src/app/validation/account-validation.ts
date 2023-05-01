@@ -10,7 +10,7 @@ export class AccountValidation {
     }, [
       Validators.required,
       Validators.maxLength(30),
-      Validators.minLength(4),
+      Validators.minLength(3),
       Validators.pattern('^\\S*$')
     ]);
   }
