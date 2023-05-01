@@ -5,7 +5,7 @@
 </div>
 
 <ion-app>
-  <ion-split-pane contentId="main-content" when="true">
+  <ion-split-pane *ngIf="tokenValid !== null" contentId="main-content" when="true">
     <ion-menu [disabled]="!tokenValid" menuId="profile-menu" contentId="main-content" type="push" side="end" style="height: 100%">
       <app-menu style="height: 100%"></app-menu>
     </ion-menu>

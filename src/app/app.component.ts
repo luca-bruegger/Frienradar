@@ -38,8 +38,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async ngOnInit() {
-    await this.showAds();
     this.tokenValid = await this.appService.init();
+    await this.showAds();
     this.jumpTo();
     this.initializeDeeplinking();
     this.initializeGoogleAnalytics();

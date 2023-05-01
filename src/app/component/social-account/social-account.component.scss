@@ -1,0 +1,11 @@
+ion-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+ion-item {
+  border-radius: 10px;
+  --background: #fff;
+  --color: #000;
+}

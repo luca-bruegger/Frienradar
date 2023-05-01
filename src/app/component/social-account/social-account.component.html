@@ -1,0 +1,16 @@
+<ion-card style="--{{accountPreset.backgroundStyle}}" class="ion-no-margin" (click)="providedUsername ? openAccountAlert() : null">
+  <ion-card-header>
+    <ion-card-title style="{{accountPreset.color}}">
+      <ion-icon *ngIf="accountPreset.icon" style="{{accountPreset.color}}" name="{{accountPreset.icon}}"></ion-icon>
+      {{accountPreset.name}}</ion-card-title>
+  </ion-card-header>
+
+  <ion-item fill="solid" lines="none" class="ion-margin-horizontal ion-margin-bottom">
+    <ion-input placeholder="Wie heisst du auf {{accountPreset.name}}?" [readonly]="providedUsername" [formControl]="usernameFormControl"></ion-input>
+    <ng-container *ngFor="let validation of usernameMessages" style="background: rgb(0, 0,0, 0.2)">
+      <ion-note slot="error" *ngIf="usernameFormControl.hasError(validation.type) && (usernameFormControl.dirty || usernameFormControl.touched)">
+        {{ validation.message }}
+      </ion-note>
+    </ng-container>
+  </ion-item>
+</ion-card>
