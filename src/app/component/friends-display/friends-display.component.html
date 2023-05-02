@@ -51,14 +51,35 @@
     </ion-row>
     <ion-row class="ion-margin-top">
       <ion-col class="ion-padding-horizontal">
-        <h1 style="color: var(--ion-color-secondary)" class="ion-no-margin ion-margin-bottom">Verbundene Accounts</h1>
-        <ion-list>
+        <h1 style="color: var(--ion-color-secondary)" class="ion-no-margin ion-margin-bottom">Verbundene Dienste</h1>
+        <ion-label *ngIf="user.social_accounts.length === 0">
+          <p style="color: var(--ion-color-medium)">{{user.username}} hat keine Accounts verbunden.</p>
+        </ion-label>
+
+        <ion-list *ngIf="user.social_accounts.length > 0">
+          <ion-item *ngFor="let account of user.social_accounts" fill="solid" lines="none" class="ion-no-padding ion-no-margin ion-margin-bottom" (click)="openExternalLink(account)">
+
+            <ion-card style="--{{accountPreset(account).backgroundStyle}} width: 100%;"
+                      class="ion-no-margin ion-padding-bottom">
+              <ion-card-header>
+                <ion-card-title style="{{accountPreset(account).color}}">
+                  <ion-icon *ngIf="accountPreset(account).icon"
+                            style="{{accountPreset(account).color}}"
+                            name="{{accountPreset(account).icon}}"></ion-icon>
+                  {{accountPreset(account).name}}</ion-card-title>
+              </ion-card-header>
+
+              <ion-item fill="solid" lines="none" class="ion-margin-horizontal">
+                <ion-input readonly="true">@{{account.username}}</ion-input>
+              </ion-item>
+            </ion-card>
+          </ion-item>
         </ion-list>
       </ion-col>
     </ion-row>
   </ion-grid>
   <div *ngIf="!user"
-    style="display: flex; align-items: center; justify-content: center; gap: 14px; position:absolute; top: 50%; left: 50%; transform: translate(-50%, -50%)">
+       style="display: flex; align-items: center; justify-content: center; gap: 14px; position:absolute; top: 50%; left: 50%; transform: translate(-50%, -50%)">
     <ion-spinner name="crescent" style="vertical-align: center"></ion-spinner>
     <p>Profil wird geladen...</p>
   </div>

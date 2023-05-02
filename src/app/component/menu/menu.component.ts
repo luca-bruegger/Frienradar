@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { Account, AccountState } from '../../store';
-import { AlertController, ModalController } from '@ionic/angular';
+import { AlertController, ModalController, PopoverController } from '@ionic/angular';
 import { SettingsComponent } from '../element/settings/settings.component';
 import { EditUserProfileComponent } from '../edit-user-profile/edit-user-profile.component';
 import { ActionCableService } from '../../service/action-cable.service';
@@ -12,6 +12,7 @@ import { ActionCableService } from '../../service/action-cable.service';
   styleUrls: ['./menu.component.scss'],
 })
 export class MenuComponent implements OnInit {
+  @ViewChild('popover', {static: true}) popover: HTMLIonPopoverElement;
 
   get user() {
     return this.store.selectSnapshot(AccountState.user);
@@ -24,6 +25,7 @@ export class MenuComponent implements OnInit {
   constructor(private alertController: AlertController,
               private modalController: ModalController,
               private store: Store,
+              private popoverController: PopoverController,
               private actionCableService: ActionCableService) {}
 
   async ngOnInit() {
@@ -54,5 +56,6 @@ export class MenuComponent implements OnInit {
 
   async signOut() {
     await this.store.dispatch(new Account.Logout()).toPromise();
+    await this.popover.dismiss();
   }
 }

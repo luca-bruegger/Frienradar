@@ -70,7 +70,6 @@ export class LoginPage implements OnInit, OnDestroy {
       await this.store.dispatch(new Account.Login(this.formGroup.value)).toPromise();
     }
 
-    console.log('redirecting');
     await this.appService.redirectAfterSignIn();
     this.loginInProgress = false;
   }

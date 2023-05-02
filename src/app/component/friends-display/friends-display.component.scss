@@ -11,6 +11,18 @@ ion-textarea {
 }
 
 ion-item {
-  --background: transparentize();
-  --inner-padding-end: 0;
+  border-radius: 10px;
+  --inner-padding-end: 0px;
+  --background-hover: #fff;
+  --background: #fff;
+  --color: #000;
+}
+
+ion-list {
+  overflow: hidden;
+  background: transparent;
+}
+
+ion-content {
+  --padding-bottom: var(--content-ad-padding-bottom, 60px);
 }

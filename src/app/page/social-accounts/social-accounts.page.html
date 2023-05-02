@@ -15,78 +15,17 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
+  <div *ngIf="userAccounts.length === 0" style="position:absolute; top: 50%; left: 50%; display: flex; flex-direction: column; text-align: center; align-items: center; transform: translate(-50%, -50%);">
+    <ion-label>Keine Dienste vorhanden...</ion-label>
+    <ion-button color="secondary" expand="block" routerLink="/tabs/social-accounts/create" class="ion-margin-top">
+      <ion-icon slot="start" name="at-circle"></ion-icon>
+      <ion-label>Dienst hinzufügen</ion-label>
+    </ion-button>
+  </div>
 
-  <ion-grid class="ion-no-padding ion-padding-horizontal ion-margin-bottom">
-    <!--<h1 *ngIf="connectedAccounts.length > 0" style="color: var(--ion-color-secondary)" class="ion-no-margin ion-margin-bottom">Verbundene Accounts</h1>
-    <ion-row style="gap: 10px" [formGroup]="accountsFormGroup">
-      <ion-col size="12" size-lg="4" size-xl="3" size-md="5" size-sm="8" push-xl="1.5" push-lg="2" push-md="1"
-               push-sm="2" *ngFor="let accountPreset of connectedAccounts" class="ion-margin-bottom">
-        <ion-card style="{{accountPreset.backgroundStyle}}" class="ion-no-margin">
-          <ion-card-header>
-            <div style="display: flex;">
-              <div style="width: 100%">
-                <ion-card-title style="{{accountPreset.titleStyle}}">{{accountPreset.name}}</ion-card-title>
-                <ion-card-subtitle
-                  style="{{accountPreset.textStyle}}">Konto verbunden
-                </ion-card-subtitle>
-              </div>
-              <div style="align-items: center">
-                <h1 class="ion-no-margin">
-                  <ion-icon style="{{accountPreset.titleStyle}}" name="{{accountPreset.icon}}"></ion-icon>
-                </h1>
-              </div>
-            </div>
-          </ion-card-header>
-
-          <div *ngIf="!isSelectedItem(accountPreset.key) && accountsFormGroup.get(accountPreset.key).value.length > 0">
-            <ion-card-content style="{{accountPreset.textStyle}}" class="ion-no-padding ion-padding-horizontal">
-              <ion-item lines="none">
-                <ion-input type="text" [disabled]="true" formControlName="{{accountPreset.key}}"></ion-input>
-              </ion-item>
-            </ion-card-content>
-          </div>
-
-          <ion-item *ngIf="isSelectedItem(accountPreset.key)" fill="solid" lines="none"
-                    class="ion-margin-horizontal">
-            <ion-input placeholder="Benutzername" formControlName="{{accountPreset.key}}"></ion-input>
-          </ion-item>
-
-          <div class="ion-padding-horizontal ion-padding-vertical" *ngIf="!isSelectedItem(accountPreset.key)" style="display: flex">
-            <ion-button class="ion-no-margin" color="dark" (click)="selectAccount(accountPreset)">Bearbeiten</ion-button>
-            <ion-button (click)="openExternalLink(accountPreset.profileUrl + accountsFormGroup.get(accountPreset.key).value)" class="ion-padding-horizontal ion-no-margin"
-                        color="dark">
-              <ion-icon name="open-outline"></ion-icon>
-            </ion-button>
-            <ion-button class="ion-no-margin" fill="clear" color="danger" (click)="removeAccount(accountPreset)" style="margin-left: auto">
-              <ion-icon name="trash-outline"></ion-icon>
-            </ion-button>
-          </div>
-          <div class="ion-padding-horizontal ion-padding-vertical" *ngIf="isSelectedItem(accountPreset.key)">
-            <ion-button class="ion-no-margin" color="success" (click)="editAccountData(accountPreset)">
-              Speichern
-            </ion-button>
-            <ion-button (click)="quitSelection()" fill="clear" color="danger">Abbrechen</ion-button>
-          </div>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-    <h1 style="color: var(--ion-color-secondary)" class="ion-no-margin" >Verfügbare Accounts</h1>
-
-    <ion-row>
-      <ion-col size="12" size-lg="8" size-xl="9" size-md="10" size-sm="8" push-xl="1.5" push-lg="2" push-md="1" push-sm="2">
-        <ion-searchbar color="light" placeholder="Suchen" class="ion-no-padding ion-padding-vertical"
-                       [(ngModel)]="searchBarValue"></ion-searchbar>
-      </ion-col>
-    </ion-row>-->
-    <ion-row style="gap: 10px" [formGroup]="accountsFormGroup">
-      <ion-col size="12" size-lg="4" size-xl="3" size-md="5" size-sm="8" push-xl="1.5" push-lg="2" push-md="1"
-               push-sm="2" *ngFor="let account of userAccounts">
-        <app-social-account [accountPreset]="accountPresets[account.provider_key]" [providedUsername]="account.username"></app-social-account>
-      </ion-col>
-    </ion-row>
-
-
-  </ion-grid>
+  <ion-list class="ion-padding-horizontal">
+    <app-social-account *ngFor="let account of userAccounts" [accountPreset]="accountPresets[account.provider_key]" [providedAccount]="account"></app-social-account>
+  </ion-list>
 
   <ion-fab slot="fixed" vertical="top" horizontal="end" [edge]="true">
     <ion-fab-button>

@@ -1,8 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AccountPresets } from '../../../helper/accountPresets';
 import { IonModal } from '@ionic/angular';
-import { SocialAccountsState } from '../../../store';
+import { SocialAccounts, SocialAccountsState } from '../../../store';
 import { Store } from '@ngxs/store';
+import { FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-create-social-account',
@@ -13,6 +14,13 @@ export class CreateSocialAccountComponent implements OnInit {
   @ViewChild('modal', { static: true }) modal!: IonModal;
   searchbarValue = '';
   selectedService: any = null;
+
+  usernameFormControl = new FormControl('', [
+    Validators.required,
+    Validators.minLength(3),
+    Validators.maxLength(30),
+    Validators.pattern('^\\S*$')
+  ]);
 
   get socialAccounts() {
     return this.store.selectSnapshot(SocialAccountsState.all);
@@ -47,6 +55,14 @@ export class CreateSocialAccountComponent implements OnInit {
   }
 
   addAccount() {
+    if (this.usernameFormControl.invalid) {
+      this.usernameFormControl.markAsTouched();
+      return;
+    }
 
+    this.store.dispatch(new SocialAccounts.Add({
+      providerKey: this.selectedService.providerKey,
+      username: this.usernameFormControl.value
+    }));
   }
 }

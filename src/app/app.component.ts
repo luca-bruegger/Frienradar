@@ -85,6 +85,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   private async showAds() {
     const { status } = await AdMob.trackingAuthorizationStatus();
     const isCapacitor = this.platform.is('capacitor');
+    document.documentElement.style.setProperty('--content-ad-padding-bottom', '60px');
 
     if (!isCapacitor) {
       return;
@@ -120,7 +121,7 @@ export class AppComponent implements OnInit, AfterViewInit {
 
       if (appMargin === 0) {
         app.style.marginBottom = '0px';
-        root.style.setProperty('--content-ad-padding-bottom', app.style.marginBottom);
+        root.style.setProperty('--content-ad-padding-bottom', '0px');
         return;
       }
 
@@ -129,7 +130,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         const bodyStyles = window.getComputedStyle(body);
         const safeAreaBottom = bodyStyles.getPropertyValue('--ion-safe-area-bottom');
         root.style.setProperty('--content-ad-padding-bottom', appMargin + 30 + 'px');
-        app.style.marginBottom = `calc(${safeAreaBottom} + ${appMargin - 20 }px)`;
+        app.style.marginBottom = `calc(${safeAreaBottom} + ${appMargin - 20}px)`;
       }
     });
     const isIos = this.platform.is('ios');

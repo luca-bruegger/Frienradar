@@ -66,7 +66,14 @@ export class GlobalState {
     const toast = await this.toastController.create({
       message,
       duration: 5000,
-      color
+      color,
+      position: 'top',
+      buttons: [
+        {
+          text: 'Schliessen',
+          role: 'cancel'
+        }
+      ]
     });
     await toast.present();
   }
@@ -121,7 +128,7 @@ export class GlobalState {
     dispatch(
       new GlobalActions.ShowToast({
         message: error.error,
-        color: 'danger',
+        color: 'danger'
       })
     );
   }

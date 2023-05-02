@@ -48,7 +48,7 @@ export namespace Account {
   export class SendResetEmail {
     static readonly type = '[Auth] Reset Password Email';
 
-    constructor(public payload: string) {
+    constructor(public payload: { email: string; modalController: any }) {
     }
   }
 
@@ -83,7 +83,7 @@ export namespace Account {
   export class ResetPassword {
     static readonly type = '[Auth] Reset Password';
 
-    constructor(public payload: { userId: string; secret: string; password: string; confirmPassword: string }) {
+    constructor(public payload: { resetPasswordToken: string; password: string; passwordConfirmation: string }) {
     }
   }
 
@@ -109,7 +109,7 @@ export namespace Account {
 @Injectable()
 export class AccountState {
   constructor(private store: Store,
-              private appInitService: AppService,
+              private appService: AppService,
               private platform: Platform,
               private locationService: LocationService,
               private apiService: ApiService,
@@ -274,7 +274,7 @@ export class AccountState {
   ) {
     return this.apiService.delete('/user/sign_out').pipe(tap(async (response) => {
       await this.tokenService.removeToken();
-      await this.appInitService.stop();
+      await this.appService.stop();
       await dispatch(new GlobalActions.Redirect({path: Path.login, forward: false, navigateRoot: true}));
     }), catchError(async (error) => {
       dispatch(new GlobalActions.HandleAuthError({error}));
@@ -286,10 +286,16 @@ export class AccountState {
     {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.SendResetEmail
   ) {
-    console.log('send reset email');
-    this.apiService.get('/user/send_restore_mail').pipe(first()).subscribe(async (response) => {
-      dispatch(new GlobalActions.ShowToast({message: 'Email gesendet', color: 'success'}));
-    }, (error) => {
+    const {email, modalController} = action.payload;
+
+    this.apiService.post('/user/password', {
+      user: {
+        email
+      }
+    }).toPromise().then(async response => {
+      await modalController.dismiss();
+      dispatch(new GlobalActions.ShowToast({message: 'Zurücksetzungs Email gesendet falls Konto existiert.', color: 'success'}));
+    }, async (error) => {
       dispatch(new GlobalActions.HandleAuthError({error}));
     });
   }
@@ -299,8 +305,23 @@ export class AccountState {
     {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.ResetPassword
   ) {
-    const {secret, userId, password, confirmPassword} = action.payload;
+    const {resetPasswordToken, password, passwordConfirmation} = action.payload;
 
+    return this.apiService.put('/user/password', {
+      user: {
+        reset_password_token: resetPasswordToken,
+        password,
+        password_confirmation: passwordConfirmation
+      }
+    }).toPromise().then(async (response: any) => {
+      patchState({
+        user: response.data
+      });
+      await this.appService.redirectAfterSignIn();
+      dispatch(new GlobalActions.ShowToast({message: 'Passwort zurückgesetzt', color: 'success'}));
+    }, async (error) => {
+      dispatch(new GlobalActions.HandleAuthError({error}));
+    });
   }
 
   @Action(Account.Verify)

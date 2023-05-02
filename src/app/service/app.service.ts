@@ -35,7 +35,7 @@ export class AppService {
     return new Promise(async (resolve) => {
       const loadingSpinner = await this.createLoadingSpinner();
 
-      await this.appstateListener();
+      await this.appStateListener();
       const tokenValid = await this.tokenService.isTokenValid();
 
       if (tokenValid) {
@@ -104,7 +104,7 @@ export class AppService {
     });
   }
 
-  private async createLoadingSpinner() {
+  async createLoadingSpinner() {
     const spinner = await this.loadingController.create({
       message: 'Lädt ...',
       spinner: 'crescent',
@@ -115,7 +115,7 @@ export class AppService {
     return spinner;
   }
 
-  private async appstateListener() {
+  private async appStateListener() {
     App.addListener('appStateChange', async state => {
       const {isActive} = state;
       if (isActive && this.store.selectSnapshot(AccountState.user) !== null) {

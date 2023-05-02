@@ -1,6 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { AlertController } from '@ionic/angular';
-import { FormControl, Validators } from '@angular/forms';
+import { AlertController, ModalController } from '@ionic/angular';
+import { FormControl } from '@angular/forms';
+import { SocialAccounts, SocialAccountsState } from '../../store';
+import { Store } from '@ngxs/store';
+import { EditSocialAccountComponent } from './edit-social-account/edit-social-account.component';
+import { AccountValidation } from '../../validation/account-validation';
 
 @Component({
   selector: 'app-social-account',
@@ -9,28 +13,23 @@ import { FormControl, Validators } from '@angular/forms';
 })
 export class SocialAccountComponent implements OnInit {
   @Input() accountPreset;
-  @Input() providedUsername = null;
+  @Input() providedAccount = null;
+  @Input() usernameFormControl = new FormControl('');
 
-  usernameFormControl = new FormControl('', [
-    Validators.required,
-    Validators.minLength(3),
-    Validators.maxLength(30),
-    Validators.pattern('^\\S*$')
-  ]);
+  usernameMessages = AccountValidation.socialAccountUsernameMessages;
 
-  usernameMessages = [
-    {type: 'required', message: 'Benutzername ist notwendig.'},
-    {type: 'minlength', message: 'Benutzername ist zu kurz.'},
-    {type: 'maxlength', message: 'Benutzername ist zu lang.'},
-    {type: 'pattern', message: 'Benutzername enthält Lücken.'},
-  ];
+  get socialAccountsCount() {
+    return this.store.selectSnapshot(SocialAccountsState.count);
+  }
 
-  constructor(private alertController: AlertController) {
+  constructor(private alertController: AlertController,
+              private store: Store,
+              private modalController: ModalController) {
   }
 
   ngOnInit() {
-    if (this.providedUsername) {
-      this.usernameFormControl.setValue('@' + this.providedUsername);
+    if (this.providedAccount) {
+      this.usernameFormControl.setValue('@' + this.providedAccount.username);
     }
   }
 
@@ -39,9 +38,32 @@ export class SocialAccountComponent implements OnInit {
       header: this.accountPreset.name,
       buttons: [
         {
+          text: 'Öffnen',
+          handler: () => {
+            this.openExternalLink();
+          }
+        },
+        {
+          text: 'Bearbeiten',
+          handler: () => {
+            this.editAccount();
+          }
+        },
+        {
           text: 'Löschen',
           role: 'destructive',
           handler: async () => {
+            if (this.socialAccountsCount === 1) {
+              const lastAccountAlert = await this.alertController.create({
+                header: 'Letztes Konto',
+                message: 'Du kannst nicht alle Konten löschen!',
+                buttons: ['OK']
+              });
+
+              await lastAccountAlert.present();
+              return;
+            }
+
             const deleteAlert = await this.alertController.create({
               header: 'Wirklich löschen?',
               subHeader: 'Das kann nicht rückgängig gemacht werden!',
@@ -64,12 +86,6 @@ export class SocialAccountComponent implements OnInit {
           }
         },
         {
-          text: 'Bearbeiten',
-          handler: () => {
-            this.editAccount();
-          }
-        },
-        {
           text: 'Abbrechen',
           role: 'cancel',
         },
@@ -79,11 +95,25 @@ export class SocialAccountComponent implements OnInit {
     await alert.present();
   }
 
-  private editAccount() {
-    console.log('editAccount');
+  private async editAccount() {
+    const modal = await this.modalController.create({
+      component: EditSocialAccountComponent,
+      componentProps: {
+        accountPreset: this.accountPreset,
+        providedAccount: this.providedAccount,
+        title: this.accountPreset.name + ' bearbeiten'
+      },
+      presentingElement: document.querySelector('app-social-accounts')
+    });
+
+    await modal.present();
+  }
+
+  private openExternalLink() {
+    window.open(this.accountPreset.profileUrl + this.usernameFormControl.value.substring(1), '_system');
   }
 
   private deleteAccount() {
-
+    this.store.dispatch(new SocialAccounts.Delete({id: this.providedAccount.id}));
   }
 }

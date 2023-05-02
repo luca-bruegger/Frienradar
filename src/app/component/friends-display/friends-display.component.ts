@@ -2,7 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AlertController, NavController } from '@ionic/angular';
 import { ApiService } from '../../service/api.service';
-import { catchError, first } from 'rxjs/operators';
+import { GlobalActions, UserRelation } from '../../store';
+import { Store } from '@ngxs/store';
+import { AccountPresets } from '../../helper/accountPresets';
 
 @Component({
   selector: 'app-friends-display',
@@ -15,21 +17,28 @@ export class FriendsDisplayComponent implements OnInit {
   constructor(private activatedRoute: ActivatedRoute,
               private navController: NavController,
               private alertController: AlertController,
-              private apiService: ApiService) {
+              private apiService: ApiService,
+              private store: Store) {
+  }
+
+  accountPreset(account) {
+    return AccountPresets.set[account.provider_key];
   }
 
   async ngOnInit() {
     const userId = this.activatedRoute.snapshot.paramMap.get('id');
-    this.apiService.get(`/profiles/${userId}`).pipe(first()).subscribe(async (response: any) => {
+    this.apiService.get(`/profiles/${userId}`).toPromise().then((response: any) => {
+      console.log(JSON.parse(response));
       this.user = JSON.parse(response).data;
-      console.log('Profile', this.user);
-    }), catchError(async error => {
-      console.error(error);
+    }, async error => {
+      this.store.dispatch(new GlobalActions.HandleError(
+        error
+      ));
     });
   }
 
   lastSeen() {
-    return new Date(this.user.friend_since).toLocaleString([], {
+    return new Date(this.user.invitation.updated_at).toLocaleString([], {
       day: '2-digit',
       month: 'short',
       hour: '2-digit',
@@ -63,7 +72,14 @@ export class FriendsDisplayComponent implements OnInit {
                   text: 'Entfernen',
                   cssClass: 'danger',
                   handler: async () => {
-                    // TODO: delete invitation
+                    this.store.dispatch(new UserRelation.RejectInvitation({
+                      invitationId: this.user.invitation.id,
+                      message: this.user.username + ' wurde als Freund entfernt'
+                      }));
+
+                    this.store.dispatch(new UserRelation.RemoveFriend({
+                      id: this.user.id
+                    }));
                     await this.navController.navigateBack('/tabs/friends');
                   }
                 }
@@ -77,5 +93,9 @@ export class FriendsDisplayComponent implements OnInit {
     });
 
     await alert.present();
+  }
+
+  openExternalLink(account) {
+    window.open(this.accountPreset(account).profileUrl + account.username, '_system');
   }
 }

@@ -14,7 +14,7 @@ export class LocationService implements OnDestroy {
   private geolocationOptions: PositionOptions = {
     enableHighAccuracy: true,
     timeout: 2000,
-    maximumAge: 10000
+    maximumAge: 20000
   };
 
   private callbackId: string;

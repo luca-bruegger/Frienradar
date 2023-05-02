@@ -8,6 +8,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:exported="true"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode"
             android:name="ch.lucabruegger.frienradar.MainActivity"
             android:label="@string/title_activity_main"

@@ -36,13 +36,8 @@ export class ResetPasswordComponent implements OnInit {
       validators: [this.passwordMatchValidator]
     });
 
-  resetData: {
-    userId: string;
-    secret: string;
-    expire: string;
-  } = null;
-
   resetInProgress: boolean;
+  resetPasswordToken: string;
   isReset: boolean;
   strength: number;
 
@@ -53,13 +48,9 @@ export class ResetPasswordComponent implements OnInit {
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
-      if (params && params.userId && params.secret && params.expire) {
-        this.checkIfResetIsExpired(params.expire);
-        this.resetData = {
-          userId: params.userId,
-          secret: params.secret,
-          expire: params.expire
-        };
+      if (params && params.reset_password_token) {
+        this.resetPasswordToken = params.reset_password_token;
+        //this.checkIfResetIsExpired(params.expire);
         this.isReset = true;
       } else {
         this.isReset = false;
@@ -83,13 +74,14 @@ export class ResetPasswordComponent implements OnInit {
     }
 
     this.resetInProgress = true;
-    await this.store.dispatch(new Account.SendResetEmail(this.emailFormControl.value)).toPromise();
+    await this.store.dispatch(new Account.SendResetEmail({
+      email: this.emailFormControl.value,
+      modalController: this.modalController
+    })).toPromise();
     this.resetInProgress = false;
-
-    this.dismiss();
   }
 
-  resetPassword() {
+  async resetPassword() {
     if (this.resetPasswordFromGroup.invalid) {
       this.resetPasswordFromGroup.markAllAsTouched();
       return;
@@ -99,14 +91,12 @@ export class ResetPasswordComponent implements OnInit {
 
     const data = {
       password: this.resetPasswordFromGroup.get('password').value,
-      confirmPassword: this.resetPasswordFromGroup.get('confirmPassword').value,
-      userId: this.resetData.userId,
-      secret: this.resetData.secret
+      passwordConfirmation: this.resetPasswordFromGroup.get('confirmPassword').value,
+      resetPasswordToken: this.resetPasswordToken
     };
 
-    this.store.dispatch(new Account.ResetPassword(data)).subscribe(async () => {
-      this.resetInProgress = false;
-    });
+    await this.store.dispatch(new Account.ResetPassword(data)).toPromise();
+    this.resetInProgress = false;
   }
 
   private passwordMatchValidator(form: FormGroup) {

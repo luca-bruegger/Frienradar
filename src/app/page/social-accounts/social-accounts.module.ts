@@ -8,6 +8,9 @@ import { SharedModule } from '../../shared.module';
 import {
   CreateSocialAccountComponent
 } from '../../component/social-account/create-social-account/create-social-account.component';
+import {
+  EditSocialAccountComponent
+} from '../../component/social-account/edit-social-account/edit-social-account.component';
 
 @NgModule({
   imports: [
@@ -20,7 +23,8 @@ import {
   ],
   declarations: [
     SocialAccountsPage,
-    CreateSocialAccountComponent
+    CreateSocialAccountComponent,
+    EditSocialAccountComponent
   ]
 })
 export class SocialAccountsPageModule {}

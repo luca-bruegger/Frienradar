@@ -14,7 +14,7 @@ export class AccountPresets {
       key: 'discord',
       name: 'Discord',
       icon: 'logo-discord',
-      backgroundStyle: 'background: linear-gradient(135deg, #7289DA 0%, #2C2F33 100%)',
+      backgroundStyle: 'background: linear-gradient(135deg, #7289DA 0%, #545961 100%);',
       color: 'color: #fff',
       profileUrl: 'https://discord.com/users/',
       providerKey: 0
@@ -164,7 +164,7 @@ export class AccountPresets {
     },
     {
       key: 'playstation',
-      backgroundStyle: 'background:linear-gradient(120deg, #FFFFFF, #000080);',
+      backgroundStyle: 'background:linear-gradient(170deg, #FFFFFF, #000080);',
       name: 'PlayStation',
       icon: 'logo-playstation',
       color: 'color: #fff',

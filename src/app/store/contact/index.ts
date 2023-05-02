@@ -68,7 +68,7 @@ export namespace UserRelation {
   export class RejectInvitation {
     static readonly type = '[UserRelation] Reject Invitation';
 
-    constructor(public payload: { invitationId: string }) {
+    constructor(public payload: { invitationId: string; message: string }) {
     }
   }
 
@@ -83,6 +83,12 @@ export namespace UserRelation {
     static readonly type = '[UserRelation] Add Friend';
 
     constructor(public payload: { username: string; profile_picture: string; id: string }) {}
+  }
+
+  export class RemoveFriend {
+    static readonly type = '[UserRelation] Remove Friend';
+
+    constructor(public payload: { id: string }) {}
   }
 
   export class ResetState {
@@ -138,7 +144,7 @@ export class UserRelationState {
         }
       );
     }), catchError(async (error) => {
-      console.log(error);
+      dispatch(new GlobalActions.HandleError({error}));
     }));
   }
 
@@ -155,7 +161,7 @@ export class UserRelationState {
         requestedFriends
       });
     }), catchError(async (error) => {
-      console.log(error);
+      dispatch(new GlobalActions.HandleError({error}));
     }));
   }
 
@@ -214,7 +220,6 @@ export class UserRelationState {
       console.log(response);
     }).catch(async (error) => {
       dispatch(new GlobalActions.HandleError({error}));
-      console.log(error);
     });
   }
 
@@ -223,7 +228,7 @@ export class UserRelationState {
     {patchState, dispatch}: StateContext<UserRelationStateModel>,
     action: UserRelation.RejectInvitation
   ) {
-    const {invitationId} = action.payload;
+    const {invitationId, message} = action.payload;
 
     return this.apiService.delete(`/invitations/${invitationId}`).pipe(tap(() => {
       const invitations = this.store.selectSnapshot(UserRelationState.receivedFriendRequests);
@@ -232,8 +237,13 @@ export class UserRelationState {
       patchState({
         receivedFriendRequests: filteredInvitations
       });
+
+      dispatch(new GlobalActions.ShowToast({
+        message,
+        color: 'danger'
+      }));
     }), catchError(async (error) => {
-      console.log(error);
+      dispatch(new GlobalActions.HandleError({error}));
     }));
   }
 
@@ -265,7 +275,7 @@ export class UserRelationState {
         color: 'success'
       }));
     }), catchError(async (error) => {
-      console.log(error);
+      dispatch(new GlobalActions.HandleError({error}));
     }));
   }
 
@@ -287,6 +297,20 @@ export class UserRelationState {
     });
   }
 
+  @Action(UserRelation.RemoveFriend)
+  async removeFriend(
+    {patchState, dispatch}: StateContext<UserRelationStateModel>,
+    action: UserRelation.RemoveFriend
+  ) {
+    const { id } = action.payload;
+
+    const friends = [...this.store.selectSnapshot(UserRelationState.friends) || []].filter((item) => item.id !== id);
+
+    patchState({
+      friends
+    });
+  }
+
   @Action(UserRelation.FetchFriends)
   async fetchFriends(
     {patchState, dispatch}: StateContext<UserRelationStateModel>,
@@ -300,7 +324,7 @@ export class UserRelationState {
         friends
       });
     }), catchError(async (error) => {
-      console.log(error);
+      dispatch(new GlobalActions.HandleError({error}));
     }));
   }
 

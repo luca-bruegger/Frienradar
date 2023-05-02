@@ -50,7 +50,8 @@ export class FriendRequestsComponent implements OnInit {
     await spinner.present();
 
     await this.store.dispatch(new UserRelation.RejectInvitation({
-      invitationId
+      invitationId,
+      message: 'Freundschaftsanfrage abgelehnt'
     })).toPromise();
 
     await spinner.dismiss();

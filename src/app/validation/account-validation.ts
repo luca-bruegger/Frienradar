@@ -105,4 +105,11 @@ export class AccountValidation {
       {type: 'pattern', message: 'Benutzername enthält Lücken.'},
     ],
   };
+
+  static socialAccountUsernameMessages = [
+    {type: 'required', message: 'Benutzername ist notwendig.'},
+    {type: 'minlength', message: 'Benutzername ist zu kurz.'},
+    {type: 'maxlength', message: 'Benutzername ist zu lang.'},
+    {type: 'pattern', message: 'Benutzername enthält Lücken.'},
+  ];
 }

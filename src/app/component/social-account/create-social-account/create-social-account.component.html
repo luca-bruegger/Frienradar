@@ -24,7 +24,7 @@
     </ion-item>
 
     <div *ngIf="selectedService">
-      <app-social-account *ngIf="selectedService" [accountPreset]="selectedService"></app-social-account>
+      <app-social-account *ngIf="selectedService" [accountPreset]="selectedService" [usernameFormControl]="usernameFormControl"></app-social-account>
       <ion-button expand="block" color="primary" class="ion-margin-top" (click)="addAccount()"><strong>Konto hinzufügen</strong></ion-button>
     </div>
 
