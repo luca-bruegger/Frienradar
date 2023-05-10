@@ -1,37 +1,54 @@
 import { Injectable } from '@angular/core';
-import { CanLoad, Route, UrlSegment, UrlTree } from '@angular/router';
-import { Observable } from 'rxjs';
+import {
+  ActivatedRouteSnapshot,
+  CanActivate,
+  CanLoad,
+  Route,
+  RouterStateSnapshot,
+  UrlSegment,
+  UrlTree
+} from '@angular/router';
+import { from, Observable } from 'rxjs';
 import { NavController } from '@ionic/angular';
 import { Path } from './path';
-import { Store } from '@ngxs/store';
-import { AccountState } from '../store';
+import { TokenService } from '../service/token.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AuthGuard implements CanLoad {
+export class AuthGuard implements CanLoad, CanActivate {
+
   constructor(private navController: NavController,
-              private store: Store) {
+              private tokenService: TokenService) {
   }
 
   canLoad(route: Route,
           segments: UrlSegment[]): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    const isAuthenticated = !!this.store.selectSnapshot(AccountState.session);
-
-    if (isAuthenticated) {
-      this.checkIfIsOnUnauthorizedRoute(segments);
-      return true;
-    } else {
-      if ('/' + segments[0].path !== Path.login) {
-        this.navController.navigateRoot([Path.login]);
-      }
-      return true;
-    }
+    return from(this.handle(segments));
   }
 
-  private checkIfIsOnUnauthorizedRoute(segments: UrlSegment[]) {
-    if (Path.unauthorizedRoutes.includes('/' + segments[0].path)) {
-      this.navController.navigateBack([Path.getJumpTo()]);
+  canActivate(childRoute: ActivatedRouteSnapshot,
+              state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+    return from(this.handle(childRoute.url));
+  }
+
+  private async handle(segments: UrlSegment[]) {
+    const isAuthenticated = await this.tokenService.isTokenValid();
+    const path = '/' + segments[0].path;
+    const unauthorizedPath = Path.unauthorizedRoutes.some(route => route.test(path));
+
+    if (isAuthenticated && unauthorizedPath) {
+      await this.navController.navigateBack([Path.default]);
+      return false;
+    } else if (!isAuthenticated && !unauthorizedPath) {
+      await this.navController.navigateRoot([Path.login]);
+      return false;
+    } else if (!isAuthenticated && unauthorizedPath) {
+      return true;
+    } else if (isAuthenticated && !unauthorizedPath) {
+      return true;
     }
+
+    return undefined;
   }
 }

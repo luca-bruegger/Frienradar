@@ -14,42 +14,55 @@ import { NgxsModule } from '@ngxs/store';
 import { environment } from '../environments/environment';
 import { AppState } from './store';
 import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
-import { HttpClientJsonpModule, HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientJsonpModule, HttpClientModule } from '@angular/common/http';
+import { MenuComponent } from './component/menu/menu.component';
+import { EditUserProfileComponent } from './component/edit-user-profile/edit-user-profile.component';
+import { IonicStorageModule } from '@ionic/storage-angular';
+import { Interceptor } from './interceptor/http.interceptor';
+import { ImageCropperModule } from 'ngx-image-cropper';
+import { HammerModule } from '../../node_modules/@angular/platform-browser';
+import { SettingsComponent } from './component/element/settings/settings.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    MenuComponent,
+    SettingsComponent,
+    EditUserProfileComponent
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     IonicModule.forRoot(),
+    IonicStorageModule.forRoot(),
     AppRoutingModule,
     ReactiveFormsModule,
     FormsModule,
     PasswordStrengthMeterModule.forRoot(),
     TabsPageModule,
     LoginPageModule,
+    HammerModule,
     NgxIntlTelInputModule,
     NgxsModule.forRoot(AppState, {
       developmentMode: !environment.production
     }),
     HttpClientModule,
+    ImageCropperModule,
     HttpClientJsonpModule,
     environment.production ? [] : NgxsReduxDevtoolsPluginModule.forRoot()
   ],
   providers: [
-    {provide: RouteReuseStrategy, useClass: IonicRouteStrategy}
-    /*    {
-          provide: APP_INITIALIZER,
-          useFactory: appConfigFactory,
-          deps: [AppInitService],
-          multi: true
-        }*/
+    {
+      provide: RouteReuseStrategy,
+      useClass: IonicRouteStrategy,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: Interceptor,
+      multi: true
+    }
   ],
-  bootstrap: [AppComponent],
-  exports: [],
-  schemas: []
+  bootstrap: [AppComponent]
 })
 
 export class AppModule {

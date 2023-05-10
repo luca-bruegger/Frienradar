@@ -8,7 +8,7 @@ import { NearbyPageRoutingModule } from './nearby-routing.module';
 
 import { NearbyPage } from './nearby.page';
 import { SharedModule } from '../../shared.module';
-import { NearbyUserElementComponent } from '../../component/element/nearby-user-element/nearby-user-element.component';
+import { UserElementComponent } from '../../component/element/nearby-user-element/user-element.component';
 import { NgCircleProgressModule } from 'ng-circle-progress';
 
 @NgModule({
@@ -27,6 +27,7 @@ import { NgCircleProgressModule } from 'ng-circle-progress';
       animationDuration: 300,
     })
   ],
-  declarations: [NearbyPage, NearbyUserElementComponent],
+  declarations: [NearbyPage, UserElementComponent],
+  exports: [UserElementComponent]
 })
 export class NearbyPageModule {}

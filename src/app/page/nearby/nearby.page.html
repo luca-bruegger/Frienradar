@@ -1,7 +1,7 @@
 <ion-header translucent="true">
   <ion-toolbar color="vbright">
     <ion-title color="primary">In der Nähe</ion-title>
-    <ion-chip color="secondary" slot="end" style="margin-right: 13px">
+    <ion-chip color="secondary" slot="start" style="margin-left: 13px">
       <ion-icon name="body"></ion-icon>
       <ion-label>{{nearbyUsersAmount}}</ion-label>
     </ion-chip>
@@ -15,47 +15,44 @@
     </ion-toolbar>
   </ion-header>
 
-  <app-distance-change (distanceChange)="distanceChanged($event)"></app-distance-change>
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
 
-  <div *ngIf="nearbyUsersAmount === 0 && !nearbyUsers"
-       style="position:absolute; top: 50%; left: 50%; display: flex; flex-direction: row; text-align: center; align-items: center; transform: translate(-50%, -50%); gap: 10px">
-    <ion-spinner name="crescent" style="vertical-align: center"></ion-spinner>
-    <ion-label>Personen in der Nähe werden gesucht...</ion-label>
-  </div>
+  <ion-grid class="align-center ion-no-padding" *ngIf="nearbyUsersAmount === 0 && !nearbyUsersForCurrentDistance">
+    <app-distance-change (distanceChange)="distanceChanged($event)"></app-distance-change>
 
-  <div *ngIf="nearbyUsersAmount === 0 && nearbyUsers"
-       style="position:absolute; top: 50%; left: 50%; display: flex; flex-direction: column; text-align: center; align-items: center; transform: translate(-50%, -50%);">
-    <ion-label>Keine Personen in der Nähe gefunden.<br> Bitte bewege dich an einen anderen Ort oder erhöhe die Distanz.
-    </ion-label>
-  </div>
+    <ion-row style="flex-grow: 1;" class="ion-padding-vertical ion-padding-horizontal">
+      <ion-col>
+        <div class="center-element">
+          <ion-spinner name="crescent" style="vertical-align: center"></ion-spinner>
+          <ion-label>Personen in der Nähe werden gesucht...</ion-label>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 
-  <div *ngIf="nearbyUsersAmount > 0" class="ion-padding-horizontal ion-padding-top">
-    <ion-grid class="ion-no-padding">
-      <ion-row style="gap: 10px">
-        <ion-col size="12" size-lg="6" size-xl="4" *ngFor="let user of nearbyUsers; trackBy:identifyNearbyUser">
-          <app-nearby-user-element [user]="user"></app-nearby-user-element>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-  </div>
+  <ion-grid class="align-center ion-no-padding" *ngIf="nearbyUsersAmount === 0 && nearbyUsersForCurrentDistance" [hidden]="selectedDistance !== preferredDistance">
+    <app-distance-change (distanceChange)="distanceChanged($event)"></app-distance-change>
 
-  <ion-fab slot="fixed" vertical="bottom" horizontal="center">
-    <ion-fab-button (click)="refresh()">
-      <ion-icon *ngIf="reloadData[distance].interval === null" name="reload" color="light"></ion-icon>
-      <circle-progress *ngIf="reloadData[distance].interval !== null" style="padding-top: 3px;"
-                       [percent]="reloadData[distance].percent"
-                       [radius]="20"
-                       [outerStrokeWidth]="2"
-                       [outerStrokeColor]="'#ffffff'"
-                       [titleColor]="'#ffffff'"
-                       [clockwise]="true"
-                       [animation]="false"
-                       [showInnerStroke]="false"
-                       [showSubtitle]="false"
-                       [showUnits]="false"
-                       title="{{reloadData[distance].reloadTime}}"
-      ></circle-progress>
-    </ion-fab-button>
-  </ion-fab>
+    <ion-row style="flex-grow: 1;" class="ion-padding-vertical ion-padding-horizontal">
+      <ion-col>
+        <div class="center-element">
+          <ion-label>Keine Personen in der Nähe gefunden.<br> Bitte bewege dich an einen anderen Ort oder erhöhe die
+            Distanz.
+          </ion-label>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 
+  <app-distance-change *ngIf="nearbyUsersAmount > 0" (distanceChange)="distanceChanged($event)"></app-distance-change>
+
+  <ion-list *ngIf="nearbyUsersAmount > 0" class="ion-margin ion-no-padding">
+    <app-user-element *ngFor="let user of nearbyUsersForCurrentDistance; let i = index; trackBy:identifyNearbyUser"
+                      [user]="user" [isSentTo]="invitationReceived(user)" [isRequested]="requestedInvitation(user)" [isFriend]="isFriend(user)" [isLastElement]="nearbyUsersForCurrentDistance.length - 1 === i"></app-user-element>
+  </ion-list>
+  <ion-infinite-scroll (ionInfinite)="fetchMoreNearbyUsers($event)">
+    <ion-infinite-scroll-content loadingText="Wird geladen..." loadingSpinner="crescent"></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 </ion-content>

@@ -1,16 +1,13 @@
-import { Injectable } from '@angular/core';
-import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
-import { LoadingController, ModalController, ToastController } from '@ionic/angular';
-import { Account, AccountStateModel } from '../account';
+import { Injectable, NgZone } from '@angular/core';
+import { Action, State, StateContext, Store } from '@ngxs/store';
+import { ModalController, NavController, ToastController } from '@ionic/angular';
+import { AccountStateModel } from '../account';
 import { Path } from '../../helper/path';
-import { BackendUnderMaintenanceComponent } from '../../component/backend-under-maintenance/backend-under-maintenance.component';
-
-export type Alert = {
-  error?: any;
-  color?: string;
-};
+import { Router } from '@angular/router';
+import { TokenService } from '../../service/token.service';
 
 export class GlobalStateModel {
+
 }
 
 export namespace GlobalActions {
@@ -24,13 +21,20 @@ export namespace GlobalActions {
     constructor(public payload: { error: Error }) {}
   }
 
-  export class HandleLoginError {
+  export class HandleAuthError {
     static readonly type = '[GlobalActions] Handle Login Error';
     constructor(public payload: { error: Error }) {}
   }
 
   export class ResetBackendUnderMaintenance {
     static readonly type = '[GlobalActions] Reset Backend Under Maintenance';
+  }
+
+  export class Redirect {
+    static readonly type = '[GlobalActions] Redirect';
+
+    constructor(public payload: { path: string; forward: boolean; navigateRoot: boolean }) {
+    }
   }
 }
 
@@ -46,7 +50,11 @@ export class GlobalState {
 
   constructor(private toastController: ToastController,
               private store: Store,
-              private modalController: ModalController) {
+              private modalController: ModalController,
+              private navController: NavController,
+              private ngZone: NgZone,
+              private router: Router,
+              private tokenService: TokenService) {
   }
 
   @Action(GlobalActions.ShowToast)
@@ -58,14 +66,21 @@ export class GlobalState {
     const toast = await this.toastController.create({
       message,
       duration: 5000,
-      color
+      color,
+      position: 'top',
+      buttons: [
+        {
+          text: 'Schliessen',
+          role: 'cancel'
+        }
+      ]
     });
     await toast.present();
   }
 
   @Action(GlobalActions.ResetBackendUnderMaintenance)
-  async resetBackendUnderMaintenance(ctx: StateContext<AccountStateModel>, action: GlobalActions.ResetBackendUnderMaintenance) {
-    this.store.dispatch(new GlobalActions.ShowToast({
+  async resetBackendUnderMaintenance({dispatch}: StateContext<AccountStateModel>, action: GlobalActions.ResetBackendUnderMaintenance) {
+    dispatch(new GlobalActions.ShowToast({
       message: 'Verbindung wiederhergestellt.',
       color: 'success'
     }));
@@ -76,7 +91,7 @@ export class GlobalState {
 
   @Action(GlobalActions.HandleError)
   async handleError(
-    {patchState}: StateContext<GlobalStateModel>,
+    {patchState, dispatch}: StateContext<GlobalStateModel>,
     action: GlobalActions.HandleError
   ) {
     const { error } = action.payload as { error: any };
@@ -85,41 +100,58 @@ export class GlobalState {
       return;
     }
 
-    if (error.code === 401 && error.type === 'general_unauthorized_scope' && error.type === 'user_unauthorized') {
-      this.store.dispatch(new Account.Redirect({path: Path.login, forward: true, navigateRoot: false}));
+    if (error.status === 401 || error.status === 404) {
+      await this.tokenService.removeToken();
+      dispatch(new GlobalActions.Redirect({path: Path.login, forward: false, navigateRoot: true}));
       return;
     }
 
-    // if (error.name === 'AppwriteException' && error.code === 0) {
-    //   this.backendUnderMaintenanceModal = await this.modalController.create({
-    //     component: BackendUnderMaintenanceComponent,
-    //     cssClass: 'fullscreen',
-    //   });
-    //
-    //   await this.backendUnderMaintenanceModal.present();
-    //   return;
-    // }
-
-    this.store.dispatch(
+    dispatch(
       new GlobalActions.ShowToast({
-        message: error.message,
+        message: error.error.message || error.statusText,
         color: 'danger',
       })
     );
   }
 
-  @Action(GlobalActions.HandleLoginError)
+  @Action(GlobalActions.HandleAuthError)
   async handleLoginError(
-    {patchState}: StateContext<GlobalStateModel>,
-    action: GlobalActions.HandleLoginError
+    {patchState, dispatch}: StateContext<GlobalStateModel>,
+    action: GlobalActions.HandleAuthError
   ) {
     const { error } = action.payload as { error: any };
 
-    this.store.dispatch(
+    if (this.backendUnderMaintenanceModal) {
+      return;
+    }
+
+    dispatch(
       new GlobalActions.ShowToast({
-        message: error.message,
-        color: 'danger',
+        message: error.error,
+        color: 'danger'
       })
     );
+  }
+
+  @Action(GlobalActions.Redirect)
+  async redirect(ctx: StateContext<AccountStateModel>, action: GlobalActions.Redirect) {
+    const {path, forward, navigateRoot} = action.payload;
+    const currentUrl = this.router.url;
+
+    if (currentUrl.includes(path)) {
+      return;
+    }
+
+    return this.ngZone.run(async () => {
+      if (navigateRoot) {
+        await this.navController.navigateRoot([path]);
+      }
+
+      if (forward) {
+        await this.navController.navigateForward([path]);
+      } else {
+        await this.navController.navigateBack([path]);
+      }
+    });
   }
 }

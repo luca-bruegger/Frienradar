@@ -1,3 +1,17 @@
 ion-list {
-  background: transparent;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+ion-item {
+  --background: transparent;
+}
+
+.list-item {
+  --min-height: 70px;
+  --background: var(--ion-color-vbright);
+}
+
+ion-avatar {
+  --border-radius: 4px;
 }

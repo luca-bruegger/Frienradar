@@ -1,20 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { Location, LocationState } from '../../store';
-import { GeohashLength } from '../../component/element/radar-display/radar-display.component';
-
-class ReloadData {
-  percent: number;
-  reloadTime: number;
-  interval: number;
-}
-
-class ReloadDatas {
-  close: ReloadData;
-  nearby: ReloadData;
-  remote: ReloadData;
-  farAway: ReloadData;
-}
+import { AccountState, Location, LocationState, UserRelationState } from '../../store';
+import { document } from 'ngx-bootstrap/utils';
+import { InfiniteScrollCustomEvent } from '@ionic/angular';
 
 @Component({
   selector: 'app-nearby',
@@ -22,116 +10,96 @@ class ReloadDatas {
   styleUrls: ['./nearby.page.scss'],
 })
 export class NearbyPage implements OnInit {
-  nearbyUsersMap = new Map();
-  nearbyUsers = null;
-  reloadData: ReloadDatas = {
-    close: {
-      percent: 0,
-      reloadTime: 0,
-      interval: null
-    },
-    nearby: {
-      percent: 0,
-      reloadTime: 0,
-      interval: null
-    },
-    remote: {
-      percent: 0,
-      reloadTime: 0,
-      interval: null
-    },
-    farAway: {
-      percent: 0,
-      reloadTime: 0,
-      interval: null
-    }
-  };
+  currentPage = null;
+  selectedDistance = null;
 
-  distance: string;
-
-  private geohashLength: number;
-  private geohash: string;
-
-  constructor(private store: Store) {}
-
-  get nearbyUsersAmount() {
-    return this.nearbyUsersMap.size;
+  constructor(private store: Store) {
   }
 
-  ngOnInit() {
-    this.checkForStorageChanges();
-    this.checkForNearbyUsersChanges();
-    this.checkForLocationChanges();
+  get preferredDistance() {
+    return this.store.selectSnapshot(AccountState.preferredDistance);
+  }
+
+  get nearbyUsers() {
+    return this.store.selectSnapshot(LocationState.nearbyUsers);
+  }
+
+  get friendRequests() {
+    return this.store.selectSnapshot(UserRelationState.receivedFriendRequests);
+  }
+
+  get friends() {
+    return this.store.selectSnapshot(UserRelationState.friends);
+  }
+
+  get requestedFriends() {
+    return this.store.selectSnapshot(UserRelationState.requestedFriends);
+  }
+
+  get nearbyUsersAmount() {
+    return this.nearbyUsers && this.nearbyUsers[this.preferredDistance] ? this.nearbyUsers[this.preferredDistance].length : 0;
+  }
+
+  get nearbyUsersForCurrentDistance() {
+    if (this.nearbyUsers && this.nearbyUsers[this.preferredDistance]) {
+      return this.nearbyUsers[this.preferredDistance].map(nearbyUser => nearbyUser.attributes);
+    } else {
+      return null;
+    }
+  }
+
+  get primaryColor() {
+    return getComputedStyle(document.body).getPropertyValue('--ion-color-bright');
+  }
+
+  async ngOnInit() {
+    await this.loadNearbyUsers(1, false);
   }
 
   identifyNearbyUser(index, nearbyUser) {
     return nearbyUser.$id;
   }
 
-  distanceChanged(distance: string) {
-    this.distance = distance;
-    this.geohashLength = Number(GeohashLength[distance]);
-    this.reloadNearbyUsers();
+  async fetchMoreNearbyUsers($event: any) {
+    await this.loadNearbyUsers(this.currentPage + 1, true);
+    await ($event as InfiniteScrollCustomEvent).target.complete();
   }
 
-  async refresh() {
-    const reloadData: ReloadData = this.reloadData[this.distance] as ReloadData;
+  async distanceChanged(distance: number) {
+    this.selectedDistance = distance;
 
-    if (reloadData.interval) {
+    if (this.preferredDistance === distance) {
       return;
     }
 
-    this.reloadNearbyUsers();
-
-    reloadData.reloadTime = 25;
-    reloadData.percent = 100;
-    reloadData.interval = await setInterval(() => {
-      reloadData.reloadTime -= 1;
-      reloadData.percent = (reloadData.reloadTime / 25) * 100;
-      if (reloadData.reloadTime === 0) {
-        clearInterval(reloadData.interval);
-        reloadData.interval = null;
-      }
-    }, 1000);
+    this.currentPage = 1;
+    await this.loadNearbyUsers(this.currentPage, false);
   }
 
-  private checkForStorageChanges() {
-
+  async refresh(event) {
+    await this.loadNearbyUsers(1, false);
+    event.target.complete();
   }
 
-  private checkForLocationChanges() {
-    this.store.select(LocationState.geohash).subscribe((geohash) => {
-      this.geohash = geohash;
-      this.store.dispatch(new Location.FetchNearbyUser({
-        geohashLength: this.geohashLength,
-        geohash
-      }));
-    });
+  invitationReceived(user: any) {
+    return this.friendRequests.filter(request => request.sender_id === user.id).length > 0;
   }
 
-  private checkForNearbyUsersChanges() {
-    this.store.select(LocationState.nearbyUsers).subscribe(state => {
-      const distanceString = GeohashLength[this.geohashLength];
-
-      // Ignore first state change
-      if (!state[distanceString]) {
-        this.nearbyUsers = [];
-        return;
-      }
-
-      this.nearbyUsersMap.clear();
-      state[distanceString].forEach((user) => {
-        this.nearbyUsersMap.set(user.$id, user);
-        this.nearbyUsers = Array.from(this.nearbyUsersMap.values());
-      });
-    });
+  isFriend(user: any) {
+    return this.friends.filter(friend => friend.id === user.id).length > 0;
   }
 
-  private reloadNearbyUsers() {
-    this.store.dispatch(new Location.FetchNearbyUser({
-        geohashLength: this.geohashLength,
-        geohash: this.geohash
-      }
-    ));
+  requestedInvitation(user: any) {
+    return this.requestedFriends.filter(guid => guid === user.id).length > 0;
+  }
+
+  private async loadNearbyUsers(page = 1, append = false) {
+    this.currentPage = page;
+    await this.store.dispatch(new Location.FetchNearbyUsers({
+      page,
+      append,
+      distance: this.selectedDistance == null ? this.preferredDistance : this.selectedDistance,
+      geohash: this.store.selectSnapshot(LocationState.geohash)
+    })).toPromise();
   }
 }

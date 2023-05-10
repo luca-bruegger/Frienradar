@@ -1,65 +1,52 @@
 <ion-header translucent="true">
   <ion-toolbar color="vbright">
     <ion-buttons slot="start">
-      <ion-back-button style="color: var(--ion-color-dark)" text="Zurück" defaultHref="/tabs/friends" color="primary"></ion-back-button>
+      <ion-back-button text="Zurück" defaultHref="/tabs/friends" color="secondary"></ion-back-button>
     </ion-buttons>
-    <ion-title color="primary">Anfragen</ion-title>
     <ion-chip color="primary" slot="end" style="margin-right: 13px">
       <ion-icon name="mail"></ion-icon>
-      <ion-label>{{fetchedUsers.length}}</ion-label>
+      <ion-label>{{requests && requests.length || 0}}</ion-label>
     </ion-chip>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-list class="ion-padding">
-    <ion-card color="vbright" *ngFor="let contact of fetchedUsers;" class="ion-no-margin">
-      <ion-card-content style="display: flex; flex-direction: row; gap: 15px; flex-grow: 1">
-        <ion-grid class="ion-no-padding">
-          <ion-row class="ion-no-margin ion-no-padding">
-            <ion-col class="ion-no-padding ion-no-margin" style="display: flex">
-              <div style="display: inline">
-                <ion-avatar style="height: 64px; width: 64px">
-                  <img style="aspect-ratio: 1/1" src="{{profilePicture(contact.sender.$id, contact.sender.pictureBreaker)}}">
-                </ion-avatar>
-              </div>
-              <div style="width: 100%; margin-left: 10px">
-                <ion-label color="secondary">
-                  <h1><strong>{{contact.sender.username}}</strong></h1>
-                  <p>Angefragt um: <br> <strong>{{updatedDate(contact.sender.$updatedAt)}}</strong></p>
-                </ion-label>
-              </div>
-            </ion-col>
-          </ion-row>
-          <ion-row class="ion-no-margin ion-no-padding">
-            <ion-col class="ion-no-padding ion-no-margin ion-margin-top">
-              <div style="display: flex; align-items: center; justify-content: space-evenly">
-                <ion-button size="small" (click)="acceptRequest(contact)" color="success" fill="outline">Annehmen</ion-button>
-                <ion-button size="small" (click)="declineRequest(contact)" color="danger" fill="outline">Ablehnen</ion-button>
-              </div>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-      </ion-card-content>
-    </ion-card>
-  </ion-list>
+  <ion-refresher slot="fixed" (ionRefresh)="refreshInvitations($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
 
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button (click)="refresh()">
-      <ion-icon *ngIf="interval === null" name="reload" color="light"></ion-icon>
-      <circle-progress *ngIf="interval" style="padding-top: 3px;"
-                       [percent]="percent"
-                       [radius]="20"
-                       [outerStrokeWidth]="2"
-                       [outerStrokeColor]="'#ffffff'"
-                       [titleColor]="'#ffffff'"
-                       [clockwise]="true"
-                       [animation]="false"
-                       [showInnerStroke]="false"
-                       [showSubtitle]="false"
-                       [showUnits]="false"
-                       title="{{reloadTime}}"
-      ></circle-progress>
-    </ion-fab-button>
-  </ion-fab>
+  <div *ngIf="requests && requests.length === 0" style="position:absolute; top: 50%; left: 50%; display: flex; flex-direction: column; text-align: center; align-items: center; transform: translate(-50%, -50%);">
+    <ion-label>Hier befindet sich zurzeit nichts</ion-label>
+    <ion-button shape="round" size="small" color="primary" routerLink="/tabs/nearby">Freunde finden</ion-button>
+  </div>
+
+  <div *ngIf="requests === null" style="position:absolute; width: 100%; top: 50%; left: 50%; display: flex; flex-direction: column; text-align: center; align-items: center; transform: translate(-50%, -50%);">
+    <div style="display: flex; align-items: center; gap: 15px">
+      <ion-spinner name="crescent"></ion-spinner>
+      Anfragen werden geladen...
+    </div>
+  </div>
+
+  <ion-item lines="none" class="ion-no-margin">
+    <ion-label color="primary">
+      <h1><strong>Freundschaftsanfragen</strong></h1>
+      <p>Warte auf deine Freundschaftsanfragen</p>
+    </ion-label>
+  </ion-item>
+  <ion-list class="ion-margin ion-no-padding">
+    <ion-item *ngFor="let request of requests; let i = index" [lines]="requests.length - 1 === i ? 'none' : null" class="list-item">
+      <ion-avatar slot="start">
+        <ion-img src="{{request.sender_profile_picture}}"></ion-img>
+      </ion-avatar>
+      <ion-label>
+        <h2><strong>{{request.sender_username}}</strong></h2>
+      </ion-label>
+      <ion-button slot="end" shape="round" size="small" color="success" (click)="acceptInvitation(request.id)">
+        <ion-icon name="checkmark-circle-outline" mode="icon-only"></ion-icon>
+      </ion-button>
+      <ion-button slot="end" shape="round" size="small" color="danger" (click)="rejectInvitation(request.id, request.sender_username)">
+        <ion-icon name="close-circle-outline" mode="icon-only"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </ion-list>
 </ion-content>

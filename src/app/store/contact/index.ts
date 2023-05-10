@@ -3,205 +3,340 @@ import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { GlobalActions } from '../global';
 import { NavController } from '@ionic/angular';
 import { Router } from '@angular/router';
-import { Contact as ContactModel } from '../../model/contact';
-import { Appwrite } from '../../helper/appwrite';
-import { AccountState } from '../account';
-import { Query } from 'appwrite';
-import { environment } from '../../../environments/environment';
+import { catchError, tap } from 'rxjs/operators';
+import { ApiService } from '../../service/api.service';
 
 /* State Model */
 @Injectable()
-export class ContactStateModel {
-  contacts: ContactModel;
+export class UserRelationStateModel {
+  receivedFriendRequests: any[];
+  requestedFriends: string[];
+  friends: any[];
 }
 
-export namespace Contact {
+export namespace UserRelation {
   /** Actions */
-  export class Fetch {
-    static readonly type = '[Contact] Fetch';
+  export class FetchInvitations {
+    static readonly type = '[UserRelation] Fetch Invitations';
+
+    constructor(public payload: { page: number }) {
+    }
   }
 
   export class Request {
-    static readonly type = '[Contact] Request';
+    static readonly type = '[UserRelation] Request';
 
-    constructor(public payload: { requestUserId: string }) {
+    constructor(public payload: { friendId: string }) {
     }
   }
 
-  export class RemoveRequest {
-    static readonly type = '[Contact] Remove Request';
+  export class AppendFriendRequest {
+    static readonly type = '[UserRelation] Append Friend Request';
 
-    constructor(public payload: { contactId: string }) {
+    constructor(public payload: { invitation: any }) {
     }
   }
 
-  export class UpdateRequested {
-    static readonly type = '[Contact] UpdateRequested';
+  export class AppendRequestedFriend {
+    static readonly type = '[UserRelation] Append Requested Friend';
 
-    constructor(public payload: { requested: string[] }) {
+    constructor(public payload: { userGuid: string }) {
     }
+  }
+
+  export class RemoveFriendRequest {
+    static readonly type = '[UserRelation] Remove Friend Request';
+
+    constructor(public payload: { userGuid: string }) {
+    }
+  }
+
+  export class FetchFriends {
+    static readonly type = '[UserRelation] Fetch Friends';
+
+    constructor(public payload: { page: number }) {
+    }
+  }
+
+  export class FetchFriendRequests {
+    static readonly type = '[UserRelation] Fetch Friend Requests';
+
+    constructor() {
+    }
+  }
+
+  export class RejectInvitation {
+    static readonly type = '[UserRelation] Reject Invitation';
+
+    constructor(public payload: { invitationId: string; message: string }) {
+    }
+  }
+
+  export class AcceptInvitation {
+    static readonly type = '[UserRelation] Accept Invitation';
+
+    constructor(public payload: { invitationId: string }) {
+    }
+  }
+
+  export class AddFriend {
+    static readonly type = '[UserRelation] Add Friend';
+
+    constructor(public payload: { username: string; profile_picture: string; id: string }) {}
+  }
+
+  export class RemoveFriend {
+    static readonly type = '[UserRelation] Remove Friend';
+
+    constructor(public payload: { id: string }) {}
+  }
+
+  export class ResetState {
+    static readonly type = '[UserRelation] Reset State';
+
   }
 }
 
-@State<ContactStateModel>({
-  name: 'contact',
+@State<UserRelationStateModel>({
+  name: 'userRelation',
   defaults: {
-    contacts: null
-  },
+    receivedFriendRequests: null,
+    requestedFriends: null,
+    friends: []
+  }
 })
 
 @Injectable()
-export class ContactState {
+export class UserRelationState {
   constructor(private navController: NavController,
               private ngZone: NgZone,
               private store: Store,
+              private apiService: ApiService,
               private router: Router) {
   }
 
   @Selector()
-  static contacts(state: ContactStateModel) {
-    return state.contacts;
+  static receivedFriendRequests(state: UserRelationStateModel) {
+    return state.receivedFriendRequests;
   }
 
   @Selector()
-  static requestedCount(state: ContactStateModel) {
-    return state.contacts.receivedFrom.length;
+  static requestedFriends(state: UserRelationStateModel) {
+    return state.requestedFriends;
   }
 
   @Selector()
-  static requested(state: ContactStateModel) {
-    return state.contacts.receivedFrom;
+  static friends(state: UserRelationStateModel) {
+    return state.friends;
   }
 
-  @Selector()
-  static sentTo(state: ContactStateModel) {
-    return state.contacts.sentTo;
-  }
-
-  @Action(Contact.UpdateRequested)
-  async updateRequested(
-    {patchState, dispatch}: StateContext<ContactStateModel>,
-    action: Contact.UpdateRequested
+  @Action(UserRelation.FetchFriendRequests)
+  async fetchFriendRequests(
+    {patchState, dispatch}: StateContext<UserRelationStateModel>,
+    action: UserRelation.FetchFriendRequests
   ) {
-    const {requested} = action.payload;
-    const filteredRequested = requested.filter((item) => item !== '');
+    return this.apiService.get('/invitations').pipe(tap(async (response: any) => {
+      const data = JSON.parse(response).data;
+      const invitations = data.map((item) => item.attributes);
+
+      patchState({
+          receivedFriendRequests: invitations
+        }
+      );
+    }), catchError(async (error) => {
+      dispatch(new GlobalActions.HandleError({error}));
+    }));
+  }
+
+  @Action(UserRelation.FetchInvitations)
+  async fetchInvitations(
+    {patchState, dispatch}: StateContext<UserRelationStateModel>,
+    action: UserRelation.FetchInvitations
+  ) {
+    const {page} = action.payload;
+    return this.apiService.get(`/requested_users?page=${page}`).pipe(tap(async (response: any) => {
+      const requestedFriends = JSON.parse(response).data.map((item) => item.id);
+
+      patchState({
+        requestedFriends
+      });
+    }), catchError(async (error) => {
+      dispatch(new GlobalActions.HandleError({error}));
+    }));
+  }
+
+  @Action(UserRelation.AppendFriendRequest)
+  async appendFriendRequest(
+    {patchState, dispatch}: StateContext<UserRelationStateModel>,
+    action: UserRelation.AppendFriendRequest
+  ) {
+    const {invitation} = action.payload;
+    const requests = [...this.store.selectSnapshot(UserRelationState.receivedFriendRequests), invitation];
+
     patchState({
-      contacts: {
-        requested: filteredRequested
-      } as unknown as ContactModel
+      receivedFriendRequests: requests
     });
   }
 
-  @Action(Contact.Fetch)
-  async fetch(
-    {patchState, dispatch}: StateContext<ContactStateModel>,
-    action: Contact.Fetch
+  @Action(UserRelation.AppendRequestedFriend)
+  async appendRequestedFriend(
+    {patchState, dispatch}: StateContext<UserRelationStateModel>,
+    action: UserRelation.AppendRequestedFriend
   ) {
-    const contacts = this.store.selectSnapshot(ContactState.contacts);
-    const userId = this.store.selectSnapshot(AccountState.user).$id;
+    const {userGuid} = action.payload;
+    const requestedFriends = [...this.store.selectSnapshot(UserRelationState.requestedFriends), userGuid];
 
-    try {
-      // If session is already fetched, don't fetch again
-      const receivedFromData = await Appwrite.databasesProvider().listDocuments(
-        environment.radarDatabaseId,
-        environment.contactsCollectionId,
-        [
-          Query.equal('recipient', userId)
-        ]);
-      const receivedFrom = receivedFromData.documents.map((item) => ({
-          sender: item.sender,
-          id: item.$id
-        }));
-
-      const sentToData = await Appwrite.databasesProvider().listDocuments(
-        environment.radarDatabaseId,
-        environment.contactsCollectionId,
-        [
-          Query.equal('sender', userId)
-        ]);
-
-      const sentTo = sentToData.documents.map((item) => item.recipient);
-      patchState({
-        contacts: {
-          receivedFrom,
-          sentTo
-        } as unknown as ContactModel
-      });
-    } catch (e: any) {
-      // if (e.type === 'document_not_found') {
-      //   await Appwrite.databasesProvider().createDocument(environment.radarDatabaseId, environment.contactsCollectionId, userId, {
-      //     accepted: [],
-      //     requested: []
-      //   }, [
-      //     Permission.read(Role.users()),
-      //     Permission.delete(Role.user(userId)),
-      //     Permission.write(Role.user(userId))
-      //   ]);
-      //   return;
-      // }
-      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
-    }
+    patchState({
+      requestedFriends
+    });
   }
 
-  @Action(Contact.Request)
+  @Action(UserRelation.RemoveFriendRequest)
+  async removeFriendRequest(
+    {patchState, dispatch}: StateContext<UserRelationStateModel>,
+    action: UserRelation.RemoveFriendRequest
+  ) {
+    const {userGuid} = action.payload;
+    const requestedFriends = this.store.selectSnapshot(UserRelationState.requestedFriends).filter((item) => item !== userGuid);
+
+    patchState({
+      requestedFriends
+    });
+  }
+
+  @Action(UserRelation.Request)
   async request(
-    {patchState, dispatch}: StateContext<ContactStateModel>,
-    action: Contact.Request
+    {patchState, dispatch}: StateContext<UserRelationStateModel>,
+    action: UserRelation.Request
   ) {
-    const {requestUserId} = action.payload;
-    const currentUserId = this.store.selectSnapshot(AccountState.user).$id;
-    const contacts = this.store.selectSnapshot(ContactState.contacts);
+    const {friendId} = action.payload;
+    const data = {
+      invitation: {
+        friend_id: friendId
+      }
+    };
 
-    try {
-      const requestedUserContacts = await Appwrite.databasesProvider().createDocument(
-        environment.radarDatabaseId,
-        environment.contactsCollectionId,
-        'unique()',
-        {
-          sender: currentUserId,
-          recipient: requestUserId
-        }
-      );
-
-      const updatedContacts = {
-        sentTo: [...contacts.sentTo, requestUserId],
-        receivedFrom: contacts.receivedFrom
-      };
-
-      patchState({
-        contacts: updatedContacts
-      });
-    } catch (e: any) {
-      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
-    }
+    return this.apiService.post('/invitations', data).toPromise().then(async (response) => {
+      console.log(response);
+    }).catch(async (error) => {
+      dispatch(new GlobalActions.HandleError({error}));
+    });
   }
 
-  @Action(Contact.RemoveRequest)
-  async removeRequest(
-    {patchState, dispatch}: StateContext<ContactStateModel>,
-    action: Contact.RemoveRequest
+  @Action(UserRelation.RejectInvitation)
+  async rejectInvitation(
+    {patchState, dispatch}: StateContext<UserRelationStateModel>,
+    action: UserRelation.RejectInvitation
   ) {
-    const { contactId } = action.payload;
-    const currentUserId = this.store.selectSnapshot(AccountState.user).$id;
-    const contacts = this.store.selectSnapshot(ContactState.contacts);
+    const {invitationId, message} = action.payload;
 
-    try {
-      await Appwrite.databasesProvider().deleteDocument(
-        environment.radarDatabaseId,
-        environment.contactsCollectionId,
-        contactId
-      );
-
-      const updatedContacts = {
-        sentTo: contacts.sentTo,
-        receivedFrom: contacts.receivedFrom.filter((item: any) => item.id !== contactId)
-      };
+    return this.apiService.delete(`/invitations/${invitationId}`).pipe(tap(() => {
+      const invitations = this.store.selectSnapshot(UserRelationState.receivedFriendRequests);
+      const filteredInvitations = invitations.filter((invitation) => invitation.id !== invitationId);
 
       patchState({
-        contacts: updatedContacts
+        receivedFriendRequests: filteredInvitations
       });
-    } catch (e: any) {
-      this.store.dispatch(new GlobalActions.HandleError({error: e as Error}));
-    }
+
+      dispatch(new GlobalActions.ShowToast({
+        message,
+        color: 'danger'
+      }));
+    }), catchError(async (error) => {
+      dispatch(new GlobalActions.HandleError({error}));
+    }));
+  }
+
+  @Action(UserRelation.AcceptInvitation)
+  async acceptInvitation(
+    {patchState, dispatch}: StateContext<UserRelationStateModel>,
+    action: UserRelation.AcceptInvitation
+  ) {
+    const {invitationId} = action.payload;
+
+    return this.apiService.put('/invitations/accept', {
+      id: invitationId
+    }).pipe(tap(async (response: any) => {
+      const { id, username, profile_picture } = response.data;
+      const friendRequests = this.store.selectSnapshot(UserRelationState.receivedFriendRequests).filter((item) => item.sender_id != id);
+      console.log(friendRequests);
+      patchState({
+        receivedFriendRequests: friendRequests
+      });
+
+      dispatch(new UserRelation.AddFriend({
+        id,
+        username,
+        profile_picture
+      }));
+
+      dispatch(new GlobalActions.ShowToast({
+        message: 'Du bist nun befreundet mit ' + username,
+        color: 'success'
+      }));
+    }), catchError(async (error) => {
+      dispatch(new GlobalActions.HandleError({error}));
+    }));
+  }
+
+  @Action(UserRelation.AddFriend)
+  async addFriend(
+    {patchState, dispatch}: StateContext<UserRelationStateModel>,
+    action: UserRelation.AddFriend
+  ) {
+    const { username, profile_picture, id} = action.payload;
+
+    const friends = [...this.store.selectSnapshot(UserRelationState.friends) || [], {
+      username,
+      profile_picture,
+      id
+    }];
+
+    patchState({
+      friends
+    });
+  }
+
+  @Action(UserRelation.RemoveFriend)
+  async removeFriend(
+    {patchState, dispatch}: StateContext<UserRelationStateModel>,
+    action: UserRelation.RemoveFriend
+  ) {
+    const { id } = action.payload;
+
+    const friends = [...this.store.selectSnapshot(UserRelationState.friends) || []].filter((item) => item.id !== id);
+
+    patchState({
+      friends
+    });
+  }
+
+  @Action(UserRelation.FetchFriends)
+  async fetchFriends(
+    {patchState, dispatch}: StateContext<UserRelationStateModel>,
+    action: UserRelation.FetchFriends
+  ) {
+    const {page} = action.payload;
+    return this.apiService.get(`/friends?page=${page}`).pipe(tap(async (response: any) => {
+      const friends = JSON.parse(response).data.map((item) => item.attributes);
+
+      patchState({
+        friends
+      });
+    }), catchError(async (error) => {
+      dispatch(new GlobalActions.HandleError({error}));
+    }));
+  }
+
+  @Action(UserRelation.ResetState)
+  async resetState(
+    {patchState, dispatch}: StateContext<UserRelationStateModel>,
+    action: UserRelation.FetchFriends
+  ) {
+    patchState({
+      receivedFriendRequests: null,
+      requestedFriends: null,
+      friends: []
+    });
   }
 }

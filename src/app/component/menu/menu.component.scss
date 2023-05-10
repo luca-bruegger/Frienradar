@@ -1,0 +1,9 @@
+ion-item {
+  --background: transparent;
+}
+
+ion-content {
+  --offset-top: 0px;
+  --offset-bottom: 0px;
+  --padding-bottom: var(--content-ad-padding-bottom, 0px);
+}

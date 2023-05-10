@@ -28,8 +28,8 @@ export class Picture {
     });
   }
 
-  static profilePictureViewURL(userId: string, cacheBreaker: string = this.cacheBreaker()): string {
-    return `${environment.endpoint}/storage/buckets/profile-picture/files/${userId}/view?project=${environment.project}&breaker=${cacheBreaker}`;
+  static profilePictureViewURL(userId: string, currentPictureBreaker: string): string {
+    return 'assets/images/blank.png';
   }
 
   static cacheBreaker(): string {

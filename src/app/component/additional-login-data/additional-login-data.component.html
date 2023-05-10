@@ -1,9 +1,6 @@
 <ion-header>
   <ion-toolbar>
     <ion-title color="primary">Konfiguration</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="back()" color="danger">Zurück</ion-button>
-    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -27,30 +24,36 @@
               <ion-card-content>
                 <ion-card-subtitle>Berechtigungen</ion-card-subtitle>
                 <ion-item color="light">
-                  <ion-icon *ngIf="geolocationPermission" slot="start" name="checkbox-outline"
+                  <ion-icon *ngIf="permissionServiceGeolocation" slot="start" name="checkbox-outline"
                             color="success"></ion-icon>
-                  <ion-icon *ngIf="!geolocationPermission" slot="start" name="close-circle-outline"
+                  <ion-icon *ngIf="!permissionServiceGeolocation" slot="start" name="close-circle-outline"
                             color="danger"></ion-icon>
                   <ion-label>Standortzugriff</ion-label>
-                  <ion-button *ngIf="!geolocationPermission && isMobile" slot="end"
+                  <ion-button [class.access-button]="!mandatoryAnimationClassEnabled"
+                              [class.access-button-error]="mandatoryAnimationClassEnabled"
+                              *ngIf="!permissionServiceGeolocation" slot="end"
                               (click)="requestGeolocationPermission()">
                     <ion-label>Anfordern</ion-label>
                   </ion-button>
                 </ion-item>
-                <ion-item color="light" *ngIf="isMobile">
-                  <ion-icon *ngIf="photosPermission" slot="start" name="checkbox-outline" color="success"></ion-icon>
-                  <ion-icon *ngIf="!photosPermission" slot="start" name="close-circle-outline"
+                <ion-item color="light" *ngIf="isMobile" lines="none">
+                  <ion-icon *ngIf="permissionServicePhoto" slot="start" name="checkbox-outline" color="success"></ion-icon>
+                  <ion-icon *ngIf="!permissionServicePhoto" slot="start" name="close-circle-outline"
                             color="danger"></ion-icon>
                   <ion-label>Fotozugriff</ion-label>
-                  <ion-button *ngIf="!photosPermission" slot="end" (click)="requestPhotoPermission()">
+                  <ion-button [class.access-button]="!mandatoryAnimationClassEnabled"
+                              [class.access-button-error]="mandatoryAnimationClassEnabled" *ngIf="!permissionServicePhoto"
+                              slot="end"
+                              (click)="requestPhotoPermission()">
                     <ion-label>Anfordern</ion-label>
                   </ion-button>
                 </ion-item>
-                <ion-item color="light" lines="none">
-                  <!--                    <ion-icon slot="start" name="checkbox-outline" color="success"></ion-icon>-->
-                  <ion-icon slot="start" name="close-circle-outline" color="danger"></ion-icon>
+                <ion-card-subtitle *ngIf="isMobile"><small>Optional</small></ion-card-subtitle>
+                <ion-item color="light" lines="none" *ngIf="isMobile">
+                  <ion-icon slot="start" name="alert-circle-outline"></ion-icon>
                   <ion-label>Benachrichtigungen</ion-label>
-                  <ion-button slot="end">
+                  <ion-button *ngIf="!permissionServiceNotification" (click)="requestNotificationPermissions()"
+                              class="access-button" slot="end">
                     <ion-label>Erlauben</ion-label>
                   </ion-button>
                 </ion-item>
@@ -69,13 +72,14 @@
                 <ion-card-subtitle>Email bestätigung</ion-card-subtitle>
                 <ion-note>Deine Email: <strong>{{user.email}}</strong></ion-note>
                 <ion-item color="light" lines="none">
-                  <ion-icon *ngIf="user.emailVerification" slot="start" name="checkbox-outline"
+                  <ion-icon *ngIf="user.confirmed" slot="start" name="checkbox-outline"
                             color="success"></ion-icon>
-                  <ion-icon *ngIf="!user.emailVerification" slot="start" name="close-circle-outline"
+                  <ion-icon *ngIf="!user.confirmed" slot="start" name="close-circle-outline"
                             color="danger"></ion-icon>
                   <ion-label>Bestätigt</ion-label>
-                  <ion-button *ngIf="!user.emailVerification" [disabled]="requestMailButtonDisabled" slot="end"
-                              (click)="verifyEmail()">
+                  <ion-button *ngIf="!user.confirmed" [disabled]="requestMailButtonDisabled" slot="end"
+                              (click)="verifyEmail()" [class.access-button]="!mandatoryAnimationClassEnabled"
+                              [class.access-button-error]="mandatoryAnimationClassEnabled">
                     <ion-label *ngIf="!requestMailButtonDisabled">Anfordern</ion-label>
                     <ion-label *ngIf="requestMailButtonDisabled">Warte {{time}}s</ion-label>
                   </ion-button>
@@ -94,9 +98,10 @@
               <ion-card-content>
                 <ion-card-subtitle>Benutzername</ion-card-subtitle>
                 <ion-note>
-                  <span>Der Benutzername wird für die Anzeige in der App verwendet. Dieser ist für dich, aber auch andere sichtbar.</span>
+                  <span *ngIf="usernameFormControl.enabled">Der Benutzername wird für die Anzeige in der App verwendet. Dieser ist für dich, aber auch andere sichtbar.</span>
+                  <span *ngIf="usernameFormControl.disabled">Der Benutzername kann in den Profileinstellungen geändert werden.</span>
                 </ion-note>
-                <ion-item color="light" class="ion-margin-top" counter="true">
+                <ion-item color="light" class="ion-margin-top" counter="{{usernameFormControl.enabled}}">
                   <ion-input [formControl]="usernameFormControl" maxlength="30" type="text"
                              placeholder="Benutzername"></ion-input>
                 </ion-item>
@@ -119,10 +124,18 @@
         <ion-button (click)="finishAdditionalSetup()" [disabled]="isLoading">
           <ion-label *ngIf="!isLoading">Abschliessen</ion-label>
           <div *ngIf="isLoading"
-            style="display: flex; flex-direction: row; text-align: center; align-items: center; gap: 20px; justify-content: center; height: 90px">
+               style="display: flex; flex-direction: row; text-align: center; align-items: center; gap: 20px; justify-content: center; height: 90px">
             <ion-spinner name="crescent" style="vertical-align: center"></ion-spinner>
             <p style="margin: 0">Anmeldung wird abgeschlossen...</p>
           </div>
+        </ion-button>
+      </ion-col>
+    </ion-row>
+    <ion-row class="ion-align-items-center">
+      <ion-col size="12" class="ion-text-center">
+        <ion-button size="small" [disabled]="isLoading" fill="clear" color="secondary"
+                    (click)="back()">
+          Abmelden
         </ion-button>
       </ion-col>
     </ion-row>

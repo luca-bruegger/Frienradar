@@ -3,8 +3,15 @@
     <google-map *ngIf="(mapApiLoaded | async) && geohash" #map height="100%" width="100%" [options]="mapOptions"
                 [center]="center" [zoom]="mapZoom" (mapInitialized)="setupZoomListener($event)"></google-map>
     <div *ngIf="!geohash"
-         style="position:absolute; top: 50%; left: 50%; display: flex; flex-direction: row; text-align: center; align-items: center; transform: translate(-50%, -50%); gap: 10px">
-      <p>Karte kann nicht geladen werden, deine position konnte nicht erfasst werden.</p>
+         style="position:absolute; top: 50%; left: 50%; display: flex; flex-direction: column; text-align: center; align-items: center; transform: translate(-50%, -50%); gap: 10px">
+      <p>Karte kann nicht geladen werden. Deine Position konnte nicht erfasst werden.</p>
+      <ion-button (click)="tryAgain()">Erneut versuchen</ion-button>
     </div>
+    <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+      <ion-fab-button (click)="resetMapLocation()">
+        <ion-icon name="contract-outline"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
   </div>
 </ion-card>
+

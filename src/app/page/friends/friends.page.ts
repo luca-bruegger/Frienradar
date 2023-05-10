@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ContactState } from '../../store';
+import { UserRelation, UserRelationState } from '../../store';
 import { Store } from '@ngxs/store';
 
 @Component({
@@ -8,13 +8,22 @@ import { Store } from '@ngxs/store';
   styleUrls: ['./friends.page.scss'],
 })
 export class FriendsPage implements OnInit {
-  count = 0;
+  invitationCount: number = null;
 
-  constructor(private store: Store) { }
+  constructor(private store: Store) {}
+
+  get friends() {
+    return this.store.selectSnapshot(UserRelationState.friends);
+  }
 
   ngOnInit() {
-    this.store.select(ContactState.requestedCount).subscribe(count => {
-      this.count = count;
+    this.store.select(UserRelationState.receivedFriendRequests).subscribe(requests => {
+      this.invitationCount = requests.length;
     });
+  }
+
+  async refresh($event: any) {
+    await this.store.dispatch(new UserRelation.FetchFriends({page: 1})).toPromise();
+    $event.target.complete();
   }
 }

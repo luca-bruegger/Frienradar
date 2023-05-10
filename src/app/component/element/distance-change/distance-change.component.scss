@@ -1,5 +1,5 @@
 ion-segment {
-  --background: #90E1EE;
+  --background: var(--ion-color-bright);
 }
 
 .ios ::part(indicator-background) {

@@ -1,7 +1,7 @@
 <ion-tabs (ionTabsWillChange)="changeTab()">
   <ion-tab-bar slot="bottom" translucent="true">
-    <ion-tab-button tab="accounts">
-      <ion-icon name="layers-outline"></ion-icon>
+    <ion-tab-button tab="social-accounts">
+      <ion-icon name="albums-outline"></ion-icon>
     </ion-tab-button>
     <ion-tab-button tab="friends">
       <ion-badge *ngIf="count > 0" color="danger" style="right: -15px; top: 3px; z-index: 3; position: absolute; max-width: min-content">{{count}}</ion-badge>
@@ -13,8 +13,10 @@
     <ion-tab-button tab="nearby">
       <ion-icon name="body-outline"></ion-icon>
     </ion-tab-button>
-    <ion-tab-button tab="profile">
+    <ion-tab-button>
+      <ion-menu-button>
       <ion-icon name="person-outline"></ion-icon>
+      </ion-menu-button>
     </ion-tab-button>
   </ion-tab-bar>
 </ion-tabs>

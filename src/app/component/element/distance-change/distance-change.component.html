@@ -1,15 +1,15 @@
 <div class="ion-padding-horizontal">
   <ion-segment [value]="currentDistance" (ionChange)="changeDistance($event)">
-    <ion-segment-button value="close">
+    <ion-segment-button value="0">
       <ion-label>Nahe</ion-label>
     </ion-segment-button>
-    <ion-segment-button value="nearby">
+    <ion-segment-button value="1">
       <ion-label>Entfernt</ion-label>
     </ion-segment-button>
-    <ion-segment-button value="remote">
+    <ion-segment-button value="2">
       <ion-label>Weg</ion-label>
     </ion-segment-button>
-    <ion-segment-button value="farAway">
+    <ion-segment-button value="3">
       <ion-label>Weit Weg</ion-label>
     </ion-segment-button>
   </ion-segment>

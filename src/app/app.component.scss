@@ -1,0 +1,17 @@
+ion-menu {
+  --width: 85%;
+  --max-width: 400px;
+}
+
+.beta-badge-wrapper {
+  left: -30px;
+  top: 50%;
+  display: flex;
+  background-color: #e23838;
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}

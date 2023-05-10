@@ -18,6 +18,6 @@ platforms:
           - com.apple.developer.associated-domains: [
               "applinks:frienradar.com",
               "webcredentials:frienradar.com"
-          ionic ]
+            ]
   android:
     packageName: $PACKAGE_NAME

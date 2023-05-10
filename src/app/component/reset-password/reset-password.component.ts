@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { AccountValidation } from '../../core/validation/account-validation';
-import { Account } from '../../store';
+import { Account, GlobalActions } from '../../store';
 import { Store } from '@ngxs/store';
 import { ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Path } from '../../helper/path';
+import { AccountValidation } from '../../validation/account-validation';
 
 @Component({
   selector: 'app-reset-password',
@@ -36,13 +36,8 @@ export class ResetPasswordComponent implements OnInit {
       validators: [this.passwordMatchValidator]
     });
 
-  resetData: {
-    userId: string;
-    secret: string;
-    expire: string;
-  } = null;
-
   resetInProgress: boolean;
+  resetPasswordToken: string;
   isReset: boolean;
   strength: number;
 
@@ -53,13 +48,9 @@ export class ResetPasswordComponent implements OnInit {
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
-      if (params && params.userId && params.secret && params.expire) {
-        this.checkIfResetIsExpired(params.expire);
-        this.resetData = {
-          userId: params.userId,
-          secret: params.secret,
-          expire: params.expire
-        };
+      if (params && params.reset_password_token) {
+        this.resetPasswordToken = params.reset_password_token;
+        //this.checkIfResetIsExpired(params.expire);
         this.isReset = true;
       } else {
         this.isReset = false;
@@ -69,28 +60,28 @@ export class ResetPasswordComponent implements OnInit {
 
   dismiss() {
     this.modalController.dismiss();
-    this.store.dispatch(new Account.Redirect({
+    this.store.dispatch(new GlobalActions.Redirect({
       path: Path.login,
       forward: false,
       navigateRoot: false
     }));
   }
 
-  sendResetEmail() {
+  async sendResetEmail() {
     if (this.emailFormControl.invalid) {
       this.emailFormControl.markAsTouched();
       return;
     }
 
     this.resetInProgress = true;
-
-    this.store.dispatch(new Account.SendResetEmail(this.emailFormControl.value)).subscribe(async data => {
-      this.resetInProgress = false;
-      this.dismiss();
-    });
+    await this.store.dispatch(new Account.SendResetEmail({
+      email: this.emailFormControl.value,
+      modalController: this.modalController
+    })).toPromise();
+    this.resetInProgress = false;
   }
 
-  resetPassword() {
+  async resetPassword() {
     if (this.resetPasswordFromGroup.invalid) {
       this.resetPasswordFromGroup.markAllAsTouched();
       return;
@@ -100,14 +91,12 @@ export class ResetPasswordComponent implements OnInit {
 
     const data = {
       password: this.resetPasswordFromGroup.get('password').value,
-      confirmPassword: this.resetPasswordFromGroup.get('confirmPassword').value,
-      userId: this.resetData.userId,
-      secret: this.resetData.secret
+      passwordConfirmation: this.resetPasswordFromGroup.get('confirmPassword').value,
+      resetPasswordToken: this.resetPasswordToken
     };
 
-    this.store.dispatch(new Account.ResetPassword(data)).subscribe(async () => {
-      this.resetInProgress = false;
-    });
+    await this.store.dispatch(new Account.ResetPassword(data)).toPromise();
+    this.resetInProgress = false;
   }
 
   private passwordMatchValidator(form: FormGroup) {
@@ -127,9 +116,7 @@ export class ResetPasswordComponent implements OnInit {
     const currentDate = new Date();
 
     if (recoveryDateOneHourLater.getTime() - currentDate.getTime() < 0) {
-      this.store.dispatch(new Account.VerificationExpired({
-        message: 'Der Link ist abgelaufen. Bitte versuche es erneut.'
-      }));
+      // expired action
       return;
     }
   }

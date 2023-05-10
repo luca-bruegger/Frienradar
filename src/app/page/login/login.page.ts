@@ -1,17 +1,22 @@
-import { Component, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { AccountValidation } from '../../core/validation/account-validation';
 import { Account } from '../../store';
-import { ModalController } from '@ionic/angular';
+import { IonInput, ModalController } from '@ionic/angular';
 import { ResetPasswordComponent } from '../../component/reset-password/reset-password.component';
+import { AccountValidation } from '../../validation/account-validation';
+import { environment } from '../../../environments/environment';
+import { AppService } from '../../service/app.service';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
 })
-export class LoginPage implements OnDestroy {
-  isRegister = true;
+export class LoginPage implements OnInit, OnDestroy {
+  @ViewChild('emailInput', { static: true }) emailInput: IonInput;
+  @ViewChild('passwordInput', { static: true }) passwordInput: IonInput;
+
+  isRegister = false;
 
   formGroup = AccountValidation.loginFormGroup;
   formMessages = AccountValidation.formMessages;
@@ -22,12 +27,19 @@ export class LoginPage implements OnDestroy {
   profilePicture = null;
 
   constructor(private store: Store,
-              private modalController: ModalController) {
+              private modalController: ModalController,
+              private appService: AppService) {
   }
 
   ngOnDestroy() {
     this.formGroup.reset();
     this.loginInProgress = false;
+  }
+
+  async ngOnInit() {
+    this.profilePicture = null;
+    this.changeLoginType(false);
+    await this.listenForIosAutofill();
   }
 
   changeLoginType(isRegister: boolean) {
@@ -45,18 +57,21 @@ export class LoginPage implements OnDestroy {
   }
 
   async signInUser() {
-    if (this.formGroup.invalid) {
+    if (this.formGroup.invalid && environment.production) {
       this.formGroup.markAllAsTouched();
       return;
     }
 
     this.loginInProgress = true;
-    const model = this.isRegister ? new Account.Signup(this.formGroup.value) : new Account.Login(this.formGroup.value);
-    await this.store.dispatch(model).subscribe(data => {
-      if (data.auth.user === null) {
-        this.loginInProgress = false;
-      }
-    });
+
+    if (this.isRegister) {
+      await this.store.dispatch(new Account.Register(this.formGroup.value)).toPromise();
+    } else {
+      await this.store.dispatch(new Account.Login(this.formGroup.value)).toPromise();
+    }
+
+    await this.appService.redirectAfterSignIn();
+    this.loginInProgress = false;
   }
 
   async resetPassword() {
@@ -67,12 +82,33 @@ export class LoginPage implements OnDestroy {
     await modal.present();
   }
 
-  setProfilePicture(profilePicture: string) {
-    this.profilePicture = profilePicture;
+  setProfilePicture(profilePicture: Blob) {
     this.formGroup.get('profilePicture').setValue(profilePicture);
   }
 
   displayFormErrorByName(name: string, validationType: string) {
-    return this.formGroup.get(name).hasError(validationType) && (this.formGroup.get(name).dirty || this.formGroup.get(name).touched);
+    if (!this.formGroup.contains(name)) {
+      return;
+    }
+
+    const formcontrol = this.formGroup.get(name);
+    return formcontrol.hasError(validationType) && (formcontrol.dirty || formcontrol.touched);
+  }
+
+  private async listenForIosAutofill() {
+    const nativeEmailInput = await this.emailInput.getInputElement();
+    const nativePasswordInput = await this.passwordInput.getInputElement();
+
+    nativeEmailInput.addEventListener('change', (ev: Event) => {
+      requestAnimationFrame(() => {
+        this.formGroup.get('email').patchValue((ev.target as HTMLInputElement).value);
+      });
+    });
+
+    nativePasswordInput.addEventListener('change', (ev: Event) => {
+      requestAnimationFrame(() => {
+        this.formGroup.get('password').patchValue((ev.target as HTMLInputElement).value);
+      });
+    });
   }
 }

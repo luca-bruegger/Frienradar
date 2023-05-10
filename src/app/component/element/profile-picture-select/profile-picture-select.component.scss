@@ -6,8 +6,10 @@
 }
 
 .img-wrapper {
-  height: 80px;
-  width: 80px;
+  min-height: 80px;
+  max-height: 80px;
+  max-width: 80px;
+  min-width: 80px;
   align-self: center;
 }
 
@@ -16,4 +18,30 @@ ion-avatar, img {
   width: 100%;
   max-width: 256px !important;  //any size
   max-height: 256px !important; //any size
+}
+
+image-cropper {
+  --cropper-overlay-color: var(--ion-app-background);
+  --cropper-outline-color: rgba(0, 0, 0, 0);
+}
+
+.img-change-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.img-preview {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+
+ion-avatar {
+  --border-radius: 15%;
+}
+
+.ngx-ic-resize {
+  border: 2px solid red !important;
+  background-color: green;
 }

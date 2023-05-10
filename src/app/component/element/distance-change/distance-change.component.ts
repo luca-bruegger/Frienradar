@@ -11,10 +11,10 @@ import { Haptics, ImpactStyle } from '@capacitor/haptics';
 export class DistanceChangeComponent implements OnInit {
   currentDistance;
 
-  @Output() distanceChange = new EventEmitter<string>();
+  @Output() distanceChange = new EventEmitter<number>();
 
   constructor(private store: Store) {
-    this.store.select(AccountState.distance).subscribe(state => {
+    this.store.select(AccountState.preferredDistance).subscribe(state => {
       this.currentDistance = state;
     });
   }
@@ -24,11 +24,16 @@ export class DistanceChangeComponent implements OnInit {
   }
 
   async changeDistance($event: any) {
-    const distance = $event.detail.value;
-    this.store.dispatch(new Account.Update({ prefs: { distance } }));
+    const distance: number = +$event.detail.value;
+    this.store.dispatch(new Account.Update({
+      options: {
+        preferred_distance: distance
+      }
+    }));
     this.distanceChange.emit(distance);
+
     try {
-      await Haptics.impact({ style: ImpactStyle.Light });
+      await Haptics.impact({style: ImpactStyle.Light});
     } catch (e) {
       return;
     }

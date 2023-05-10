@@ -5,17 +5,14 @@
 export const environment = {
   production: false,
   beta: true,
-  endpoint: 'https://beta.api.frienradar.com/v1',
-  project: '638b8a8bda11a2ebe8fc',
+  test: false,
+  apiUrl: 'https://staging.api.frienradar.com',
+  iosAdId: 'ca-app-pub-6953123179903035/3049634317',
+  androidAdId: 'ca-app-pub-6953123179903035/9676252847',
   mapsKey: 'AIzaSyBI6AT9M_Nz_Y-_Xpql_Q28twKOO0jzu_8',
-  radarDatabaseId: 'radar',
-  geolocationsCollectionId: 'geolocations',
-  contactsCollectionId: 'contacts',
+  socketHost: 'ws://staging.api.frienradar.com/cable',
   appUrl: 'https://beta.frienradar.com',
   googleAnalyticsId: 'G-G2452L0H7H',
-  usernameCollectionId: 'usernames',
-  usersDatabaseId: 'users',
-  accountsCollectionId: 'accounts',
   oneSignalAppId: 'dbcfaa41-2e99-498a-8293-a3020ac85b2c'
 };
 

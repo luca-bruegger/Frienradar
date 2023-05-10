@@ -38,6 +38,7 @@ html, body {
   display: inline-block;
   vertical-align: middle;
   margin-right: 5px;
+  padding-bottom: 2px;
 }
 
 .phone-number-input {
@@ -98,6 +99,33 @@ html, body {
 }
 
 .fullscreen {
-  --width:100% !important;
-  --height:100% !important;
+  --width: 100% !important;
+  --height: 100% !important;
+}
+
+ion-img {
+  pointer-events: none;
+}
+
+.ngx-ic-move {
+  border: none !important;
+}
+
+.ngx-ic-cropper::after {
+  border: 1px solid var(--ion-color-primary) !important;
+}
+
+.ngx-ic-square {
+  background-color: #03B6DD !important;
+  width: 10px !important;
+  height: 10px !important;
+  opacity: 1 !important;
+  border: none !important;
+  border-radius: 4px;
+}
+
+ion-toast::part(button) {
+  border-left: 1px solid #d2d2d2;
+  color: #030207;
+  font-size: 15px;
 }

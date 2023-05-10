@@ -8,6 +8,7 @@ import { PluginListenerHandle } from '@capacitor/core';
 import MapOptions = google.maps.MapOptions;
 import LatLngLiteral = google.maps.LatLngLiteral;
 import Polygon = google.maps.Polygon;
+import { LocationService } from '../../../service/location.service';
 
 @Component({
   selector: 'app-radar-display',
@@ -17,23 +18,31 @@ import Polygon = google.maps.Polygon;
 export class RadarDisplayComponent implements OnInit, OnChanges {
   @Input() geohash = null;
   @Input() currentDistance: string;
-
   @ViewChild('map') map;
 
   mapApiLoaded: Observable<boolean>;
 
-  mapOptions: MapOptions = MapsHelper.getOptions();
+  mapOptions: MapOptions;
+
+  locationBoxOptions;
   center: LatLngLiteral;
   bounds: LatLngLiteral[];
   locationPolygon: Polygon;
   accelHandler: PluginListenerHandle;
 
-  locationBoxOptions = {
-    strokeColor: '#8ddae6',
-    fillColor: '#8ddae6',
-  };
+  private readonly DEFAULT_ZOOM_STEPS = [15, 12, 8, 5];
+  private readonly GEOHASH_LENGTHS = [6, 5, 3, 2];
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private httpClient: HttpClient,
+              private locationService: LocationService) {
+  }
+
+  get mapGeohashDistance() {
+    return this.GEOHASH_LENGTHS[this.currentDistance];
+  }
+
+  get mapZoom() {
+    return this.DEFAULT_ZOOM_STEPS[this.currentDistance];
   }
 
   async ngOnInit() {
@@ -42,29 +51,49 @@ export class RadarDisplayComponent implements OnInit, OnChanges {
         .pipe(map(() => true), catchError(() => of(false)));
     }
 
-    this.updateLocationBox();
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    this.renderMap(prefersDark.matches);
+
+    prefersDark.addEventListener('change', mediaQuery => {
+      this.renderMap(mediaQuery.matches);
+    });
   }
 
   ngOnChanges(simpleChanges) {
     const changedGeohash = simpleChanges.geohash;
     const changedDistance = simpleChanges.currentDistance;
 
+
     if (changedDistance || changedGeohash) {
       if (changedDistance) {
-        console.log('distance changed', changedDistance.currentValue);
         this.currentDistance = changedDistance.currentValue;
       }
 
       if (changedGeohash && changedGeohash.currentValue && changedGeohash.currentValue.length > 0) {
-        console.log('geohash changed', changedGeohash.currentValue);
         this.geohash = changedGeohash.currentValue;
       }
-
-      console.log(this.geohash, this.currentDistance);
 
       this.updateLocationBox();
       this.resetLocationBox();
     }
+  }
+
+  tryAgain() {
+    this.locationService.getCurrentGeohash().then(geohash => {
+      this.geohash = geohash;
+      this.updateLocationBox();
+    });
+  }
+
+  setupZoomListener($event: any) {
+    $event.addListener('tilesloaded', () => {
+      this.resetLocationBox();
+    });
+  }
+
+  resetMapLocation() {
+    this.map.googleMap.setZoom(this.mapZoom);
+    this.updateLocationBox();
   }
 
   private updateLocationBox() {
@@ -75,20 +104,6 @@ export class RadarDisplayComponent implements OnInit, OnChanges {
     const {lat, lng, boundaries} = MapsHelper.getLocationData(this.mapGeohashDistance, this.geohash);
     this.center = {lat, lng};
     this.bounds = MapsHelper.getBounds(boundaries);
-  }
-
-  setupZoomListener($event: any) {
-    $event.addListener('tilesloaded', () => {
-      this.resetLocationBox();
-    });
-  }
-
-  get mapZoom() {
-    return Number(MapZoom[this.currentDistance]) || MapZoom.close;
-  }
-
-  get mapGeohashDistance() {
-    return Number(GeohashLength[this.currentDistance]) || GeohashLength.close;
   }
 
   private resetLocationBox() {
@@ -106,18 +121,10 @@ export class RadarDisplayComponent implements OnInit, OnChanges {
       ...this.locationBoxOptions
     });
   }
-}
 
-enum MapZoom {
-  close = 15,
-  nearby = 12,
-  remote = 8,
-  farAway = 5
-}
-
-export enum GeohashLength {
-  close = 6,
-  nearby = 5,
-  remote = 3,
-  farAway = 2
+  private renderMap(prefersDark) {
+    this.mapOptions = prefersDark ? MapsHelper.getDarkOptions() : MapsHelper.getLightOptions();
+    this.locationBoxOptions = prefersDark ? MapsHelper.getDarkBoxOptions() : MapsHelper.getLightBoxOptions();
+    this.updateLocationBox();
+  }
 }

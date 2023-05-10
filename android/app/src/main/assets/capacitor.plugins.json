@@ -1,5 +1,13 @@
 [
 	{
+		"pkg": "@capacitor-community/admob",
+		"classpath": "com.getcapacitor.community.admob.AdMob"
+	},
+	{
+		"pkg": "@capacitor-community/background-geolocation",
+		"classpath": "com.equimaps.capacitor_background_geolocation.BackgroundGeolocation"
+	},
+	{
 		"pkg": "@capacitor/app",
 		"classpath": "com.capacitorjs.plugins.app.AppPlugin"
 	},
@@ -34,5 +42,9 @@
 	{
 		"pkg": "@capacitor/status-bar",
 		"classpath": "com.capacitorjs.plugins.statusbar.StatusBarPlugin"
+	},
+	{
+		"pkg": "capacitor-native-settings",
+		"classpath": "nl.raphael.settings.NativeSettingsPlugin"
 	}
 ]
