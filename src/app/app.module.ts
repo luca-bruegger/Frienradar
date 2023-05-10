@@ -21,11 +21,13 @@ import { IonicStorageModule } from '@ionic/storage-angular';
 import { Interceptor } from './interceptor/http.interceptor';
 import { ImageCropperModule } from 'ngx-image-cropper';
 import { HammerModule } from '../../node_modules/@angular/platform-browser';
+import { SettingsComponent } from './component/element/settings/settings.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     MenuComponent,
+    SettingsComponent,
     EditUserProfileComponent
   ],
   imports: [

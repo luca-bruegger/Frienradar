@@ -26,6 +26,18 @@ export class AdditionalLoginDataComponent implements OnInit {
   requestMailButtonDisabled = false;
   mandatoryAnimationClassEnabled = false;
 
+  get permissionServiceGeolocation() {
+    return this.permissionService.geolocation;
+  }
+
+  get permissionServicePhoto() {
+    return this.permissionService.photo;
+  }
+
+  get permissionServiceNotification() {
+    return this.permissionService.notification;
+  }
+
   constructor(private store: Store,
               private platform: Platform,
               private router: Router,

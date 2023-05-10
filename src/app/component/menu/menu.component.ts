@@ -14,7 +14,7 @@ import { ActionCableService } from '../../service/action-cable.service';
 export class MenuComponent implements OnInit {
   @ViewChild('popover', {static: true}) popover: HTMLIonPopoverElement;
 
-  get user() {
+  get user(): any {
     return this.store.selectSnapshot(AccountState.user);
   }
 

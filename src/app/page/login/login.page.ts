@@ -57,7 +57,7 @@ export class LoginPage implements OnInit, OnDestroy {
   }
 
   async signInUser() {
-    if (this.formGroup.invalid && (environment.production || environment.beta)) {
+    if (this.formGroup.invalid && environment.production) {
       this.formGroup.markAllAsTouched();
       return;
     }

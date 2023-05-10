@@ -8,8 +8,8 @@ import { AccountState, GlobalActions, Location, LocationState } from '../../stor
   styleUrls: ['radar.page.scss'],
 })
 export class RadarPage {
-  geohash: string;
-  currentDistance = this.store.selectSnapshot(AccountState.preferredDistance);
+  geohash = '';
+  currentDistance = `${this.store.selectSnapshot(AccountState.preferredDistance)}`;
 
   constructor(private store: Store) {
     this.store.select(LocationState.geohash).subscribe(state => {
@@ -29,7 +29,7 @@ export class RadarPage {
   }
 
   distanceChanged($event: number) {
-    this.currentDistance = $event;
+    this.currentDistance = `${$event}`;
     this.store.dispatch(new Location.FetchNearbyUsers({
       page: 1,
       append: false,
