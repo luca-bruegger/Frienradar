@@ -102,10 +102,7 @@ export class LocationState {
       patchState({
         geohash
       });
-    }, async (error) => {
-      console.log(error);
-      return error;
-    });
+    }, async (error) => error);
   }
 
   @Action(Location.FetchNearbyUsers)
@@ -132,10 +129,7 @@ export class LocationState {
       patchState({
         nearbyUsers
       });
-    }), catchError(async (error) => {
-      console.log(error);
-      return error;
-    }));
+    }), catchError(async (error) => error));
   }
 
   @Action(Location.ResetState)

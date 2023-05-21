@@ -47,7 +47,6 @@ export class PermissionService {
     if (isMobile) {
       OneSignal.promptForPushNotificationsWithUserResponse(true, (data) => {
         console.log('DEBUG: OneSignal.promptForPushNotificationsWithUserResponse');
-        console.log(data);
       });
     }
   }

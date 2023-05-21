@@ -217,7 +217,6 @@ export class UserRelationState {
     };
 
     return this.apiService.post('/invitations', data).toPromise().then(async (response) => {
-      console.log(response);
     }).catch(async (error) => {
       dispatch(new GlobalActions.HandleError({error}));
     });
@@ -259,7 +258,6 @@ export class UserRelationState {
     }).pipe(tap(async (response: any) => {
       const { id, username, profile_picture } = response.data;
       const friendRequests = this.store.selectSnapshot(UserRelationState.receivedFriendRequests).filter((item) => item.sender_id != id);
-      console.log(friendRequests);
       patchState({
         receivedFriendRequests: friendRequests
       });

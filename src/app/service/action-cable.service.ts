@@ -26,9 +26,6 @@ export class ActionCableService {
         console.log('connected');
       },
       received: (params) => {
-        console.log(params);
-        console.log('received', params.data);
-
         if (params.type == 'sent') {
           this.store.dispatch(new UserRelation.AppendRequestedFriend({ userGuid: params.data.friend_id }));
           this.store.dispatch(new GlobalActions.ShowToast({

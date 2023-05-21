@@ -100,6 +100,8 @@ export class AppService {
   }
 
   private async isRegistrationCompleted() {
+    await this.store.dispatch(new SocialAccounts.Fetch()).toPromise();
+
     const user = this.store.selectSnapshot(AccountState.user);
     const socialAccountsLength = this.store.selectSnapshot(SocialAccountsState.all).length;
     await this.permissionService.checkPermissions(this.isMobile());
@@ -145,7 +147,6 @@ export class AppService {
 
   private async fetchCurrentUser() {
     await this.store.dispatch(new Account.Fetch()).toPromise();
-    await this.store.dispatch(new SocialAccounts.Fetch()).toPromise();
   }
 
   private async connectToActionCable(token: string, userId: string) {

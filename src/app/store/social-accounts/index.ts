@@ -74,7 +74,6 @@ export class SocialAccountsState {
         socialAccounts
       });
     }, (err: any) => {
-      console.log(err);
     });
   }
 

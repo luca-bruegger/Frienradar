@@ -50,8 +50,6 @@ export class ResetPasswordComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       if (params && params.reset_password_token) {
         this.resetPasswordToken = params.reset_password_token;
-        console.log('reset_password_token', this.resetPasswordToken);
-        //this.checkIfResetIsExpired(params.expire);
         this.isReset = true;
       } else {
         this.isReset = false;
