@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { Account, AccountState, GlobalActions } from '../../store';
+import { Account, AccountState, GlobalActions, SocialAccountsState } from '../../store';
 import { Platform } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import OneSignal from 'onesignal-cordova-plugin';
@@ -8,7 +8,7 @@ import { AccountValidation } from '../../validation/account-validation';
 import { PermissionService } from '../../service/permission.service';
 import { AppService } from '../../service/app.service';
 import { Path } from '../../helper/path';
-import { LocationService } from '../../service/location.service';
+import { AccountPresets } from '../../helper/accountPresets';
 
 @Component({
   selector: 'app-additional-login-data',
@@ -43,13 +43,16 @@ export class AdditionalLoginDataComponent implements OnInit {
               private router: Router,
               private route: ActivatedRoute,
               private permissionService: PermissionService,
-              private appInitService: AppService,
-              private locationService: LocationService) {
+              private appInitService: AppService) {
 
   }
 
   get isMobile() {
     return this.appInitService.isMobile();
+  }
+
+  get primaryService() {
+    return this.store.selectSnapshot(SocialAccountsState.all)[0];
   }
 
   back() {
@@ -145,6 +148,10 @@ export class AdditionalLoginDataComponent implements OnInit {
     );
   }
 
+  nameForService(primaryService: any) {
+    return AccountPresets.set[primaryService.provider_key].name;
+  }
+
   private readRouteParams() {
     this.route.queryParams.subscribe(async params => {
       if (params && params.confirmation_token) {
@@ -166,17 +173,6 @@ export class AdditionalLoginDataComponent implements OnInit {
         })).toPromise();
       }
     });
-  }
-
-  private checkIfResetIsExpired(expire: string) {
-    const recoveryDate = new Date(expire);
-    const recoveryDateOneHourLater = new Date(recoveryDate.getTime() + 60 * 60 * 1000);
-    const currentDate = new Date();
-
-    if (recoveryDateOneHourLater.getTime() - currentDate.getTime() < 0) {
-      // expired action
-      return;
-    }
   }
 
   private startRequestMailButtonTimer() {

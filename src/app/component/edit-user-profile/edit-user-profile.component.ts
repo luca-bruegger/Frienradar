@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { Account, AccountState, GlobalActions } from '../../store';
+import { Account, AccountState } from '../../store';
 import { Store } from '@ngxs/store';
 import { AccountValidation } from '../../validation/account-validation';
 
@@ -40,7 +40,7 @@ export class EditUserProfileComponent implements OnInit {
     let user = this.store.selectSnapshot(AccountState.user) as any;
     let userData = { name: user.name, description: user.description, username: user.username };
 
-    let data: any = {};
+    const data: any = {};
 
     // Only set changed values
     Object.keys(userData).forEach((key) => {
@@ -55,7 +55,8 @@ export class EditUserProfileComponent implements OnInit {
     }
 
     await this.store.dispatch(new Account.UpdateWithFormData({
-      options: data
+      options: data,
+      modalController: this.modalController
     })).toPromise();
 
     // Close only if user has been updated
@@ -67,15 +68,6 @@ export class EditUserProfileComponent implements OnInit {
         data[key] = userData[key];
       }
     }
-
-    data = { name: data.name, description: data.description, username: data.username };
-    if (JSON.stringify(userData) === JSON.stringify(data) || this.updatedProfilePicture) {
-      await this.modalController.dismiss();
-      this.store.dispatch(new GlobalActions.ShowToast({
-        message: 'Benutzer aktualisiert.',
-        color: 'success'
-      }));
-    }
   }
 
   private setInitialValues() {
@@ -84,7 +76,7 @@ export class EditUserProfileComponent implements OnInit {
       this.formGroup.get('email').patchValue(user.email);
       this.formGroup.get('username').patchValue(user.username);
       this.formGroup.get('profilePicture').patchValue(user.profile_picture);
-      //this.formGroup.get('description').patchValue(user.description);
+      this.formGroup.get('description').patchValue(user.description);
     });
   }
 }

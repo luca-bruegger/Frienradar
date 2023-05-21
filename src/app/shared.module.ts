@@ -6,6 +6,7 @@ import { BackendUnderMaintenanceComponent } from './component/backend-under-main
 import { RequestPermissionsComponent } from './component/request-permissions/request-permissions.component';
 import { SocialAccountComponent } from './component/social-account/social-account.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { SelectAccountComponent } from './component/social-account/select-account/select-account.component';
 
 @NgModule({
   imports: [CommonModule, IonicModule, ReactiveFormsModule],
@@ -13,13 +14,15 @@ import { ReactiveFormsModule } from '@angular/forms';
     DistanceChangeComponent,
     BackendUnderMaintenanceComponent,
     RequestPermissionsComponent,
-    SocialAccountComponent
+    SocialAccountComponent,
+    SelectAccountComponent
   ],
   exports: [
     DistanceChangeComponent,
     BackendUnderMaintenanceComponent,
     RequestPermissionsComponent,
-    SocialAccountComponent
+    SocialAccountComponent,
+    SelectAccountComponent
   ]
 })
 export class SharedModule {}

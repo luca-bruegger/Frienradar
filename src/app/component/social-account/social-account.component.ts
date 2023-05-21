@@ -18,13 +18,13 @@ export class SocialAccountComponent implements OnInit {
 
   usernameMessages = AccountValidation.socialAccountUsernameMessages;
 
-  get socialAccountsCount() {
-    return this.store.selectSnapshot(SocialAccountsState.count);
-  }
-
   constructor(private alertController: AlertController,
               private store: Store,
               private modalController: ModalController) {
+  }
+
+  get socialAccountsCount() {
+    return this.store.selectSnapshot(SocialAccountsState.count);
   }
 
   ngOnInit() {
@@ -56,7 +56,7 @@ export class SocialAccountComponent implements OnInit {
             if (this.socialAccountsCount === 1) {
               const lastAccountAlert = await this.alertController.create({
                 header: 'Letztes Konto',
-                message: 'Du kannst nicht alle Konten löschen!',
+                message: 'Du darfst nicht alle Konten löschen!',
                 buttons: ['OK']
               });
 

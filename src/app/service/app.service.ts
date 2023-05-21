@@ -5,12 +5,13 @@ import { App } from '@capacitor/app';
 import { LocationService } from './location.service';
 import OneSignal from 'onesignal-cordova-plugin';
 import { environment } from '../../environments/environment';
-import { Account, AccountState, GlobalActions, Location, UserRelation } from '../store';
+import { Account, AccountState, GlobalActions, Location, SocialAccountsState, UserRelation } from '../store';
 import { TokenService } from './token.service';
 import { PermissionService } from './permission.service';
 import { ActionCableService } from './action-cable.service';
 import { Path } from '../helper/path';
 import { SocialAccounts } from '../store/social-accounts';
+import { ColorSchemeService } from './color-scheme.service';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +25,8 @@ export class AppService {
               private platform: Platform,
               private tokenService: TokenService,
               private permissionService: PermissionService,
-              private actionCableService: ActionCableService) {
+              private actionCableService: ActionCableService,
+              private colorSchemeService: ColorSchemeService) {
   }
 
   isMobile() {
@@ -34,6 +36,7 @@ export class AppService {
   async init(): Promise<boolean> {
     return new Promise(async (resolve) => {
       const loadingSpinner = await this.createLoadingSpinner();
+      this.colorSchemeService.loadStoredTheme();
 
       await this.appStateListener();
       const tokenValid = await this.tokenService.isTokenValid();
@@ -62,8 +65,7 @@ export class AppService {
 
     if (fullyRegistered) {
       await this.startServices(await this.tokenService.getToken());
-      await this.fetchUserRelation();
-      await this.fetchUserData();
+      await this.fetchUserRelatedData();
       await this.redirectToDefault();
     } else {
       await this.redirectToAdditionalLogin();
@@ -73,17 +75,37 @@ export class AppService {
   async stop() {
     await this.locationService.stop();
     await this.actionCableService.disconnect();
+    OneSignal.removeExternalUserId();
     await this.store.dispatch(new Account.ResetState());
     await this.store.dispatch(new Location.ResetState());
     await this.store.dispatch(new UserRelation.ResetState());
   }
 
+  async createLoadingSpinner(message = 'Lädt ...') {
+    const spinner = await this.loadingController.create({
+      message,
+      spinner: 'crescent',
+      showBackdrop: true
+    });
+
+    await spinner.present();
+    return spinner;
+  }
+
+  private async fetchUserRelatedData() {
+    await this.store.dispatch(new UserRelation.FetchInvitations({page: 1})).toPromise();
+    await this.store.dispatch(new UserRelation.FetchFriends({page: 1})).toPromise();
+    await this.store.dispatch(new SocialAccounts.Fetch()).toPromise();
+    await this.store.dispatch(new UserRelation.FetchFriendRequests()).toPromise();
+  }
+
   private async isRegistrationCompleted() {
     const user = this.store.selectSnapshot(AccountState.user);
+    const socialAccountsLength = this.store.selectSnapshot(SocialAccountsState.all).length;
     await this.permissionService.checkPermissions(this.isMobile());
     const permitted = this.permissionService.hasMandatoryPermissions(this.isMobile());
 
-    return user.confirmed && permitted && user.username && user.username.length > 0 || false;
+    return user.confirmed && permitted && user.username && user.username.length > 0 && socialAccountsLength > 0 || false;
   }
 
   private oneSignalInit(user) {
@@ -104,24 +126,17 @@ export class AppService {
     });
   }
 
-  async createLoadingSpinner() {
-    const spinner = await this.loadingController.create({
-      message: 'Lädt ...',
-      spinner: 'crescent',
-      showBackdrop: true
-    });
-
-    await spinner.present();
-    return spinner;
-  }
-
   private async appStateListener() {
     App.addListener('appStateChange', async state => {
       const {isActive} = state;
       if (isActive && this.store.selectSnapshot(AccountState.user) !== null) {
+        this.colorSchemeService.loadStoredTheme();
+        const spinner = await this.createLoadingSpinner('Daten werden aktualisiert ...');
+        await this.fetchCurrentUser();
+        await this.fetchUserRelatedData();
+        await spinner.dismiss();
         await this.permissionService.checkPermissions(this.isMobile());
         await this.locationService.watch();
-        await this.fetchCurrentUser();
       } else {
         await this.locationService.stop();
       }
@@ -130,20 +145,11 @@ export class AppService {
 
   private async fetchCurrentUser() {
     await this.store.dispatch(new Account.Fetch()).toPromise();
+    await this.store.dispatch(new SocialAccounts.Fetch()).toPromise();
   }
 
   private async connectToActionCable(token: string, userId: string) {
     await this.actionCableService.connect(token, userId);
-  }
-
-  private async fetchUserData() {
-    await this.store.dispatch(new UserRelation.FetchFriendRequests()).toPromise();
-  }
-
-  private async fetchUserRelation() {
-    await this.store.dispatch(new UserRelation.FetchInvitations({page: 1})).toPromise();
-    await this.store.dispatch(new UserRelation.FetchFriends({page: 1})).toPromise();
-    await this.store.dispatch(new SocialAccounts.Fetch()).toPromise();
   }
 
   private async redirectToDefault() {

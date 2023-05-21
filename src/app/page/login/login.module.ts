@@ -12,6 +12,7 @@ import { ResetPasswordComponent } from '../../component/reset-password/reset-pas
 import { ProfilePictureSelectComponent } from '../../component/element/profile-picture-select/profile-picture-select.component';
 import { AdditionalLoginDataComponent } from '../../component/additional-login-data/additional-login-data.component';
 import { ImageCropperModule } from 'ngx-image-cropper';
+import { SharedModule } from '../../shared.module';
 
 @NgModule({
   imports: [
@@ -21,7 +22,8 @@ import { ImageCropperModule } from 'ngx-image-cropper';
     LoginPageRoutingModule,
     ReactiveFormsModule,
     PasswordStrengthMeterModule.forRoot(),
-    ImageCropperModule
+    ImageCropperModule,
+    SharedModule
   ],
   declarations: [
     LoginPage,

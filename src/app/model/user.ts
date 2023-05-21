@@ -4,6 +4,7 @@ export type User = {
   username: string;
   email: string;
   confirmed: boolean;
+  description: string;
   // eslint-disable-next-line @typescript-eslint/naming-convention
   profile_picture: string;
   // eslint-disable-next-line @typescript-eslint/naming-convention

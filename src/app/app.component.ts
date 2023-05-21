@@ -58,14 +58,13 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   private initializeDeeplinking() {
-    App.addListener('appUrlOpen', (event: URLOpenListenerEvent) => {
-      this.zone.run(() => {
-        const domain = environment.appUrl;
-        const pathArray = event.url.split(domain);
+    App.addListener('appUrlOpen', async (event: URLOpenListenerEvent) => {
+      await this.zone.run(async () => {
+        const domain = environment.deeplinkDomain;
+        const path = event.url.replace(domain, '');
 
-        const appPath = pathArray.pop();
-        if (appPath) {
-          this.navController.navigateRoot(appPath);
+        if (path) {
+          await this.navController.navigateRoot(path);
         }
       });
     });

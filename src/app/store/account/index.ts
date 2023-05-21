@@ -4,11 +4,10 @@ import { Models } from 'appwrite';
 import { GlobalActions } from '../global';
 import { Path } from '../../helper/path';
 import { Platform } from '@ionic/angular';
-import { AccountData } from '../../model/accountData';
 import { AppService } from '../../service/app.service';
 import { LocationService } from '../../service/location.service';
 import { ApiService } from '../../service/api.service';
-import { catchError, first, tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { TokenService } from '../../service/token.service';
 import { PermissionService } from '../../service/permission.service';
 import { User } from '../../model/user';
@@ -28,7 +27,7 @@ export namespace Account {
     static readonly type = '[Auth] Register';
 
     constructor(
-      public payload: { email: string; password: string; name: string; profilePicture: Blob }
+      public payload: { email: string; password: string; name: string; profilePicture: Blob; registerLoading: boolean }
     ) {
     }
   }
@@ -36,7 +35,7 @@ export namespace Account {
   export class Login {
     static readonly type = '[Auth] Login';
 
-    constructor(public payload: { email: string; password: string }) {
+    constructor(public payload: { email: string; password: string; loading: boolean }) {
     }
   }
 
@@ -76,7 +75,7 @@ export namespace Account {
   export class UpdateWithFormData {
     static readonly type = '[Auth] Update with FormData';
 
-    constructor(public payload: { options: any }) {
+    constructor(public payload: { options: any; modalController: any}) {
     }
   }
 
@@ -157,7 +156,7 @@ export class AccountState {
     {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.Register
   ) {
-    const {email, password, name, profilePicture} = action.payload;
+    let {email, password, name, profilePicture, registerLoading} = action.payload;
 
     const formData = new FormData();
     formData.append('profile_picture', profilePicture, profilePicture.type);
@@ -175,6 +174,8 @@ export class AccountState {
       await dispatch(new GlobalActions.Redirect({path: Path.additionalLoginData, forward: true, navigateRoot: false}));
     }, async (error) => {
       dispatch(new GlobalActions.HandleAuthError({error}));
+    }).finally(() => {
+      registerLoading = false;
     });
   }
 
@@ -183,7 +184,7 @@ export class AccountState {
     {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.Login
   ) {
-    const {email, password} = action.payload;
+    let {email, password, loading} = action.payload;
 
     return this.apiService.post('/user/sign_in', {
       user: {
@@ -193,12 +194,15 @@ export class AccountState {
     }).toPromise().then(async (response: any) => {
       const user = response.body.data;
       await this.tokenService.setTokenFromResponse(response);
-
       patchState({
         user
       });
+
+      await this.appService.redirectAfterSignIn();
     }, async (error) => {
       dispatch(new GlobalActions.HandleAuthError({error}));
+    }).finally(() => {
+      loading = false;
     });
   }
 
@@ -225,9 +229,7 @@ export class AccountState {
     {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.UpdateWithFormData
   ) {
-    const {options} = action.payload;
-
-    console.log(options);
+    const {options, modalController} = action.payload;
 
     const formData = new FormData();
     if (options.profilePicture) {
@@ -242,10 +244,16 @@ export class AccountState {
       }
     }
 
-    return this.apiService.put('/current_user/edited', formData, true).pipe(tap((response: any) => {
+    return this.apiService.put('/current_user/edited', formData, true).pipe(tap(async (response: any) => {
       patchState({
         user: response.data
       });
+
+      dispatch(new GlobalActions.ShowToast({
+        message: 'Benutzer aktualisiert.',
+        color: 'success'
+      }));
+      await modalController.dismiss();
     }), catchError(async (error) => {
       dispatch(new GlobalActions.HandleError({error}));
     }));
@@ -293,8 +301,8 @@ export class AccountState {
         email
       }
     }).toPromise().then(async response => {
+      dispatch(new GlobalActions.ShowToast({message: 'Email gesendet falls Konto existiert.', color: 'success'}));
       await modalController.dismiss();
-      dispatch(new GlobalActions.ShowToast({message: 'Zurücksetzungs Email gesendet falls Konto existiert.', color: 'success'}));
     }, async (error) => {
       dispatch(new GlobalActions.HandleAuthError({error}));
     });
@@ -317,8 +325,12 @@ export class AccountState {
       patchState({
         user: response.data
       });
-      await this.appService.redirectAfterSignIn();
-      dispatch(new GlobalActions.ShowToast({message: 'Passwort zurückgesetzt', color: 'success'}));
+      await dispatch(new GlobalActions.ShowToast({message: 'Passwort zurückgesetzt. Du kannst dich jetzt Anmelden', color: 'success'}));
+      await dispatch(new GlobalActions.Redirect({
+        path: Path.login,
+        forward: false,
+        navigateRoot: false
+      }));
     }, async (error) => {
       dispatch(new GlobalActions.HandleAuthError({error}));
     });
