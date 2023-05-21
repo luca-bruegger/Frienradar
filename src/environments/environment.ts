@@ -8,12 +8,12 @@ export const environment = {
   test: false,
   apiUrl: 'http://192.168.1.148:3000',
   mapsKey: 'AIzaSyBzaHPkOpQSETE6Q9RsIbKFL_LOL_f7xCU',
-  oneSignalAppId: 'dbcfaa41-2e99-498a-8293-a3020ac85b2c',
   iosAdId: 'ca-app-pub-6953123179903035/3049634317',
   androidAdId: 'ca-app-pub-6953123179903035/9676252847',
   socketHost: 'ws://192.168.1.148:3000/cable',
-  appUrl: 'https://frienradar.com',
-  googleAnalyticsId: ''
+  deeplinkDomain: 'https://frienradar.com',
+  googleAnalyticsId: 'G-G2452L0H7H',
+  oneSignalAppId: 'dbcfaa41-2e99-498a-8293-a3020ac85b2c'
 };
 
 /*

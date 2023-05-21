@@ -8,10 +8,6 @@
       <ion-popover #popover trigger="popover" size="auto" side="bottom" alignment="start">
         <ng-template>
           <ion-list>
-            <ion-item (click)="openChangePassword()">
-              <ion-icon name="key-outline" slot="start"></ion-icon>
-              <ion-label>Passwort ändern</ion-label>
-            </ion-item>
             <ion-item (click)="signOut()" lines="none">
               <ion-icon name="log-out-outline" slot="start"></ion-icon>
               <ion-label>Abmelden</ion-label>
@@ -64,7 +60,7 @@
                     </ion-text>
                   </div>
                 </div>
-                <ion-item *ngIf="user.description" class="ion-margin-top ion-no-padding" lines="none">
+                <ion-item style="--inner-padding-end: 0" *ngIf="user.description" class="ion-margin-top ion-no-margin ion-no-padding" lines="none">
                   <ion-textarea auto-grow="true" readonly="true"
                                 [value]="user.description" class="ion-padding">
                   </ion-textarea>
@@ -72,41 +68,58 @@
               </div>
             </ion-card-content>
           </ion-card>
-          <ion-button (click)="openEditProfile()" class="ion-no-margin ion-margin-top" expand="block" color="secondary">
-            <ion-icon color="light" class="text-icon" name="create-outline"></ion-icon>
-            <p class="icon-text" style="color: var(--ion-color-light)">Profil bearbeiten</p>
+          <ion-button (click)="openEditProfile()" class="ion-no-margin ion-margin-top" expand="block" color="bright" fill="outline">
+            <ion-icon color="dark" class="text-icon" name="create-outline"></ion-icon>
+            <p class="icon-text" style="color: var(--ion-color-dark)">Profil bearbeiten</p>
           </ion-button>
         </div>
       </ion-col>
     </ion-row>
     <ion-row class="ion-margin-bottom">
-      <h1 style="color: var(--ion-color-primary)">Optionen</h1>
-      <ion-card style="background-color: var(--ion-color-bright)"
+      <h1 style="color: var(--ion-color-primary); width: 100%">Optionen</h1>
+      <ion-card style="background-color: var(--ion-color-bright); width: 100%"
                 class="ion-no-margin">
         <ion-card-content class="ion-no-padding">
-          <ion-item style="background-color: transparent">
+          <!--<ion-item style="background-color: transparent">
             <ion-label>Benachrichtigungen</ion-label>
             <ion-toggle slot="end"></ion-toggle>
           </ion-item>
           <ion-item style="background-color: transparent">
             <ion-label>Live Standort</ion-label>
             <ion-toggle slot="end"></ion-toggle>
+          </ion-item>-->
+          <ion-item>
+            <ion-label>Dark Mode forcieren</ion-label>
+            <ion-toggle slot="end" (ionChange)="changeDarkMode($event)"></ion-toggle>
           </ion-item>
           <ion-item lines="none">
-            <ion-label>Dark Mode forcieren</ion-label>
-            <ion-toggle slot="end"></ion-toggle>
+            <ion-label>Socket Verbindung</ion-label>
+            <ion-badge slot="end" color="{{connectionStatus ? 'success' : 'danger'}}"
+                       style="margin-left: 10px; margin-top: 2px;">{{connectionStatus ? 'Verbunden' : 'Getrennt'}}</ion-badge>
           </ion-item>
         </ion-card-content>
       </ion-card>
-      <div style="display: flex; align-items: center;" class="ion-margin-top">
-        Live-Nachrichten Status: <ion-badge color="{{connectionStatus ? 'success' : 'danger'}}" style="margin-left: 10px; margin-top: 2px;">{{connectionStatus ? 'Verbunden' : 'Getrennt'}}</ion-badge>
-      </div>
-    </ion-row>
-    <ion-row class="ion-margin-top">
-      <ion-col>
-        <ion-label>Deine Benutzer ID:</ion-label><br>
-        <ion-label style="font-weight: bold"><small>#{{user.id}}</small></ion-label>
-      </ion-col>
+      <h1 style="color: var(--ion-color-primary); width: 100%">Benutzerinformation</h1>
+      <ion-card style="background-color: var(--ion-color-bright); width: 100%"
+                class="ion-no-margin">
+        <ion-card-content class="ion-no-padding">
+          <ion-item style="background-color: transparent">
+            <ion-label style="font-weight: bold"><small>#{{user.id}}</small></ion-label>
+          </ion-item>
+          <ion-item style="background-color: transparent">
+            <ion-label>Benutzername</ion-label>
+            <ion-label slot="end" style="font-weight: bold">{{user.username}}</ion-label>
+          </ion-item>
+          <ion-item style="background-color: transparent">
+            <ion-label>E-Mail</ion-label>
+            <ion-label slot="end" style="font-weight: bold">{{user.email}}</ion-label>
+          </ion-item>
+          <!--<ion-item style="background-color: transparent" lines="none">
+            <ion-label>Passwort</ion-label>
+            <ion-button slot="end" fill="clear" (click)="openChangePassword()">Ändern</ion-button>
+          </ion-item>-->
+        </ion-card-content>
+      </ion-card>
     </ion-row>
     <ion-row>
       <ion-col class="ion-text-center">

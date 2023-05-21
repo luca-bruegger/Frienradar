@@ -15,108 +15,128 @@
 
     </ion-refresher-content>
   </ion-refresher>
-  <ion-grid>
-    <ion-row>
+  <ion-grid class="ion-no-padding ion-margin-horizontal ion-padding-bottom">
+    <ion-row class="ion-margin-bottom">
       <ion-col size-xl="4" offset-xl="4" size="12">
-        <ion-row style="margin-bottom: 0; padding-bottom: 0">
-          <ion-col>
-            <ion-card color="light">
-              <ion-card-content>
-                <ion-card-subtitle>Berechtigungen</ion-card-subtitle>
-                <ion-item color="light">
-                  <ion-icon *ngIf="permissionServiceGeolocation" slot="start" name="checkbox-outline"
-                            color="success"></ion-icon>
-                  <ion-icon *ngIf="!permissionServiceGeolocation" slot="start" name="close-circle-outline"
-                            color="danger"></ion-icon>
-                  <ion-label>Standortzugriff</ion-label>
-                  <ion-button [class.access-button]="!mandatoryAnimationClassEnabled"
-                              [class.access-button-error]="mandatoryAnimationClassEnabled"
-                              *ngIf="!permissionServiceGeolocation" slot="end"
-                              (click)="requestGeolocationPermission()">
-                    <ion-label>Anfordern</ion-label>
-                  </ion-button>
-                </ion-item>
-                <ion-item color="light" *ngIf="isMobile" lines="none">
-                  <ion-icon *ngIf="permissionServicePhoto" slot="start" name="checkbox-outline" color="success"></ion-icon>
-                  <ion-icon *ngIf="!permissionServicePhoto" slot="start" name="close-circle-outline"
-                            color="danger"></ion-icon>
-                  <ion-label>Fotozugriff</ion-label>
-                  <ion-button [class.access-button]="!mandatoryAnimationClassEnabled"
-                              [class.access-button-error]="mandatoryAnimationClassEnabled" *ngIf="!permissionServicePhoto"
-                              slot="end"
-                              (click)="requestPhotoPermission()">
-                    <ion-label>Anfordern</ion-label>
-                  </ion-button>
-                </ion-item>
-                <ion-card-subtitle *ngIf="isMobile"><small>Optional</small></ion-card-subtitle>
-                <ion-item color="light" lines="none" *ngIf="isMobile">
-                  <ion-icon slot="start" name="alert-circle-outline"></ion-icon>
-                  <ion-label>Benachrichtigungen</ion-label>
-                  <ion-button *ngIf="!permissionServiceNotification" (click)="requestNotificationPermissions()"
-                              class="access-button" slot="end">
-                    <ion-label>Erlauben</ion-label>
-                  </ion-button>
-                </ion-item>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-        </ion-row>
+        <ion-card color="light">
+          <ion-card-content>
+            <ion-card-subtitle>Berechtigungen</ion-card-subtitle>
+            <ion-item color="light">
+              <ion-icon *ngIf="permissionServiceGeolocation" slot="start" name="checkbox-outline"
+                        color="success"></ion-icon>
+              <ion-icon *ngIf="!permissionServiceGeolocation" slot="start" name="close-circle-outline"
+                        color="danger"></ion-icon>
+              <ion-label>Standortzugriff</ion-label>
+              <ion-button [class.access-button]="!mandatoryAnimationClassEnabled"
+                          [class.access-button-error]="mandatoryAnimationClassEnabled"
+                          *ngIf="!permissionServiceGeolocation" slot="end"
+                          (click)="requestGeolocationPermission()">
+                <ion-label>Anfordern</ion-label>
+              </ion-button>
+            </ion-item>
+            <ion-item color="light" *ngIf="isMobile" lines="none">
+              <ion-icon *ngIf="permissionServicePhoto" slot="start" name="checkbox-outline"
+                        color="success"></ion-icon>
+              <ion-icon *ngIf="!permissionServicePhoto" slot="start" name="close-circle-outline"
+                        color="danger"></ion-icon>
+              <ion-label>Fotozugriff</ion-label>
+              <ion-button [class.access-button]="!mandatoryAnimationClassEnabled"
+                          [class.access-button-error]="mandatoryAnimationClassEnabled"
+                          *ngIf="!permissionServicePhoto"
+                          slot="end"
+                          (click)="requestPhotoPermission()">
+                <ion-label>Anfordern</ion-label>
+              </ion-button>
+            </ion-item>
+            <ion-card-subtitle *ngIf="isMobile"><small>Optional</small></ion-card-subtitle>
+            <ion-item color="light" lines="none" *ngIf="isMobile">
+              <ion-icon slot="start" name="alert-circle-outline"></ion-icon>
+              <ion-label>Benachrichtigungen</ion-label>
+              <ion-button *ngIf="!permissionServiceNotification" (click)="requestNotificationPermissions()"
+                          class="access-button" slot="end">
+                <ion-label>Erlauben</ion-label>
+              </ion-button>
+            </ion-item>
+          </ion-card-content>
+        </ion-card>
       </ion-col>
     </ion-row>
-    <ion-row>
+    <ion-row class="ion-margin-bottom">
       <ion-col size-xl="4" offset-xl="4" size="12">
-        <ion-row style="margin-bottom: 0; padding-bottom: 0">
-          <ion-col>
-            <ion-card color="light">
-              <ion-card-content>
-                <ion-card-subtitle>Email bestätigung</ion-card-subtitle>
-                <ion-note>Deine Email: <strong>{{user.email}}</strong></ion-note>
-                <ion-item color="light" lines="none">
-                  <ion-icon *ngIf="user.confirmed" slot="start" name="checkbox-outline"
-                            color="success"></ion-icon>
-                  <ion-icon *ngIf="!user.confirmed" slot="start" name="close-circle-outline"
-                            color="danger"></ion-icon>
-                  <ion-label>Bestätigt</ion-label>
-                  <ion-button *ngIf="!user.confirmed" [disabled]="requestMailButtonDisabled" slot="end"
-                              (click)="verifyEmail()" [class.access-button]="!mandatoryAnimationClassEnabled"
-                              [class.access-button-error]="mandatoryAnimationClassEnabled">
-                    <ion-label *ngIf="!requestMailButtonDisabled">Anfordern</ion-label>
-                    <ion-label *ngIf="requestMailButtonDisabled">Warte {{time}}s</ion-label>
-                  </ion-button>
-                </ion-item>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-        </ion-row>
+        <ion-card color="light">
+          <ion-card-content>
+            <ion-card-subtitle>Email bestätigung</ion-card-subtitle>
+            <ion-note>Deine Email: <strong>{{user.email}}</strong></ion-note>
+            <ion-item color="light" lines="none">
+              <ion-icon *ngIf="user && user.confirmed" slot="start" name="checkbox-outline"
+                        color="success"></ion-icon>
+              <ion-icon *ngIf="user && !user.confirmed" slot="start" name="close-circle-outline"
+                        color="danger"></ion-icon>
+              <ion-label>Bestätigt</ion-label>
+              <ion-button *ngIf="user && !user.confirmed" [disabled]="requestMailButtonDisabled" slot="end"
+                          (click)="verifyEmail()" [class.access-button]="!mandatoryAnimationClassEnabled"
+                          [class.access-button-error]="mandatoryAnimationClassEnabled">
+                <ion-label *ngIf="!requestMailButtonDisabled">Anfordern</ion-label>
+                <ion-label *ngIf="requestMailButtonDisabled">Warte {{time}}s</ion-label>
+              </ion-button>
+            </ion-item>
+          </ion-card-content>
+        </ion-card>
       </ion-col>
     </ion-row>
-    <ion-row>
+    <ion-row class="ion-margin-bottom">
       <ion-col size-xl="4" offset-xl="4" size="12">
-        <ion-row style="margin-bottom: 0; padding-bottom: 0">
-          <ion-col>
-            <ion-card color="light">
-              <ion-card-content>
-                <ion-card-subtitle>Benutzername</ion-card-subtitle>
-                <ion-note>
-                  <span *ngIf="usernameFormControl.enabled">Der Benutzername wird für die Anzeige in der App verwendet. Dieser ist für dich, aber auch andere sichtbar.</span>
-                  <span *ngIf="usernameFormControl.disabled">Der Benutzername kann in den Profileinstellungen geändert werden.</span>
-                </ion-note>
-                <ion-item color="light" class="ion-margin-top" counter="{{usernameFormControl.enabled}}">
-                  <ion-input [formControl]="usernameFormControl" maxlength="30" type="text"
-                             placeholder="Benutzername"></ion-input>
-                </ion-item>
-                <div>
-                  <ng-container *ngFor="let validation of formMessages.username">
-                    <div class="error-message"
-                         *ngIf="usernameFormControl.hasError(validation.type) && (usernameFormControl.dirty || usernameFormControl.touched)">
-                      {{ validation.message }}
-                    </div>
-                  </ng-container>
+        <ion-card color="light">
+          <ion-card-content>
+            <ion-card-subtitle>{{primaryService === undefined ? 'Dienst hinzufügen' : 'Hinzugefügter Dienst'}}</ion-card-subtitle>
+            <ion-note *ngIf="primaryService === undefined">Damit du Frienradar verwenden kannst, musst du mindestens
+              einen Dienst hinzufügen.
+            </ion-note>
+            <ion-item color="light" lines="none" *ngIf="primaryService === undefined">
+              <ion-icon slot="start" name="alert-circle-outline"></ion-icon>
+
+              <ion-label>Primärer Dienst</ion-label>
+              <ion-button id="add-service-button" slot="end"
+                          [class.access-button]="!mandatoryAnimationClassEnabled"
+                          [class.access-button-error]="mandatoryAnimationClassEnabled">
+                <ion-label>Hinzufügen</ion-label>
+              </ion-button>
+            </ion-item>
+
+            <ion-item color="light" lines="none" *ngIf="primaryService !== undefined">
+              <ion-icon slot="start" name="checkmark-circle-outline" color="success"></ion-icon>
+              <ion-label>{{nameForService(primaryService)}}</ion-label>
+              <ion-label slot="end">
+                {{primaryService.username}}
+              </ion-label>
+            </ion-item>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row class="ion-margin-bottom">
+      <ion-col size-xl="4" offset-xl="4" size="12">
+        <ion-card color="light">
+          <ion-card-content>
+            <ion-card-subtitle>Benutzername</ion-card-subtitle>
+            <ion-note>
+              <span *ngIf="usernameFormControl.enabled">Der Benutzername wird für die Anzeige in der App verwendet. Dieser ist für dich, aber auch andere sichtbar.</span>
+              <span *ngIf="usernameFormControl.disabled">Der Benutzername kann in den Profileinstellungen geändert werden.</span>
+            </ion-note>
+            <ion-item color="light" class="ion-margin-top" counter="{{usernameFormControl.enabled}}">
+              <ion-input [formControl]="usernameFormControl" maxlength="30" type="text"
+                         placeholder="Benutzername"></ion-input>
+            </ion-item>
+            <div>
+              <ng-container *ngFor="let validation of formMessages.username">
+                <div class="error-message"
+                     *ngIf="usernameFormControl.hasError(validation.type) && (usernameFormControl.dirty || usernameFormControl.touched)">
+                  {{ validation.message }}
                 </div>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-        </ion-row>
+              </ng-container>
+            </div>
+          </ion-card-content>
+        </ion-card>
       </ion-col>
     </ion-row>
     <ion-row>
@@ -131,7 +151,7 @@
         </ion-button>
       </ion-col>
     </ion-row>
-    <ion-row class="ion-align-items-center">
+    <ion-row class="ion-align-items-center ion-margin-bottom">
       <ion-col size="12" class="ion-text-center">
         <ion-button size="small" [disabled]="isLoading" fill="clear" color="secondary"
                     (click)="back()">
@@ -141,3 +161,22 @@
     </ion-row>
   </ion-grid>
 </ion-content>
+
+<ion-modal
+  #addServiceModal
+  trigger="add-service-button"
+  [initialBreakpoint]="0.65"
+  [breakpoints]="[0.65]"
+  [backdropDismiss]="false"
+  [backdropBreakpoint]="0.1">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar class="ion-padding-top">
+        <ion-title color="primary">Dienst hinzufügen</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding" scroll-y="false">
+      <app-select-account [withRedirect]="false"></app-select-account>
+    </ion-content>
+  </ng-template>
+</ion-modal>

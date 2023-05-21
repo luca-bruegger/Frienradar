@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { Account } from '../../store';
 import { IonInput, ModalController } from '@ionic/angular';
@@ -63,14 +63,11 @@ export class LoginPage implements OnInit, OnDestroy {
     }
 
     this.loginInProgress = true;
-
     if (this.isRegister) {
-      await this.store.dispatch(new Account.Register(this.formGroup.value)).toPromise();
+      await this.store.dispatch(new Account.Register({...this.formGroup.value, registerLoading: this.loginInProgress})).toPromise();
     } else {
-      await this.store.dispatch(new Account.Login(this.formGroup.value)).toPromise();
+      await this.store.dispatch(new Account.Login({...this.formGroup.value, loading: this.loginInProgress})).toPromise();
     }
-
-    await this.appService.redirectAfterSignIn();
     this.loginInProgress = false;
   }
 

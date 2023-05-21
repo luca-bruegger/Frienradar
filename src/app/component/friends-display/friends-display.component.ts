@@ -28,7 +28,6 @@ export class FriendsDisplayComponent implements OnInit {
   async ngOnInit() {
     const userId = this.activatedRoute.snapshot.paramMap.get('id');
     this.apiService.get(`/profiles/${userId}`).toPromise().then((response: any) => {
-      console.log(JSON.parse(response));
       this.user = JSON.parse(response).data;
     }, async error => {
       this.store.dispatch(new GlobalActions.HandleError(
@@ -52,7 +51,7 @@ export class FriendsDisplayComponent implements OnInit {
       message: 'Möchtest du die Freundschaft wirklich beenden?',
       buttons: [
         {
-          text: 'Cancel',
+          text: 'Abbrechen',
           role: 'cancel',
           cssClass: 'secondary'
         },
@@ -64,7 +63,7 @@ export class FriendsDisplayComponent implements OnInit {
               message: 'Möchtest du die Freundschaft endgültig beenden? Diese Aktion kann nicht rückgängig gemacht werden.',
               buttons: [
                 {
-                  text: 'Cancel',
+                  text: 'Abbrechen',
                   role: 'cancel',
                   cssClass: 'secondary'
                 },

@@ -1,0 +1,42 @@
+<ion-label color="primary">
+  <p>Wähle einen Dienst aus, den du hinzufügen möchtest.</p>
+</ion-label>
+<ion-item class="ion-margin-vertical ion-item-select" lines="none" style="--{{selectedService.backgroundStyle}}"
+          [button]="true" [detail]="false" id="account-presets">
+  <ion-label style="{{selectedService.color}}">{{selectedService.name}}</ion-label>
+  <div slot="end" id="selected-fruits" style="{{selectedService.color}}">
+    <strong>Dienst ändern</strong>
+  </div>
+</ion-item>
+
+<div *ngIf="selectedService">
+  <app-social-account *ngIf="selectedService" [accountPreset]="selectedService"
+                      [usernameFormControl]="usernameFormControl"></app-social-account>
+  <ion-button expand="block" color="primary" class="ion-margin-top" (click)="addAccount()"><strong>Konto
+    hinzufügen</strong>
+  </ion-button>
+</div>
+
+<ion-modal trigger="account-presets" #modal>
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-button (click)="cancelChanges()">Abbrechen</ion-button>
+        </ion-buttons>
+        <ion-title>Dienste</ion-title>
+      </ion-toolbar>
+      <ion-toolbar>
+        <ion-searchbar placeholder="Suchen" (ionInput)="searchbarInput($event)"></ion-searchbar>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content color="light" class="ion-padding ion-padding-bottom">
+      <ion-list id="modal-list" [inset]="true">
+        <ion-item *ngFor="let accountPreset of filteredPresets()" (click)="selectService(accountPreset)" style="--{{accountPreset.backgroundStyle}}">
+          <ion-label style="{{accountPreset.color}}"><strong>{{ accountPreset.name }}</strong></ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-modal>

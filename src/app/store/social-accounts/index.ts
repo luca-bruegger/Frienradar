@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { ApiService } from '../../service/api.service';
 import { GlobalActions } from '../global';
-import { NavController } from '@ionic/angular';
+import { ModalController, NavController } from '@ionic/angular';
 
 
 /* State Model */
@@ -29,7 +29,7 @@ export namespace SocialAccounts {
   export class Add {
     static readonly type = '[SocialAccounts] Add';
 
-    constructor(public payload: { providerKey: string; username: string }) {
+    constructor(public payload: { providerKey: string; username: string; withRedirect: boolean }) {
     }
   }
 
@@ -52,7 +52,8 @@ export namespace SocialAccounts {
 export class SocialAccountsState {
   constructor(private store: Store,
               private apiService: ApiService,
-              private navController: NavController) {
+              private navController: NavController,
+              private modalController: ModalController) {
   }
 
   @Selector()
@@ -99,7 +100,7 @@ export class SocialAccountsState {
     {patchState, dispatch}: StateContext<SocialAccountsStateModel>,
     action: SocialAccounts.Add
   ) {
-    const {providerKey, username} = action.payload;
+    const {providerKey, username, withRedirect} = action.payload;
     return this.apiService.post('/social_accounts',
       {
         social_account:
@@ -108,7 +109,7 @@ export class SocialAccountsState {
             username
           }
       }
-    ).toPromise().then((response: any) => {
+    ).toPromise().then(async (response: any) => {
       patchState({
         socialAccounts: [...this.store.selectSnapshot(SocialAccountsState.all), response.body.data]
       });
@@ -118,7 +119,15 @@ export class SocialAccountsState {
         color: 'success'
       }));
 
-      this.navController.navigateBack('/tabs/social-accounts');
+      if (!withRedirect) {
+        const modal = await this.modalController.getTop();
+        if (modal) {
+          await modal.dismiss();
+        }
+        return;
+      }
+
+      await this.navController.navigateBack('/tabs/social-accounts');
     }, (err: any) => {
       dispatch(new GlobalActions.HandleError({
         error: err

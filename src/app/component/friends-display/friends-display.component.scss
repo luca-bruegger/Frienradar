@@ -1,14 +1,16 @@
 ion-textarea {
-  --color: var(--ion-color-dark);
+  --background: #373737;
+  --color: #ffffff;
   --padding-bottom: 0;
   --padding-end: 0;
   --padding-start: 0;
   --padding-top: 0;
-  --placeholder-color: var(--ion-color-dark);
-  --placeholder-opacity: 0.8;
-  background-color: var(--ion-color-light);
+  --placeholder-color: #ffffff;
+  --placeholder-opacity: 1;
+  background-color: rgba(229,229,229,0.62);
   border-radius: 10px;
 }
+
 
 ion-item {
   border-radius: 10px;

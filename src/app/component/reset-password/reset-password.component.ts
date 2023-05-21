@@ -50,6 +50,7 @@ export class ResetPasswordComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       if (params && params.reset_password_token) {
         this.resetPasswordToken = params.reset_password_token;
+        console.log('reset_password_token', this.resetPasswordToken);
         //this.checkIfResetIsExpired(params.expire);
         this.isReset = true;
       } else {
@@ -94,7 +95,6 @@ export class ResetPasswordComponent implements OnInit {
       passwordConfirmation: this.resetPasswordFromGroup.get('confirmPassword').value,
       resetPasswordToken: this.resetPasswordToken
     };
-
     await this.store.dispatch(new Account.ResetPassword(data)).toPromise();
     this.resetInProgress = false;
   }
@@ -108,16 +108,5 @@ export class ResetPasswordComponent implements OnInit {
     }
     form.get('confirmPassword').setErrors(null);
     return null;
-  }
-
-  private checkIfResetIsExpired(expire: any) {
-    const recoveryDate = new Date(expire);
-    const recoveryDateOneHourLater = new Date(recoveryDate.getTime() + 60 * 60 * 1000);
-    const currentDate = new Date();
-
-    if (recoveryDateOneHourLater.getTime() - currentDate.getTime() < 0) {
-      // expired action
-      return;
-    }
   }
 }

@@ -8,7 +8,7 @@ export const environment = {
   test: true,
   endpoint: 'https://dev.api.frienradar.com/v1',
   mapsKey: 'AIzaSyBzaHPkOpQSETE6Q9RsIbKFL_LOL_f7xCU',
-  appUrl: 'https://frienradar.com',
+  deeplinkDomain: 'https://frienradar.com',
   googleAnalyticsId: '',
   oneSignalAppId: 'dbcfaa41-2e99-498a-8293-a3020ac85b2c',
   iosAdId: 'ca-app-pub-6953123179903035/3049634317',

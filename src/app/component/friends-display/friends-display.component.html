@@ -20,7 +20,7 @@
   </ion-header>
 
 
-  <ion-grid class="ion-no-padding" *ngIf="user">
+  <ion-grid class="ion-no-padding ion-margin-bottom" *ngIf="user">
     <ion-row>
       <ion-col sizeXl="6" offsetXl="3" class="ion-no-padding ion-padding-horizontal">
         <ion-card style="background-color: var(--ion-color-vbright)"
@@ -34,12 +34,12 @@
                   <ion-text color="secondary">
                     <h1><strong>{{user.username}}</strong></h1>
                   </ion-text>
-                  <ion-text color="secondary">
+                  <ion-text color="dark">
                     <p style="width: 100%">Befreundet seit: <br> <strong>{{lastSeen()}}</strong></p>
                   </ion-text>
                 </div>
               </div>
-              <ion-item *ngIf="user.description" class="ion-margin-top ion-no-padding" lines="none">
+              <ion-item *ngIf="user.description" style="--background: transparent !important;" class="ion-margin-top ion-no-padding" lines="none">
                 <ion-textarea auto-grow="true" readonly="true"
                               [value]="user.description" class="ion-padding">
                 </ion-textarea>
