@@ -1,0 +1,17 @@
+.ios :host {
+  ion-select {
+    --padding-start: 0;
+    color: var(--ion-color-dark);
+  }
+}
+
+.ion-item-select {
+  --padding-end: 0;
+  border-radius: 8px;
+}
+
+ion-content {
+  --offset-top: 0px;
+  --offset-bottom: 0px;
+  --padding-bottom: var(--content-ad-padding-bottom, 0px);
+}

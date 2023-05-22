@@ -1,0 +1,17 @@
+<ion-content fullscreen="true" class="ion-padding" color="light">
+  <h1>Menü</h1>
+  <ion-label><b>Allgemein</b></ion-label>
+  <ion-button fill="clear" expand="block">
+    <ion-icon name="notifications-outline"></ion-icon>
+    <ion-label>Mitteilungen</ion-label>
+  </ion-button>
+  <ion-button fill="clear" expand="block">
+    <ion-icon name="cog-outline"></ion-icon>
+    <ion-label>Einstellungen</ion-label>
+  </ion-button>
+  <ion-label><b>Konto</b></ion-label>
+  <ion-button color="danger" expand="block" fill="clear" (click)="logOut()">
+    <ion-icon name="log-out-outline"></ion-icon>
+    <ion-label>Abmelden</ion-label>
+  </ion-button>
+</ion-content>

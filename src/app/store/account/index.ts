@@ -1,83 +1,120 @@
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { Models } from 'appwrite';
-import { Appwrite } from 'src/app/helpers/appwrite';
 import { GlobalActions } from '../global';
-import { Path } from "../../helpers/path";
-import { Account as AccountModel } from "../../model/account";
-import { Observable } from "rxjs";
-import { Picture } from "../../helpers/picture";
-import { NavController } from '@ionic/angular';
-import { Router } from '@angular/router';
-import { Location } from '../location';
+import { Path } from '../../helper/path';
+import { Platform } from '@ionic/angular';
+import { AppService } from '../../service/app.service';
+import { LocationService } from '../../service/location.service';
+import { ApiService } from '../../service/api.service';
+import { catchError, tap } from 'rxjs/operators';
+import { TokenService } from '../../service/token.service';
+import { PermissionService } from '../../service/permission.service';
+import { User } from '../../model/user';
 
 /* State Model */
 @Injectable()
 export class AccountStateModel {
-  user: AccountModel.User;
+  user: User;
   session: Models.Session;
+  accountsData: [];
+  username: string;
 }
 
 export namespace Account {
   /** Actions */
-  export class Signup {
-    static readonly type = '[Auth] Signup';
-    constructor(
-      public payload: { email: string; password: string; name: string, profilePicture: string }
-    ) {}
-  }
+  export class Register {
+    static readonly type = '[Auth] Register';
 
-  export class Fetch {
-    static readonly type = '[Auth] Fetch';
-  }
-
-  export class Update {
-    static readonly type = '[User] Update';
     constructor(
-      public payload: { prefs?: AccountModel.UserPrefs, name?: string, profilePicture?: string }
-    ) {}
+      public payload: { email: string; password: string; name: string; profilePicture: Blob; registerLoading: boolean }
+    ) {
+    }
   }
 
   export class Login {
     static readonly type = '[Auth] Login';
-    constructor(public payload: { email: string; password: string }) {}
+
+    constructor(public payload: { email: string; password: string; loading: boolean }) {
+    }
+  }
+
+  export class Fetch {
+    static readonly type = '[Auth] Fetch';
+
+  }
+
+  export class SendResetEmail {
+    static readonly type = '[Auth] Reset Password Email';
+
+    constructor(public payload: { email: string; modalController: any }) {
+    }
+  }
+
+  export class SendVerificationEmail {
+    static readonly type = '[Auth] Send Verification Email';
+
+    constructor(public payload: { email: string }) {
+    }
+  }
+
+  export class Verify {
+    static readonly type = '[Auth] Verify';
+
+    constructor(public payload: { token: string }) {
+    }
+  }
+
+  export class Update {
+    static readonly type = '[Auth] Update';
+
+    constructor(public payload: { options: any }) {
+    }
+  }
+
+  export class UpdateWithFormData {
+    static readonly type = '[Auth] Update with FormData';
+
+    constructor(public payload: { options: any; modalController: any}) {
+    }
+  }
+
+  export class ResetPassword {
+    static readonly type = '[Auth] Reset Password';
+
+    constructor(public payload: { resetPasswordToken: string; password: string; passwordConfirmation: string }) {
+    }
   }
 
   export class Logout {
     static readonly type = '[Auth] Logout';
   }
 
-  /** Events */
-  export class Redirect {
-    static readonly type = '[Auth] AccountRedirect';
-    constructor(public payload: { path: string, forward: boolean }) {}
-  }
-}
-
-const prefs = {
-  description: '',
-  distance: 'close',
-  accounts: {
-    instagram: ''
+  export class ResetState {
+    static readonly type = '[Auth] Reset State';
   }
 }
 
 @State<AccountStateModel>({
   name: 'auth',
   defaults: {
-    user: {
-      prefs
-    } as unknown as AccountModel.User,
+    user: null,
     session: null,
+    username: null,
+    accountsData: null
   },
 })
 
 @Injectable()
 export class AccountState {
-  constructor(private navController: NavController,
-              private ngZone: NgZone,
-              private store: Store,
-              private router: Router) {}
+  constructor(private store: Store,
+              private appService: AppService,
+              private platform: Platform,
+              private locationService: LocationService,
+              private apiService: ApiService,
+              private tokenService: TokenService,
+              private permissionService: PermissionService) {
+  }
 
   @Selector()
   static user(state: AccountStateModel) {
@@ -90,8 +127,23 @@ export class AccountState {
   }
 
   @Selector()
-  static distance(state: AccountStateModel) {
-    return state.user.prefs.distance;
+  static preferredDistance(state: AccountStateModel) {
+    return state.user.preferred_distance;
+  }
+
+  @Selector()
+  static invitationCount(state: AccountStateModel) {
+    return state.user.invitation_count;
+  }
+
+  @Selector()
+  static username(state: AccountStateModel) {
+    return state.username;
+  }
+
+  @Selector()
+  static accountsData(state: AccountStateModel) {
+    return state.accountsData;
   }
 
   @Selector()
@@ -99,188 +151,239 @@ export class AccountState {
     return !!state.user;
   }
 
-  @Action(Account.Login)
-  async login(
-    { patchState, dispatch }: StateContext<AccountStateModel>,
-    action: Account.Login
+  @Action(Account.Register)
+  async register(
+    {patchState, dispatch}: StateContext<AccountStateModel>,
+    action: Account.Register
   ) {
-    let { email, password } = action.payload;
-    try {
-      await Appwrite.accountProvider().createEmailSession(email, password);
-      await dispatch(new Account.Fetch);
-      dispatch(new Account.Redirect({ path: Path.default, forward: true }));
-    } catch (e: any) {
-      this.handleError(e, dispatch);
-    }
-  }
+    let {email, password, name, profilePicture, registerLoading} = action.payload;
 
-  @Action(Account.Signup)
-  async signup(
-    { patchState, dispatch }: StateContext<AccountStateModel>,
-    action: Account.Signup
-  ) {
-    let { email, password, name, profilePicture } = action.payload;
-    try {
-      let user = await Appwrite.accountProvider().create(
-        'unique()',
-        email,
-        password,
-        name
-      ) as AccountModel.User;
-      let session = await Appwrite.accountProvider().createEmailSession(email, password);
-      await Appwrite.accountProvider().updatePrefs(prefs);
-      user.pictureBreaker = await this.updateProfilePicture(profilePicture, user.$id, dispatch);
-      patchState({
-        user,
-        session,
-      });
-      dispatch(new Account.Redirect({ path: Path.default, forward: true }));
-    } catch (e: any) {
-      this.handleError(e, dispatch);
-    }
-  }
+    const formData = new FormData();
+    formData.append('profile_picture', profilePicture, profilePicture.type);
+    formData.append('email', email);
+    formData.append('password', password);
+    formData.append('name', name);
 
-  @Action(Account.Fetch)
-  async fetch(
-    { patchState, dispatch }: StateContext<AccountStateModel>,
-    action: Account.Fetch
-  ) {
-    let user = this.store.selectSnapshot(AccountState.user);
-    let session = this.store.selectSnapshot(AccountState.session);
+    return this.apiService.post('/user', formData, true).toPromise().then(async (response: any) => {
+      const user = response.body.data;
+      await this.tokenService.setTokenFromResponse(response);
 
-    try {
-      // If session is already fetched, don't fetch again
-      if (!session) {
-        session = await Appwrite.accountProvider().getSession('current') as Models.Session;
-        patchState({
-          session
-        });
-      }
-
-      // If user is already fetched, don't fetch again
-      if (!user.$id) {
-        user = await Appwrite.accountProvider().get() as AccountModel.User;
-      }
-
-      // Set cacheBreaker to force image reload if not set
-      if (!user.pictureBreaker) {
-        user.pictureBreaker = Picture.cacheBreaker();
-      }
-
-      await dispatch(new Location.FetchLastLocation({ user }));
       patchState({
         user
       });
-    } catch (e: any) {
-      this.handleError(e, dispatch);
-    }
+      await dispatch(new GlobalActions.Redirect({path: Path.additionalLoginData, forward: true, navigateRoot: false}));
+    }, async (error) => {
+      dispatch(new GlobalActions.HandleAuthError({error}));
+    }).finally(() => {
+      registerLoading = false;
+    });
+  }
+
+  @Action(Account.Login)
+  async login(
+    {patchState, dispatch}: StateContext<AccountStateModel>,
+    action: Account.Login
+  ) {
+    let {email, password, loading} = action.payload;
+
+    return this.apiService.post('/user/sign_in', {
+      user: {
+        email,
+        password
+      }
+    }).toPromise().then(async (response: any) => {
+      const user = response.body.data;
+      await this.tokenService.setTokenFromResponse(response);
+      patchState({
+        user
+      });
+
+      await this.appService.redirectAfterSignIn();
+    }, async (error) => {
+      dispatch(new GlobalActions.HandleAuthError({error}));
+    }).finally(() => {
+      loading = false;
+    });
   }
 
   @Action(Account.Update)
   async update(
-    { patchState, dispatch }: StateContext<AccountStateModel>,
+    {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.Update
   ) {
-    const { prefs, profilePicture, name } = action.payload;
-    let user: AccountModel.User = this.store.selectSnapshot(AccountState.user);
-    let updated_user = {} as AccountModel.User;
+    const {options} = action.payload;
 
-    if (!!name) {
-      updated_user = await this.updateUserName(name, dispatch);
-      user = { ...user, ...updated_user } as AccountModel.User;
-    }
-
-    if (!!prefs) {
-      const updated_prefs = { ...user.prefs, ...prefs };
-      updated_user = await this.updateUserPrefs(updated_prefs, patchState, dispatch)
-      user = { ...user, ...updated_user } as AccountModel.User;
-    }
-
-    if (!!profilePicture) {
-      updated_user.pictureBreaker = await this.updateProfilePicture(profilePicture, user.$id, dispatch);
-      user = { ...user, ...updated_user } as AccountModel.User;
-    }
-
-    patchState({
-      user
+    return this.apiService.put('/current_user', {
+      user: options
+    }, false).toPromise().then((response: any) => {
+      patchState({
+        user: response.data
+      });
+    }, async (error) => {
+      dispatch(new GlobalActions.HandleError({error}));
     });
+  }
+
+  @Action(Account.UpdateWithFormData)
+  async updateWithFormData(
+    {patchState, dispatch}: StateContext<AccountStateModel>,
+    action: Account.UpdateWithFormData
+  ) {
+    const {options, modalController} = action.payload;
+
+    const formData = new FormData();
+    if (options.profilePicture) {
+      formData.append('profile_picture', options.profilePicture, options.profilePicture.type);
+      delete options.profilePicture;
+    }
+
+    for (const key in options) {
+      if (options.hasOwnProperty(key)) {
+        const value = options[key];
+        formData.append(key, value);
+      }
+    }
+
+    return this.apiService.put('/current_user/edited', formData, true).pipe(tap(async (response: any) => {
+      patchState({
+        user: response.data
+      });
+
+      dispatch(new GlobalActions.ShowToast({
+        message: 'Benutzer aktualisiert.',
+        color: 'success'
+      }));
+      await modalController.dismiss();
+    }), catchError(async (error) => {
+      dispatch(new GlobalActions.HandleError({error}));
+    }));
+  }
+
+  @Action(Account.Fetch)
+  async fetch(
+    {patchState, dispatch}: StateContext<AccountStateModel>,
+    action: Account.Fetch
+  ) {
+    return this.apiService.get('/current_user').pipe(tap((response: any) => {
+      const user = JSON.parse(response).data;
+
+      patchState({
+        user
+      });
+    }), catchError(async (error) => {
+      dispatch(new GlobalActions.HandleError({error}));
+    }));
   }
 
   @Action(Account.Logout)
   async logout(
-    { patchState, dispatch }: StateContext<AccountStateModel>,
+    {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.Logout
   ) {
-    try {
-      await Appwrite.accountProvider().deleteSession('current');
-      patchState({
-        user: {
-          prefs
-        } as unknown as AccountModel.User,
-        session: null,
-      });
-      dispatch(new Account.Redirect({ path: Path.login, forward: false }));
-    } catch (e: any) {
-      this.handleError(e, dispatch);
-    }
+    return this.apiService.delete('/user/sign_out').pipe(tap(async (response) => {
+      await this.tokenService.removeToken();
+      await this.appService.stop();
+      await dispatch(new GlobalActions.Redirect({path: Path.login, forward: false, navigateRoot: true}));
+    }), catchError(async (error) => {
+      dispatch(new GlobalActions.HandleAuthError({error}));
+    }));
   }
 
-  @Action(Account.Redirect)
-  redirect(ctx: StateContext<AccountStateModel>, action: Account.Redirect) {
-    const { path, forward } = action.payload;
-    const currentUrl = this.router.url;
+  @Action(Account.SendResetEmail)
+  async sendResetEmail(
+    {patchState, dispatch}: StateContext<AccountStateModel>,
+    action: Account.SendResetEmail
+  ) {
+    const {email, modalController} = action.payload;
 
-    if (currentUrl.includes(path)) {
-      return;
-    }
-
-    this.ngZone.run(() => {
-      if (forward) {
-        this.navController.navigateForward([path]);
-      } else {
-        this.navController.navigateBack([path]);
+    this.apiService.post('/user/password', {
+      user: {
+        email
       }
+    }).toPromise().then(async response => {
+      dispatch(new GlobalActions.ShowToast({message: 'Email gesendet falls Konto existiert.', color: 'success'}));
+      await modalController.dismiss();
+    }, async (error) => {
+      dispatch(new GlobalActions.HandleAuthError({error}));
     });
   }
 
-  private async updateUserName(name: string, dispatch: (actions: any) => Observable<void>) {
-    try {
-      let user = await Appwrite.accountProvider().updateName(name) as AccountModel.User;
-      return user;
-    } catch (e: any) {
-      this.handleError(e, dispatch);
-    }
+  @Action(Account.ResetPassword)
+  async resetPassword(
+    {patchState, dispatch}: StateContext<AccountStateModel>,
+    action: Account.ResetPassword
+  ) {
+    const {resetPasswordToken, password, passwordConfirmation} = action.payload;
+
+    return this.apiService.put('/user/password', {
+      user: {
+        reset_password_token: resetPasswordToken,
+        password,
+        password_confirmation: passwordConfirmation
+      }
+    }).toPromise().then(async (response: any) => {
+      patchState({
+        user: response.data
+      });
+      await dispatch(new GlobalActions.ShowToast({message: 'Passwort zurückgesetzt. Du kannst dich jetzt Anmelden', color: 'success'}));
+      await dispatch(new GlobalActions.Redirect({
+        path: Path.login,
+        forward: false,
+        navigateRoot: false
+      }));
+    }, async (error) => {
+      dispatch(new GlobalActions.HandleAuthError({error}));
+    });
   }
 
-  private async updateProfilePicture(profilePictureString: string, userId, dispatch: (actions: any) => Observable<void>) {
-    try {
-      const picture = await Picture.convertToPicture(profilePictureString) as unknown as File;
-      await Appwrite.storageProvider().createFile('profile-picture', userId, picture);
-      return Picture.cacheBreaker();
-    } catch (e: any) {
-      this.handleError(e, dispatch);
-    }
+  @Action(Account.Verify)
+  async verify(
+    {patchState, dispatch}: StateContext<AccountStateModel>,
+    action: Account.Verify
+  ) {
+    const {token} = action.payload;
+
+    return this.apiService.get(`/user/confirmation?confirmation_token=${token}`).pipe(tap((response: any) => {
+      const user = {...this.store.selectSnapshot(AccountState.user)};
+      user.confirmed = true;
+
+      dispatch(new GlobalActions.ShowToast({message: 'Email bestätigt', color: 'success'}));
+
+      patchState({
+        user
+      });
+    }), catchError(async (error) => {
+      dispatch(new GlobalActions.HandleAuthError({error}));
+    }));
   }
 
-  private async updateUserPrefs(prefs: AccountModel.UserPrefs, patchState: (val: Partial<AccountStateModel>) => AccountStateModel, dispatch: (actions: any) => Observable<void>) {
-    try {
-      return await Appwrite.accountProvider().updatePrefs(prefs) as AccountModel.User;
-    } catch (e: any) {
-      this.handleError(e, dispatch);
-    }
+  @Action(Account.SendVerificationEmail)
+  async sendVerificationEmail({
+                                patchState,
+                                dispatch
+                              }: StateContext<AccountStateModel>, action: Account.SendVerificationEmail) {
+    const {email} = action.payload;
+    return this.apiService.post('/user/confirmation', {
+      user: {
+        email
+      }
+    }).pipe(tap((response: any) => {
+      dispatch(new GlobalActions.ShowToast({message: 'Email gesendet', color: 'success'}));
+    }), catchError(async (error) => {
+      dispatch(new GlobalActions.HandleAuthError({error}));
+    }));
   }
 
-  private handleError(e: any, dispatch: (actions: any) => Observable<void>) {
-    if (e.type == 'general_unauthorized_scope') {
-      dispatch(new Account.Redirect({ path: Path.login, forward: true }));
-      return;
-    }
-
-    dispatch(
-      new GlobalActions.showToast({
-        error: e,
-        color: 'danger',
-      })
-    );
+  @Action(Account.ResetState)
+  async resetState({
+                      patchState,
+                      dispatch
+                     }: StateContext<AccountStateModel>, action: Account.ResetState) {
+    patchState({
+      user: null,
+      session: null,
+      username: null,
+      accountsData: null
+    });
   }
 }

@@ -14,5 +14,8 @@
 	},
 	"ios": {
 		"scheme": "Frienradar"
+	},
+	"server": {
+		"hostname": "app.frienradar.com"
 	}
 }

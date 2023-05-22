@@ -1,0 +1,23 @@
+<ion-header translucent="true">
+  <ion-toolbar color="vbright">
+    <ion-title>Radar</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen="true" scroll-y="false">
+  <div style="display: flex; flex-direction: column; height: 100%; width: 100%;">
+    <ion-header collapse="condense">
+      <ion-toolbar>
+        <ion-title size="large" style="color: var(--ion-color-primary)">Radar</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <app-distance-change (distanceChange)="distanceChanged($event)"></app-distance-change>
+    <div class="ion-padding radar-wrapper" style="flex: 1;">
+      <app-radar-display [geohash]="geohash" [currentDistance]="currentDistance"></app-radar-display>
+    </div>
+    <ion-button size="block" class="ion-margin-horizontal ion-margin-bottom" *ngIf="isRegionalChatAvailable" (click)="notImplemented()">
+      <ion-label>Regional Chat öffnen</ion-label>
+      <ion-icon name="chatbubbles" style="margin-left: 10px"></ion-icon>
+    </ion-button>
+  </div>
+</ion-content>

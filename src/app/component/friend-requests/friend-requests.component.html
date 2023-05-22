@@ -1,0 +1,52 @@
+<ion-header translucent="true">
+  <ion-toolbar color="vbright">
+    <ion-buttons slot="start">
+      <ion-back-button text="Zurück" defaultHref="/tabs/friends" color="secondary"></ion-back-button>
+    </ion-buttons>
+    <ion-chip color="primary" slot="end" style="margin-right: 13px">
+      <ion-icon name="mail"></ion-icon>
+      <ion-label>{{requests && requests.length || 0}}</ion-label>
+    </ion-chip>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="refreshInvitations($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div *ngIf="requests && requests.length === 0" style="position:absolute; top: 50%; left: 50%; display: flex; flex-direction: column; text-align: center; align-items: center; transform: translate(-50%, -50%);">
+    <ion-label>Hier befindet sich zurzeit nichts</ion-label>
+    <ion-button shape="round" size="small" color="primary" routerLink="/tabs/nearby">Freunde finden</ion-button>
+  </div>
+
+  <div *ngIf="requests === null" style="position:absolute; width: 100%; top: 50%; left: 50%; display: flex; flex-direction: column; text-align: center; align-items: center; transform: translate(-50%, -50%);">
+    <div style="display: flex; align-items: center; gap: 15px">
+      <ion-spinner name="crescent"></ion-spinner>
+      Anfragen werden geladen...
+    </div>
+  </div>
+
+  <ion-item lines="none" class="ion-no-margin">
+    <ion-label color="primary">
+      <h1><strong>Freundschaftsanfragen</strong></h1>
+      <p>Warte auf deine Freundschaftsanfragen</p>
+    </ion-label>
+  </ion-item>
+  <ion-list class="ion-margin ion-no-padding">
+    <ion-item *ngFor="let request of requests; let i = index" [lines]="requests.length - 1 === i ? 'none' : null" class="list-item">
+      <ion-avatar slot="start">
+        <ion-img src="{{request.sender_profile_picture}}"></ion-img>
+      </ion-avatar>
+      <ion-label>
+        <h2><strong>{{request.sender_username}}</strong></h2>
+      </ion-label>
+      <ion-button slot="end" shape="round" size="small" color="success" (click)="acceptInvitation(request.id)">
+        <ion-icon name="checkmark-circle-outline" mode="icon-only"></ion-icon>
+      </ion-button>
+      <ion-button slot="end" shape="round" size="small" color="danger" (click)="rejectInvitation(request.id, request.sender_username)">
+        <ion-icon name="close-circle-outline" mode="icon-only"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </ion-list>
+</ion-content>

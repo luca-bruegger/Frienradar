@@ -36,7 +36,7 @@
               "src/global.scss"
             ],
             "scripts": [
-              "./node_modules/latlon-geohash/latlon-geohash.js"
+              "./node_modules/ngeohash/main.js"
             ],
             "aot": false,
             "vendorChunk": true,
@@ -47,6 +47,22 @@
             "namedChunks": true
           },
           "configurations": {
+            "staging": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.staging.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            },
             "production": {
               "fileReplacements": [
                 {
@@ -83,6 +99,9 @@
           "configurations": {
             "production": {
               "browserTarget": "app:build:production"
+            },
+            "staging": {
+              "browserTarget": "app:build:staging"
             },
             "ci": {
               "progress": false

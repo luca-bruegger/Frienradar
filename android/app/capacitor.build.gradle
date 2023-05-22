@@ -2,27 +2,28 @@
 
 android {
   compileOptions {
-      sourceCompatibility JavaVersion.VERSION_1_8
-      targetCompatibility JavaVersion.VERSION_1_8
+      sourceCompatibility JavaVersion.VERSION_11
+      targetCompatibility JavaVersion.VERSION_11
   }
 }
 
 apply from: "../capacitor-cordova-android-plugins/cordova.variables.gradle"
 dependencies {
+    implementation project(':capacitor-community-admob')
+    implementation project(':capacitor-community-background-geolocation')
     implementation project(':capacitor-app')
     implementation project(':capacitor-camera')
     implementation project(':capacitor-device')
     implementation project(':capacitor-geolocation')
-    implementation project(':capacitor-google-maps')
     implementation project(':capacitor-haptics')
     implementation project(':capacitor-keyboard')
     implementation project(':capacitor-local-notifications')
     implementation project(':capacitor-push-notifications')
     implementation project(':capacitor-status-bar')
-    implementation "com.android.support:appcompat-v7:27.+"
+    implementation project(':capacitor-native-settings')
+    implementation "com.onesignal:OneSignal:4.8.5"
 }
-apply from: "../../node_modules/cordova-plugin-telerik-imagepicker/src/android/ignorelinterrors.gradle"
-apply from: "../../node_modules/cordova-plugin-telerik-imagepicker/src/android/androidtarget.gradle"
+apply from: "../../node_modules/onesignal-cordova-plugin/build-extras-onesignal.gradle"
 
 if (hasProperty('postBuildExtras')) {
   postBuildExtras()

@@ -1,19 +1,22 @@
-<ion-tabs>
+<ion-tabs (ionTabsWillChange)="changeTab()">
   <ion-tab-bar slot="bottom" translucent="true">
-    <ion-tab-button tab="interests">
-      <span class="material-symbols-rounded tab-icon">interests</span>
+    <ion-tab-button tab="social-accounts">
+      <ion-icon name="albums-outline"></ion-icon>
     </ion-tab-button>
-    <ion-tab-button tab="chat">
-      <span class="material-symbols-rounded tab-icon">chat</span>
+    <ion-tab-button tab="friends">
+      <ion-badge *ngIf="count > 0" color="danger" style="right: -15px; top: 3px; z-index: 3; position: absolute; max-width: min-content">{{count}}</ion-badge>
+      <ion-icon name="people-outline"></ion-icon>
     </ion-tab-button>
     <ion-tab-button tab="radar">
-      <span class="material-symbols-rounded tab-icon">radar</span>
+      <ion-icon name="map-outline"></ion-icon>
     </ion-tab-button>
     <ion-tab-button tab="nearby">
-      <span class="material-symbols-rounded tab-icon">featured_play_list</span>
+      <ion-icon name="body-outline"></ion-icon>
     </ion-tab-button>
-    <ion-tab-button tab="profile">
-      <span class="material-symbols-rounded tab-icon">person</span>
+    <ion-tab-button>
+      <ion-menu-button>
+      <ion-icon name="person-outline"></ion-icon>
+      </ion-menu-button>
     </ion-tab-button>
   </ion-tab-bar>
 </ion-tabs>

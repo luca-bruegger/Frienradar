@@ -1,0 +1,16 @@
+ion-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+ion-item {
+  border-radius: 10px;
+  --background-hover: #fff;
+  --background: #fff;
+  --color: #000;
+}
+
+ion-input:hover {
+  --color: #000;
+}

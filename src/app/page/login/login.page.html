@@ -1,0 +1,115 @@
+<ion-content>
+  <ion-grid class="container-grid">
+    <ion-row style="flex: 1; align-content: center">
+      <ion-col sizeXl="4" offsetXl="4" class="ion-no-padding ion-padding-horizontal">
+        <div class="ion-text-center ion-padding-bottom">
+          <img src="assets/images/banner.png" alt="Frienradar Banner" style="max-width: 150px">
+        </div>
+        <ion-card-title color="primary">
+          {{isRegister ? 'Registrieren' : 'Anmelden'}}
+        </ion-card-title>
+        <ion-card-subtitle>
+          {{isRegister ? 'Neues Konto erstellen' : 'Mit bestehendem Konto anmelden'}}
+        </ion-card-subtitle>
+        <form (submit)="signInUser()" [hidden]="loginInProgress">
+          <div [formGroup]="formGroup" class="ion-margin-vertical">
+            <div *ngIf="isRegister">
+              <app-profile-picture-select [profilePicture]="profilePicture"
+                                          (profilePictureChange)="setProfilePicture($event)"></app-profile-picture-select>
+              <ng-container *ngFor="let validation of formMessages.profilePicture">
+                <div class="error-message" style="text-align: center; padding-left: 0"
+                     *ngIf="displayFormErrorByName('profilePicture', validation.type)">
+                  {{ validation.message }}
+                </div>
+              </ng-container>
+              <ion-item>
+                <ion-input formControlName="name" placeholder="Vollständiger Name..." maxlength="50" required="true"
+                           autocorrect="true"></ion-input>
+                <ng-container *ngFor="let validation of formMessages.name">
+                  <ion-note slot="error" *ngIf="displayFormErrorByName('name', validation.type)">
+                    {{ validation.message }}
+                  </ion-note>
+                </ng-container>
+              </ion-item>
+            </div>
+            <ion-item>
+              <ion-input #emailInput formControlName="email" type="email" email="true" maxlength="50" required="true"
+                         autocorrect="true" placeholder="Email Adresse"></ion-input>
+              <ng-container *ngFor="let validation of formMessages.email">
+                <ion-note slot="error" *ngIf="displayFormErrorByName('email', validation.type)">
+                  {{ validation.message }}
+                </ion-note>
+              </ng-container>
+            </ion-item>
+            <ion-item lines="none">
+              <ion-input #passwordInput formControlName="password" type="password" maxlength="50" required="true"
+                         autocorrect="true" placeholder="Passwort"></ion-input>
+              <ng-container
+                *ngFor="let validation of isRegister ? formMessages.passwordRegister : formMessages.passwordLogin">
+                <ion-note slot="error" *ngIf="displayFormErrorByName('password', validation.type)">
+                  {{ validation.message }}
+                </ion-note>
+              </ng-container>
+            </ion-item>
+            <div *ngIf="isRegister" style="width: 100%; padding-left: 15px; display: block">
+              <password-strength-meter [password]="formGroup.value.password"
+                                       (strengthChange)="this.strength = $event"></password-strength-meter>
+            </div>
+            <div *ngIf="isRegister">
+              <div class="terms-checkbox">
+                <div class="ion-padding checkbox-wrapper">
+                  <ion-checkbox slot="start" formControlName="acceptTerms"></ion-checkbox>
+                </div>
+                <div>
+                  <ion-label class="ion-text-wrap" style="font-size: 1rem">Ich akzeptiere die <a
+                    href="https://frienradar.com/privacy/">Datenschutzerklärung</a>
+                    und die <a href="https://frienradar.com/terms-conditions/">Nutzungsbedinungen</a></ion-label>
+                </div>
+              </div>
+              <ng-container
+                *ngFor="let validation of isRegister ? formMessages.acceptTerms : formMessages.acceptTerms">
+                <div class="error-message"
+                     *ngIf="displayFormErrorByName('acceptTerms', validation.type)">
+                  {{ validation.message }}
+                </div>
+              </ng-container>
+            </div>
+          </div>
+          <ion-grid class="ion-no-padding">
+            <ion-row class="ion-align-items-center">
+              <ion-col size="12" class="ion-text-center">
+                <ion-button class="action-button" (click)="signInUser()" color="secondary">
+                  {{isRegister ? 'Registrieren' : 'Anmelden'}}
+                </ion-button>
+              </ion-col>
+            </ion-row>
+            <ion-row class="ion-align-items-center">
+              <ion-col size="12" class="ion-text-center">
+                <ion-button size="small" *ngIf="isRegister" [disabled]="loginInProgress" fill="clear" color="secondary"
+                            (click)="changeLoginType(false)">
+                  Hast du bereits ein Konto?
+                </ion-button>
+                <ion-button size="small" *ngIf="!isRegister" [disabled]="loginInProgress" fill="clear" color="secondary"
+                            (click)="changeLoginType(true)">
+                  Noch kein Konto?
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </form>
+        <ion-card-content *ngIf="loginInProgress">
+          <div
+            style="display: flex; flex-direction: row; text-align: center; align-items: center; gap: 10px; justify-content: center; height: 70px">
+            <ion-spinner name="crescent" style="vertical-align: center"></ion-spinner>
+            <p>Du wirst angemeldet...</p>
+          </div>
+        </ion-card-content>
+      </ion-col>
+      <ion-col *ngIf="!isRegister" size="12" class="ion-text-center">
+        <ion-button color="secondary" fill="clear" [disabled]="loginInProgress" (click)="resetPassword()">
+          <small>Passwort zurücksetzen</small>
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

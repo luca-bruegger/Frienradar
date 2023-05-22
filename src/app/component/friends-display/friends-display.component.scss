@@ -1,0 +1,30 @@
+ion-textarea {
+  --background: #373737;
+  --color: #ffffff;
+  --padding-bottom: 0;
+  --padding-end: 0;
+  --padding-start: 0;
+  --padding-top: 0;
+  --placeholder-color: #ffffff;
+  --placeholder-opacity: 1;
+  background-color: rgba(229,229,229,0.62);
+  border-radius: 10px;
+}
+
+
+ion-item {
+  border-radius: 10px;
+  --inner-padding-end: 0px;
+  --background-hover: #fff;
+  --background: #fff;
+  --color: #000;
+}
+
+ion-list {
+  overflow: hidden;
+  background: transparent;
+}
+
+ion-content {
+  --padding-bottom: var(--content-ad-padding-bottom, 60px);
+}
