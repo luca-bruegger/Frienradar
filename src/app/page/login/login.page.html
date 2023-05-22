@@ -1,0 +1,113 @@
+<ion-content *transloco="let t">
+  <ion-grid class="container-grid">
+    <ion-row style="flex: 1; align-content: center">
+      <ion-col sizeXl="4" offsetXl="4" class="ion-no-padding ion-padding-horizontal">
+        <div class="ion-text-center ion-padding-bottom">
+          <img src="assets/images/banner.png" alt="Frienradar Banner" style="max-width: 150px">
+        </div>
+        <ion-card-title color="primary">
+          {{isRegister ? t('login-page.register') : t('login-page.login')}}
+        </ion-card-title>
+        <ion-card-subtitle>
+          {{isRegister ? t('login-page.create-account') : t('login-page.with-existing-account')}}
+        </ion-card-subtitle>
+        <form (submit)="signInUser()" [hidden]="loginInProgress">
+          <div [formGroup]="formGroup" class="ion-margin-vertical">
+            <div *ngIf="isRegister">
+              <app-profile-picture-select [profilePicture]="profilePicture"
+                                          (profilePictureChange)="setProfilePicture($event)"></app-profile-picture-select>
+              <ng-container *ngFor="let validation of formMessages.profilePicture">
+                <div class="error-message" style="text-align: center; padding-left: 0"
+                     *ngIf="displayFormErrorByName('profilePicture', validation.type)">
+                  {{ 'validation-profilePicture.' + validation.type | transloco }}
+                </div>
+              </ng-container>
+              <ion-item>
+                <ion-input formControlName="name" placeholder="{{t ('login-page.placeholder-name')}}" maxlength="50" required="true"
+                           autocorrect="true"></ion-input>
+                <ng-container *ngFor="let validation of formMessages.name">
+                  <ion-note class="error-note" slot="error" *ngIf="displayFormErrorByName('name', validation.type)">
+                    {{ 'validation-name.' + validation.type | transloco }}
+                  </ion-note>
+                </ng-container>
+              </ion-item>
+            </div>
+            <ion-item>
+              <ion-input #emailInput formControlName="email" type="email" email="true" maxlength="50" required="true"
+                         autocorrect="true" placeholder="{{t ('login-page.placeholder-email')}}"></ion-input>
+              <ng-container *ngFor="let validation of formMessages.email">
+                <ion-note class="error-note" slot="error" *ngIf="displayFormErrorByName('email', validation.type)">
+                  {{ 'validation-email.' + validation.type | transloco }}
+                </ion-note>
+              </ng-container>
+            </ion-item>
+            <ion-item lines="none">
+              <ion-input #passwordInput formControlName="password" type="password" maxlength="50" required="true"
+                         autocorrect="true" placeholder="{{t ('login-page.placeholder-password')}}"></ion-input>
+              <ng-container
+                *ngFor="let validation of isRegister ? formMessages.passwordRegister : formMessages.passwordLogin">
+                <ion-note class="error-note" slot="error" *ngIf="displayFormErrorByName('password', validation.type)">
+                  {{ 'validation-password.' + validation.type | transloco }}
+                </ion-note>
+              </ng-container>
+            </ion-item>
+            <div *ngIf="isRegister" style="width: 100%; padding-left: 15px; display: block">
+              <password-strength-meter [password]="formGroup.value.password"
+                                       (strengthChange)="this.strength = $event"></password-strength-meter>
+            </div>
+            <div *ngIf="isRegister">
+              <div class="terms-checkbox">
+                <div class="ion-padding checkbox-wrapper">
+                  <ion-checkbox slot="start" formControlName="acceptTerms"></ion-checkbox>
+                </div>
+                <div>
+                  <ion-label class="ion-text-wrap" style="font-size: 1rem" [innerHTML]="t ('login-page.accept-terms')"></ion-label>
+                </div>
+              </div>
+              <ng-container
+                *ngFor="let validation of isRegister ? formMessages.acceptTerms : formMessages.acceptTerms">
+                <div class="error-message"
+                     *ngIf="displayFormErrorByName('acceptTerms', validation.type)">
+                  {{ 'validation-acceptTerms.' + validation.type | transloco }}
+                </div>
+              </ng-container>
+            </div>
+          </div>
+          <ion-grid class="ion-no-padding">
+            <ion-row class="ion-align-items-center">
+              <ion-col size="12" class="ion-text-center">
+                <ion-button class="action-button" (click)="signInUser()" color="secondary">
+                  {{isRegister ? t ('login-page.register-button') : t ('login-page.login-button')}}
+                </ion-button>
+              </ion-col>
+            </ion-row>
+            <ion-row class="ion-align-items-center">
+              <ion-col size="12" class="ion-text-center">
+                <ion-button size="small" *ngIf="isRegister" [disabled]="loginInProgress" fill="clear" color="secondary"
+                            (click)="changeLoginType(false)">
+                  {{t ('login-page.have-account')}}
+                </ion-button>
+                <ion-button size="small" *ngIf="!isRegister" [disabled]="loginInProgress" fill="clear" color="secondary"
+                            (click)="changeLoginType(true)">
+                  {{t ('login-page.no-account')}}
+                </ion-button>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </form>
+        <ion-card-content *ngIf="loginInProgress">
+          <div
+            style="display: flex; flex-direction: row; text-align: center; align-items: center; gap: 10px; justify-content: center; height: 70px">
+            <ion-spinner name="crescent" style="vertical-align: center"></ion-spinner>
+            <p>{{t ('general.being-signed-in')}}</p>
+          </div>
+        </ion-card-content>
+      </ion-col>
+      <ion-col *ngIf="!isRegister" size="12" class="ion-text-center">
+        <ion-button color="secondary" fill="clear" [disabled]="loginInProgress" (click)="resetPassword()">
+          <small>{{t ('login-page.reset-password')}}</small>
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

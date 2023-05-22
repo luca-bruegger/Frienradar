@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { TabsPage } from './tabs.page';
+import { AuthGuard } from '../helper/auth.guard';
 
 const routes: Routes = [
   {
@@ -8,24 +9,24 @@ const routes: Routes = [
     component: TabsPage,
     children: [
       {
-        path: 'profile',
-        loadChildren: () => import('../pages/profile/profile.module').then(m => m.ProfilePageModule)
-      },
-      {
         path: 'radar',
-        loadChildren: () => import('../pages/radar/radar.module').then(m => m.RadarPageModule)
+        loadChildren: () => import('../page/radar/radar.module').then(m => m.RadarPageModule),
+        canActivate: [AuthGuard]
       },
       {
-        path: 'chat',
-        loadChildren: () => import('../pages/chat/chat.module').then(m => m.ChatPageModule)
+        path: 'friends',
+        loadChildren: () => import('../page/friends/friends.module').then(m => m.FriendsPageModule),
+        canActivate: [AuthGuard]
       },
       {
-        path: 'interests',
-        loadChildren: () => import('../pages/interest/interest.module').then(m => m.InterestPageModule)
+        path: 'social-accounts',
+        loadChildren: () => import('../page/social-accounts/social-accounts.module').then(m => m.SocialAccountsPageModule),
+        canActivate: [AuthGuard]
       },
       {
         path: 'nearby',
-        loadChildren: () => import('../pages/nearby/nearby.module').then(m => m.NearbyPageModule)
+        loadChildren: () => import('../page/nearby/nearby.module').then(m => m.NearbyPageModule),
+        canActivate: [AuthGuard]
       },
       {
         path: '',

@@ -1,0 +1,19 @@
+<ion-header translucent="true">
+  <ion-toolbar color="vbright">
+    <ion-title>{{'radar-page.title' | transloco}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen="true" scroll-y="false">
+  <div style="display: flex; flex-direction: column; height: 100%; width: 100%;">
+    <ion-header collapse="condense">
+      <ion-toolbar>
+        <ion-title size="large" style="color: var(--ion-color-primary)">{{'radar-page.title' | transloco}}</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <app-distance-change (distanceChange)="distanceChanged($event)"></app-distance-change>
+    <div class="ion-padding radar-wrapper" style="flex: 1;">
+      <app-radar-display [geohash]="geohash" [currentDistance]="currentDistance"></app-radar-display>
+    </div>
+  </div>
+</ion-content>

@@ -1,0 +1,249 @@
+{
+	"login-page": {
+		"login": "Anmelden",
+		"register": "Registrieren",
+		"create-account": "Ein Konto erstellen",
+		"with-existing-account": "Nutzen sie ein bestehendes Konto",
+		"placeholder-name": "Vollständiger Name",
+		"placeholder-email": "Email",
+		"placeholder-password": "Passwort",
+		"register-button": "Registrieren",
+		"login-button": "Anmeldung",
+		"no-account": "Sie haben noch kein Konto?",
+		"have-account": "Sie haben bereits ein Konto?",
+		"reset-password": "Passwort zurücksetzen",
+		"accept-terms": "Ich akzeptiere die <a href=\"https://frienradar.com/privacy/\">Datenschutzerklärung</a> und die <a href=\"https://frienradar.com/terms-conditions/\">Nutzungsbedingungen</a>"
+	},
+	"social-accounts-page": {
+		"title": "Konten",
+		"add-account": "Dienst hinzufügen"
+	},
+	"additional-login-data": {
+		"title": "Konfiguration",
+		"permissions": "Berechtigungen",
+		"location-access": "Standortzugriff",
+		"email-confirmation": "Email Bestätigung",
+		"email-confirmation-description": "Sie erhalten eine Email mit einem Link zur Bestätigung Ihrer Email-Adresse.",
+		"email-confirmation-button": "Email senden",
+		"email-confirmation-sent": "Email gesendet",
+		"request": "Anfragen",
+		"photo-access": "Fotozugriff",
+		"optional": "Optional",
+		"notifications": "Benachrichtigungen",
+		"allow": "Erlauben",
+		"your-email": "Ihre Email: {{email}}",
+		"confirmed": "Bestätigt",
+		"not-confirmed": "Nicht bestätigt",
+		"wait": "Warten Sie {{time}}s",
+		"add-service": "Dienst hinzufügen",
+		"added-service": "Zusätzlicher Service",
+		"add-service-description": "Um Frienradar nutzen zu können, müssen Sie mindestens einen Dienst hinzufügen.",
+		"primary-service": "Primärdienst",
+		"create": "Erstellen",
+		"username": "Nutzername",
+		"username-description-present": "Der Benutzername kann in den Profileinstellungen geändert werden.",
+		"username-description-not-present": "Der Benutzername wird für die Anzeige in der App verwendet. Dies ist für Sie, aber auch für andere sichtbar.",
+		"finish": "Beenden",
+		"progress": "Die Registrierung wird abgeschlossen...",
+		"sign-out": "Abmelden",
+		"completed": "Konfiguration erfolgreich abgeschlossen",
+		"already-confirmed": "Email bereits bestätigt",
+		"confirm-before-continue": "Bestätigen Sie Ihre Email-Adresse, um fortzufahren.",
+		"activate-mandatory-permissions": "Aktivieren Sie die erforderlichen Berechtigungen",
+		"email-confirmed": "Email erfolgreich bestätigt",
+		"mail-sent": "Email gesendet"
+	},
+	"nearby-page": {
+		"title": "Nahe bei dir",
+		"searching": "Personen in der Nähe werden gesucht...",
+		"no-people-found": "Keine Personen in der Nähe gefunden.<br> Gehen Sie an einen anderen Ort oder ändern Sie die Entfernung.",
+		"loading": "Ladet..."
+	},
+	"general": {
+		"loading": "Wird geladen...",
+		"being-signed-in": "Anmelden...",
+		"data-is-refreshing": "Daten werden aktualisiert...",
+		"cancel": "Abbrechen",
+		"save": "Speichern",
+		"back": "Zurück",
+		"close": "Schliessen",
+		"open": "Offen",
+		"edit": "Bearbeiten",
+		"delete": "Löschen",
+		"ok": "OK"
+	},
+	"validation-email": {
+		"required": "Email ist erforderlich",
+		"pattern": "Email ist ungültig"
+	},
+	"validation-password": {
+		"required": "Passwort wird benötigt",
+		"minLength": "Das Passwort ist zu kurz",
+		"maxLength": "Das Passwort ist zu lang",
+		"pattern": "Das Passwort muss Gross- und Kleinbuchstaben sowie Zahlen enthalten. (mind. 8 Zeichen)"
+	},
+	"validation-name": {
+		"required": "Name ist erforderlich",
+		"minLength": "Name ist zu kurz",
+		"maxLength": "Name ist zu lang"
+	},
+	"validation-description": {
+		"minLength": "Beschreibung ist zu kurz",
+		"maxLength": "Beschreibung ist zu lang"
+	},
+	"validation-profilePicture": {
+		"required": "Profilbild ist erforderlich"
+	},
+	"validation-acceptTerms": {
+		"required": "Du musst die Geschäftsbedingungen akzeptieren"
+	},
+	"validation-username": {
+		"required": "Benutzername wird benötigt",
+		"minLength": "Der Benutzername ist zu kurz",
+		"maxLength": "Der Benutzername ist zu lang",
+		"pattern": "Der Benutzername enthält Leerzeichen"
+	},
+	"validation-social-account": {
+		"required": "Benutzername wird benötigt",
+		"minLength": "Der Benutzername ist zu kurz",
+		"maxLength": "Der Benutzername ist zu lang",
+		"pattern": "Der Benutzername enthält Leerzeichen"
+	},
+	"validation-social-account-username": {
+		"required": "Benutzername wird benötigt",
+		"minLength": "Der Benutzername ist zu kurz",
+		"maxLength": "Der Benutzername ist zu lang",
+		"pattern": "Der Benutzername enthält Leerzeichen"
+	},
+	"elements-distance-change": {
+		"near": "Nahe",
+		"distant": "Entfernt",
+		"away": "Weg",
+		"far-away": "Weit weg"
+	},
+	"elements-user-element": {
+		"request": "Anfrage",
+		"request-sent": "Anfrage geschickt",
+		"request-received": "Anfrage erhalten",
+		"friends": "Freunde"
+	},
+	"action-cable": {
+		"request-sent": "Anfrage gesendet an {{name}}",
+		"request-received": "{{name}} möchte dein Freund sein",
+		"request-accepted": "{{name}} hat deine Anfrage angenommen",
+		"request-declined": "{{name}} hat deine Anfrage abgelehnt"
+	},
+	"permission-service": {
+		"needs-permission": "{{name}} benötigt Erlaubnis"
+	},
+	"radar-page": {
+		"title": "Radar"
+	},
+	"maintenance": {
+		"message": "Server befindet sich im Wartungsmodus...",
+		"try-again": "Versuchen Sie es später erneut",
+		"reconnected": "Die Verbindung wurde erfolgreich wiederhergestellt"
+	},
+	"edit-profile": {
+		"title": "Profil bearbeiten",
+		"username-description": "Ihr Name ist <strong>nur für Sie sichtbar</strong>.",
+		"description": "Beschreibung",
+		"description-description": "Deine Beschreibung...",
+		"updated": "Profil erfolgreich aktualisiert"
+	},
+	"profile-picture-select": {
+		"preview": "Vorschau",
+		"change": "Profilbild ändern",
+		"select-photo": "Foto auswählen",
+		"take-photo": "Foto machen",
+		"select": "Profilbild auswählen"
+	},
+	"radar-display": {
+		"not-loaded": "Karte kann nicht geladen werden. Ihre Position konnte nicht erkannt werden.",
+		"try-again": "Versuchen Sie es erneut"
+	},
+	"friend-requests": {
+		"title": "Freundschaftsanfragen",
+		"no-requests": "Zur Zeit gibt es hier nichts",
+		"loading": "Anfragen werden geladen...",
+		"wait": "Warte auf deine Freundschaftsanfragen",
+		"decline": "Wird abgelehnt...",
+		"decline-message": "Freundschaftsanfrage abgelehnt",
+		"accept": "Wird akzeptiert...",
+		"decline-invitation": "Einladung ablehnen",
+		"decline-invitation-confirm": "Möchten Sie die Einladung von {{name}} wirklich ablehnen?",
+		"decline-confirm": "Löschen",
+		"find": "Freunde finden"
+	},
+	"friends-display": {
+		"title": "Profil",
+		"friend-since": "Freund seit:<br> <strong>{{Datum}}</strong>",
+		"services": "Vernetzte Dienste",
+		"no-services": "{{name}} hat noch keine Dienste verbunden.",
+		"loading": "Profil wird geladen...",
+		"finish-friendship": "Beende die Freundschaft",
+		"finish-friendship-confirm": "Willst du die Freundschaft wirklich beenden?",
+		"finish": "Beenden",
+		"really-finish": "Freundschaft wirklich beenden?",
+		"really-finish-message": "Willst du die Freundschaft für immer beenden? Diese Aktion kann nicht rückgängig gemacht werden.",
+		"remove": "Entfernen",
+		"remove-message": "{{name}} wurde aus deinen Freunden entfernt"
+	},
+	"menu": {
+		"title": "Profil",
+		"sign-out": "Abmelden",
+		"settings": "Einstellungen",
+		"loading": "Ladet...",
+		"force-dark-mode": "Dunkelmodus erzwingen",
+		"socket-connection": "Socket Verbindung",
+		"connected": "Verbunden",
+		"disconnected": "Getrennt",
+		"user-information": "Nutzerinformation",
+		"label": "In der 🇨🇭 mit ❤️ entwickelt",
+		"edit-profile": "Profil bearbeiten"
+	},
+	"reset-password": {
+		"title": "Passwort zurücksetzen",
+		"instructions": "Bitte geben Sie die Email-Adresse ein, mit der Sie Ihr Benutzerkonto registriert haben. Anschliessend erhalten Sie eine Email mit einem Link zum Zurücksetzen Ihres Passworts.",
+		"reset": "Zurücksetzen",
+		"mail-sent": "Ihr Passwort wird zurückgesetzt...<br> Sie erhalten in Kürze eine Email.",
+		"no-match": "Passwörter stimmen nicht überein",
+		"resetting": "Passwort wird zurückgesetzt...",
+		"password-confirmation": "Passwort Bestätigung",
+		"email-sent": "Email gesendet, wenn ein Konto vorhanden ist",
+		"login-message": "Passwort zurücksetzen. Sie können sich jetzt anmelden"
+	},
+	"create-social-account": {
+		"title": "Dienst hinzufügen"
+	},
+	"edit-social-account": {
+		"title": "Benutzernamen ändern",
+		"update": "Aktualisieren",
+		"edit-title": "Dienst bearbeiten"
+	},
+	"select-account": {
+		"description": "Wählen Sie einen Dienst aus, den Sie hinzufügen möchten.",
+		"change": "Dienst ändern",
+		"add": "Dienst hinzufügen",
+		"services": "Dienstleistungen",
+		"search": "Suchen"
+	},
+	"social-account": {
+		"question": "Wie lautet Ihr {{name}}-Benutzername?",
+		"last-account": "Letzter Account",
+		"warning": "Sie dürfen nicht alle Konten löschen!",
+		"delete-confirmation": "Wirklich löschen?",
+		"delete-warning": "Das kann nicht rückgängig gemacht werden!",
+		"permanently-delete": "{{name}} dauerhaft löschen",
+		"edit": "{{name}} bearbeiten",
+		"successfully-created": "Konto erfolgreich erstellt",
+		"successfully-updated": "Konto erfolgreich aktualisiert"
+	},
+	"friends-page": {
+		"title": "Freunde",
+		"requests": "Anfragen",
+		"description": "Du hast im Moment keine Freunde. Es ist Zeit, das zu ändern :)",
+		"nearby-users": "Benutzer in der Nähe",
+		"friend-with": "Du bist jetzt mit {{name}} befreundet"
+	}
+}

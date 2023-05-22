@@ -1,0 +1,57 @@
+<ion-header translucent="true">
+  <ion-toolbar color="vbright">
+    <ion-title color="primary">{{'nearby-page.title' | transloco}}</ion-title>
+    <ion-chip color="secondary" slot="start" style="margin-left: 13px">
+      <ion-icon name="body"></ion-icon>
+      <ion-label>{{nearbyUsersAmount}}</ion-label>
+    </ion-chip>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large" color="primary">{{'nearby-page.title' | transloco}}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-grid class="align-center ion-no-padding" *ngIf="nearbyUsersAmount === 0 && !nearbyUsersForCurrentDistance">
+    <app-distance-change (distanceChange)="distanceChanged($event)"></app-distance-change>
+
+    <ion-row style="flex-grow: 1;" class="ion-padding-vertical ion-padding-horizontal">
+      <ion-col>
+        <div class="center-element">
+          <ion-spinner name="crescent" style="vertical-align: center"></ion-spinner>
+          <ion-label [innerHTML]="'nearby-page.searching' | transloco"></ion-label>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ion-grid class="align-center ion-no-padding" *ngIf="nearbyUsersAmount === 0 && nearbyUsersForCurrentDistance" [hidden]="selectedDistance !== preferredDistance">
+    <app-distance-change (distanceChange)="distanceChanged($event)"></app-distance-change>
+
+    <ion-row style="flex-grow: 1;" class="ion-padding-vertical ion-padding-horizontal">
+      <ion-col>
+        <div class="center-element">
+          <ion-label [innerHTML]="'nearby-page.no-people-found' | transloco">
+          </ion-label>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <app-distance-change *ngIf="nearbyUsersAmount > 0" (distanceChange)="distanceChanged($event)"></app-distance-change>
+
+  <ion-list *ngIf="nearbyUsersAmount > 0" class="ion-margin ion-no-padding">
+    <app-user-element *ngFor="let user of nearbyUsersForCurrentDistance; let i = index; trackBy:identifyNearbyUser"
+                      [user]="user" [isSentTo]="invitationReceived(user)" [isRequested]="requestedInvitation(user)" [isFriend]="isFriend(user)" [isLastElement]="nearbyUsersForCurrentDistance.length - 1 === i"></app-user-element>
+  </ion-list>
+  <ion-infinite-scroll (ionInfinite)="fetchMoreNearbyUsers($event)">
+    <ion-infinite-scroll-content loadingText="{{'nearby-page.no-people-found' | transloco}}" loadingSpinner="crescent"></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+</ion-content>

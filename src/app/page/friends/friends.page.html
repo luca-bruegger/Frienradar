@@ -1,0 +1,43 @@
+<ion-header translucent="true">
+  <ion-toolbar color="vbright">
+    <ion-title color="primary">{{ 'friends-page.title' | transloco }}</ion-title>
+    <ion-chip color="secondary" slot="start" style="margin-left: 13px">
+      <ion-icon name="people"></ion-icon>
+      <ion-label>{{friends.length}}</ion-label>
+    </ion-chip>
+    <ion-buttons collapse="true" slot="end">
+      <ion-button color="primary" routerLink="/tabs/friends/requests">
+        {{ 'friends-page.requests' | transloco }}
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-header collapse="condense" class="ion-no-margin">
+    <ion-toolbar>
+      <ion-title size="large" style="color: var(--ion-color-primary)">{{ 'friends-page.title' | transloco }}</ion-title>
+      <ion-buttons collapse="true" slot="end" style="margin-right: 13px">
+        <ion-badge *ngIf="invitationCount > 0" color="danger" style="right: -5px; top: 0px; z-index: 3; position: absolute; pointer-events: none">{{invitationCount}}</ion-badge>
+        <ion-button color="primary" routerLink="/tabs/friends/requests">
+          <ion-icon name="mail" color="primary"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div *ngIf="friends.length === 0" style="position:absolute; top: 50%; left: 50%; display: flex; flex-direction: column; text-align: center; align-items: center; transform: translate(-50%, -50%);">
+    <ion-label>{{ 'friends-page.description' | transloco }}</ion-label>
+    <ion-button color="secondary" expand="block" routerLink="/tabs/nearby" class="ion-margin-top">
+      <ion-icon slot="start" name="body"></ion-icon>
+      <ion-label>{{ 'friends-page.nearby-users' | transloco }}</ion-label>
+    </ion-button>
+  </div>
+  <ion-list  *ngIf="friends.length > 0" class="ion-margin ion-no-padding">
+    <app-user-element *ngFor="let friend of friends; let i = index" [user]="friend" [friendPreview]="true" [isLastElement]="friends.length -1 === i"></app-user-element>
+  </ion-list>
+</ion-content>

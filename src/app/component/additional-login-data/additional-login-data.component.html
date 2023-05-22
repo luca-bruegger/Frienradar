@@ -1,0 +1,179 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title color="primary">{{ 'additional-login-data.title' | transloco}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-header collapse="condense" class="ion-no-margin">
+    <ion-toolbar>
+      <ion-title size="large" style="color: var(--ion-color-primary)">{{ 'additional-login-data.title' | transloco}}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <ion-grid class="ion-no-padding ion-margin-horizontal ion-padding-bottom">
+    <ion-row class="ion-margin-bottom">
+      <ion-col size-xl="4" offset-xl="4" size="12">
+        <ion-card color="light">
+          <ion-card-content>
+            <ion-card-subtitle>{{ 'additional-login-data.permissions' | transloco}}</ion-card-subtitle>
+            <ion-item color="light" [lines]="isMobile ? '' : 'none'">
+              <ion-icon *ngIf="permissionServiceGeolocation" slot="start" name="checkbox-outline"
+                        color="success"></ion-icon>
+              <ion-icon *ngIf="!permissionServiceGeolocation" slot="start" name="close-circle-outline"
+                        color="danger"></ion-icon>
+              <ion-label>{{ 'additional-login-data.location-access' | transloco}}</ion-label>
+              <ion-button [class.access-button]="!mandatoryAnimationClassEnabled"
+                          [class.access-button-error]="mandatoryAnimationClassEnabled"
+                          *ngIf="!permissionServiceGeolocation" slot="end"
+                          (click)="requestGeolocationPermission()">
+                <ion-label>{{ 'additional-login-data.request' | transloco}}</ion-label>
+              </ion-button>
+            </ion-item>
+            <ion-item color="light" *ngIf="isMobile" lines="none">
+              <ion-icon *ngIf="permissionServicePhoto" slot="start" name="checkbox-outline"
+                        color="success"></ion-icon>
+              <ion-icon *ngIf="!permissionServicePhoto" slot="start" name="close-circle-outline"
+                        color="danger"></ion-icon>
+              <ion-label>{{ 'additional-login-data.photo-access' | transloco}}</ion-label>
+              <ion-button [class.access-button]="!mandatoryAnimationClassEnabled"
+                          [class.access-button-error]="mandatoryAnimationClassEnabled"
+                          *ngIf="!permissionServicePhoto"
+                          slot="end"
+                          (click)="requestPhotoPermission()">
+                <ion-label>{{ 'additional-login-data.request' | transloco}}</ion-label>
+              </ion-button>
+            </ion-item>
+            <ion-card-subtitle *ngIf="isMobile"><small>{{ 'additional-login-data.optional' | transloco}}</small></ion-card-subtitle>
+            <ion-item color="light" lines="none" *ngIf="isMobile">
+              <ion-icon slot="start" name="alert-circle-outline"></ion-icon>
+              <ion-label>{{ 'additional-login-data.notifications' | transloco}}</ion-label>
+              <ion-button *ngIf="!permissionServiceNotification" (click)="requestNotificationPermissions()"
+                          class="access-button" slot="end">
+                <ion-label>{{ 'additional-login-data.allow' | transloco}}</ion-label>
+              </ion-button>
+            </ion-item>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row class="ion-margin-bottom">
+      <ion-col size-xl="4" offset-xl="4" size="12">
+        <ion-card color="light">
+          <ion-card-content>
+            <ion-card-subtitle>{{ 'additional-login-data.email-confirmation' | transloco}}</ion-card-subtitle>
+            <ion-note>{{ 'additional-login-data.email-confirmation-description' | transloco}}</ion-note><br>
+            <ion-note>{{ 'additional-login-data.your-email' | transloco: { email: user.email } }}</ion-note>
+            <ion-item color="light" lines="none">
+              <ion-icon *ngIf="user && user.confirmed" slot="start" name="checkbox-outline"
+                        color="success"></ion-icon>
+              <ion-icon *ngIf="user && !user.confirmed" slot="start" name="close-circle-outline"
+                        color="danger"></ion-icon>
+              <ion-label>{{(user && user.confirmed ? 'additional-login-data.confirmed' : 'additional-login-data.not-confirmed') | transloco }}</ion-label>
+              <ion-button *ngIf="user && !user.confirmed" [disabled]="requestMailButtonDisabled" slot="end"
+                          (click)="verifyEmail()" [class.access-button]="!mandatoryAnimationClassEnabled"
+                          [class.access-button-error]="mandatoryAnimationClassEnabled">
+                <ion-label *ngIf="!requestMailButtonDisabled">{{ 'additional-login-data.request' | transloco}}</ion-label>
+                <ion-label *ngIf="requestMailButtonDisabled">{{ 'additional-login-data.wait' | transloco: { time: time } }}</ion-label>
+              </ion-button>
+            </ion-item>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row class="ion-margin-bottom">
+      <ion-col size-xl="4" offset-xl="4" size="12">
+        <ion-card color="light">
+          <ion-card-content>
+            <ion-card-subtitle>{{(primaryService === undefined ? 'additional-login-data.add-service' : 'additional-login-data.added-service') | transloco}}</ion-card-subtitle>
+            <ion-note *ngIf="primaryService === undefined">{{ 'additional-login-data.add-service-description' | transloco}}</ion-note>
+            <ion-item color="light" lines="none" *ngIf="primaryService === undefined">
+              <ion-icon slot="start" name="alert-circle-outline"></ion-icon>
+
+              <ion-label>{{ 'additional-login-data.primary-service' | transloco}}</ion-label>
+              <ion-button id="add-service-button" slot="end"
+                          [class.access-button]="!mandatoryAnimationClassEnabled"
+                          [class.access-button-error]="mandatoryAnimationClassEnabled">
+                <ion-label>{{ 'additional-login-data.create' | transloco}}</ion-label>
+              </ion-button>
+            </ion-item>
+
+            <ion-item color="light" lines="none" *ngIf="primaryService !== undefined">
+              <ion-icon slot="start" name="checkmark-circle-outline" color="success"></ion-icon>
+              <ion-label>{{nameForService(primaryService)}}</ion-label>
+              <ion-label slot="end">
+                {{primaryService.username}}
+              </ion-label>
+            </ion-item>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row class="ion-margin-bottom">
+      <ion-col size-xl="4" offset-xl="4" size="12">
+        <ion-card color="light">
+          <ion-card-content>
+            <ion-card-subtitle>{{ 'additional-login-data.username' | transloco}}</ion-card-subtitle>
+            <ion-note>
+              <span *ngIf="usernameFormControl.enabled">{{ 'additional-login-data.username-description-not-present' | transloco}}</span>
+              <span *ngIf="usernameFormControl.disabled">{{ 'additional-login-data.username-description-present' | transloco}}</span>
+            </ion-note>
+            <ion-item color="light" class="ion-margin-top" counter="{{usernameFormControl.enabled}}">
+              <ion-input [formControl]="usernameFormControl" maxlength="30" type="text"
+                         placeholder="{{'additional-login-data.username' | transloco}}"></ion-input>
+            </ion-item>
+            <div>
+              <ng-container *ngFor="let validation of formMessages.username">
+                <div class="error-message"
+                     *ngIf="usernameFormControl.hasError(validation.type) && (usernameFormControl.dirty || usernameFormControl.touched)">
+                  {{ 'validation-username.' + validation.type | transloco }}
+                </div>
+              </ng-container>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col class="ion-text-center">
+        <ion-button (click)="finishAdditionalSetup()" [disabled]="isLoading">
+          <ion-label *ngIf="!isLoading">{{ 'additional-login-data.finish' | transloco}}</ion-label>
+          <div *ngIf="isLoading"
+               style="display: flex; flex-direction: row; text-align: center; align-items: center; gap: 20px; justify-content: center; height: 90px">
+            <ion-spinner name="crescent" style="vertical-align: center"></ion-spinner>
+            <p style="margin: 0">{{ 'additional-login-data.progress' | transloco}}</p>
+          </div>
+        </ion-button>
+      </ion-col>
+    </ion-row>
+    <ion-row class="ion-align-items-center ion-margin-bottom">
+      <ion-col size="12" class="ion-text-center">
+        <ion-button size="small" [disabled]="isLoading" fill="clear" color="secondary"
+                    (click)="back()">
+          {{ 'additional-login-data.sign-out' | transloco}}
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
+
+<ion-modal
+  #addServiceModal
+  trigger="add-service-button"
+  [initialBreakpoint]="0.65"
+  [breakpoints]="[0.65]"
+  [backdropDismiss]="false"
+  [backdropBreakpoint]="0.1">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar class="ion-padding-top">
+        <ion-title color="primary">{{ 'additional-login-data.add-service' | transloco}}</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding" scroll-y="false">
+      <app-select-account [withRedirect]="false"></app-select-account>
+    </ion-content>
+  </ng-template>
+</ion-modal>

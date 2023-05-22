@@ -1,0 +1,24 @@
+<ion-item (click)="showFriendPreview(user.id)" [lines]="isLastElement ? 'none' : null">
+  <ion-avatar slot="start">
+    <ion-img src="{{user.profile_picture}}"></ion-img>
+  </ion-avatar>
+  <ion-label>
+    <h2><strong>{{user.username}}</strong></h2>
+  </ion-label>
+  <div *ngIf="!friendPreview">
+    <ion-button [disabled]="isLoading" slot="end" shape="round" size="small" *ngIf="!isRequested && !isSentTo && !isFriend"
+                (click)="requestUserContact(user.id)" color="bright">
+      {{'elements-user-element.request' | transloco}}
+    </ion-button>
+    <ion-button disabled="true" slot="end" shape="round" size="small" *ngIf="isRequested && !isFriend" color="medium">
+      <small>{{'elements-user-element.request-sent' | transloco}}</small>
+    </ion-button>
+    <ion-button slot="end" shape="round" size="small" *ngIf="isSentTo && !isFriend" color="primary"
+                routerLink="/tabs/friends/requests">
+      <small>{{'elements-user-element.request-received' | transloco}}</small>
+    </ion-button>
+    <ion-button slot="end" shape="round" size="small" *ngIf="isFriend" color="dark" (click)="navigateToFriends()">
+      {{'elements-user-element.friends' | transloco}}
+    </ion-button>
+  </div>
+</ion-item>

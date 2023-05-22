@@ -1,0 +1,249 @@
+{
+	"login-page": {
+		"login": "Log ind",
+		"register": "Tilmelde",
+		"create-account": "Opret en konto",
+		"with-existing-account": "Brug en eksisterende konto",
+		"placeholder-name": "Fulde navn",
+		"placeholder-email": "E-mail",
+		"placeholder-password": "Adgangskode",
+		"register-button": "Tilmeld",
+		"login-button": "Log på",
+		"no-account": "Har du ikke en konto?",
+		"have-account": "har du allerede en bruger?",
+		"reset-password": "Nulstille kodeord",
+		"accept-terms": "Jeg accepterer <a href=\"https://frienradar.com/privacy/\">privatlivspolitikken</a> og <a href=\"https://frienradar.com/terms-conditions/\">vilkårene for brug</a>"
+	},
+	"social-accounts-page": {
+		"title": "Regnskaber",
+		"add-account": "Tilføj tjeneste"
+	},
+	"additional-login-data": {
+		"title": "Konfiguration",
+		"permissions": "Tilladelser",
+		"location-access": "Placeringsadgang",
+		"email-confirmation": "Email bekræftelse",
+		"email-confirmation-description": "Du vil modtage en e-mail med et link for at bekræfte din e-mailadresse.",
+		"email-confirmation-button": "Send e-mail",
+		"email-confirmation-sent": "Email sendt",
+		"request": "Anmodning",
+		"photo-access": "Fotoadgang",
+		"optional": "Valgfri",
+		"notifications": "Meddelelser",
+		"allow": "Give lov til",
+		"your-email": "Din e-mail: {{email}}",
+		"confirmed": "Bekræftet",
+		"not-confirmed": "Ikke bekræftet",
+		"wait": "Vent {{time}}s",
+		"add-service": "Tilføj tjeneste",
+		"added-service": "Tilføjet service",
+		"add-service-description": "For at bruge Frienradar skal du tilføje mindst én tjeneste.",
+		"primary-service": "Primær tjeneste",
+		"create": "skab",
+		"username": "Brugernavn",
+		"username-description-present": "Brugernavnet kan ændres i profilindstillingerne.",
+		"username-description-not-present": "Brugernavnet bruges til visningen i appen. Dette er synligt for dig, men også for andre.",
+		"finish": "Afslut",
+		"progress": "Tilmeldingen vil blive gennemført...",
+		"sign-out": "Log ud",
+		"completed": "Konfigurationen er gennemført",
+		"already-confirmed": "E-mail allerede bekræftet",
+		"confirm-before-continue": "Bekræft din e-mailadresse for at fortsætte.",
+		"activate-mandatory-permissions": "Aktiver de nødvendige tilladelser",
+		"email-confirmed": "E-mail blev bekræftet",
+		"mail-sent": "Email sendt"
+	},
+	"nearby-page": {
+		"title": "I nærheden af dig",
+		"searching": "Der søges efter personer i nærheden...",
+		"no-people-found": "Ingen personer fundet i nærheden.<br> Flyt til et andet sted, eller skift afstand.",
+		"loading": "Indlæser..."
+	},
+	"general": {
+		"loading": "Indlæser...",
+		"being-signed-in": "Logger ind...",
+		"data-is-refreshing": "Opdaterer data...",
+		"cancel": "Afbestille",
+		"save": "Gemme",
+		"back": "Tilbage",
+		"close": "Tæt",
+		"open": "Åben",
+		"edit": "Redigere",
+		"delete": "Slet",
+		"ok": "Okay"
+	},
+	"validation-email": {
+		"required": "E-mail er påkrævet",
+		"pattern": "E-mail er ikke gyldig"
+	},
+	"validation-password": {
+		"required": "adgangskode er påkrævet",
+		"minLength": "Adgangskoden er for kort",
+		"maxLength": "Adgangskoden er for lang",
+		"pattern": "Adgangskoden skal indeholde store og små bogstaver og tal. (min. 8 tegn)"
+	},
+	"validation-name": {
+		"required": "Navn er påkrævet",
+		"minLength": "Navnet er for kort",
+		"maxLength": "Navnet er for langt"
+	},
+	"validation-description": {
+		"minLength": "Beskrivelsen er for kort",
+		"maxLength": "Beskrivelsen er for lang"
+	},
+	"validation-profilePicture": {
+		"required": "Profilbillede er påkrævet"
+	},
+	"validation-acceptTerms": {
+		"required": "Du skal acceptere vilkårene og betingelserne"
+	},
+	"validation-username": {
+		"required": "Brugernavn er påkrævet",
+		"minLength": "Brugernavnet er for kort",
+		"maxLength": "Brugernavnet er for langt",
+		"pattern": "Brugernavnet indeholder mellemrum"
+	},
+	"validation-social-account": {
+		"required": "Brugernavn er påkrævet",
+		"minLength": "Brugernavnet er for kort",
+		"maxLength": "Brugernavnet er for langt",
+		"pattern": "Brugernavnet indeholder mellemrum"
+	},
+	"validation-social-account-username": {
+		"required": "Brugernavn er påkrævet",
+		"minLength": "Brugernavnet er for kort",
+		"maxLength": "Brugernavnet er for langt",
+		"pattern": "Brugernavnet indeholder mellemrum"
+	},
+	"elements-distance-change": {
+		"near": "Nær ved",
+		"distant": "Fjern",
+		"away": "Væk",
+		"far-away": "Langt væk"
+	},
+	"elements-user-element": {
+		"request": "Anmodning",
+		"request-sent": "Anmodning sendt",
+		"request-received": "Anmodning modtaget",
+		"friends": "Venner"
+	},
+	"action-cable": {
+		"request-sent": "Anmodning sendt til {{name}}",
+		"request-received": "{{name}} vil gerne være din ven",
+		"request-accepted": "{{name}} accepterede din anmodning",
+		"request-declined": "{{name}} afviste din anmodning"
+	},
+	"permission-service": {
+		"needs-permission": "{{name}} skal have tilladelse"
+	},
+	"radar-page": {
+		"title": "Radar"
+	},
+	"maintenance": {
+		"message": "Serveren er i vedligeholdelsestilstand...",
+		"try-again": "Prøv igen senere",
+		"reconnected": "Genforbindelsen lykkedes"
+	},
+	"edit-profile": {
+		"title": "Rediger profil",
+		"username-description": "Dit navn er <strong>kun synligt for dig</strong> .",
+		"description": "Beskrivelse",
+		"description-description": "Din beskrivelse...",
+		"updated": "Profilen blev opdateret"
+	},
+	"profile-picture-select": {
+		"preview": "Forhåndsvisning",
+		"change": "Skift profilbillede",
+		"select-photo": "Vælg foto",
+		"take-photo": "Tag et billede",
+		"select": "Vælg profilbillede"
+	},
+	"radar-display": {
+		"not-loaded": "Kort kan ikke indlæses. Din position kunne ikke registreres.",
+		"try-again": "Prøv igen"
+	},
+	"friend-requests": {
+		"title": "Venne anmodning",
+		"no-requests": "Der er i øjeblikket intet her",
+		"loading": "Anmodninger er indlæst...",
+		"wait": "Vent på dine venneanmodninger",
+		"decline": "Er afvist...",
+		"decline-message": "Venneanmodning blev afvist",
+		"accept": "Er accepteret...",
+		"decline-invitation": "Afslå invitation",
+		"decline-invitation-confirm": "Vil du virkelig afvise invitationen fra {{name}}?",
+		"decline-confirm": "Nedgang",
+		"find": "Find venner"
+	},
+	"friends-display": {
+		"title": "Profil",
+		"friend-since": "Ven siden:<br> <strong>{{dato}}</strong>",
+		"services": "Tilknyttede tjenester",
+		"no-services": "{{name}} har ikke tilsluttet nogen tjenester endnu.",
+		"loading": "Profilen indlæses...",
+		"finish-friendship": "Afslut venskab",
+		"finish-friendship-confirm": "Vil du virkelig afslutte venskabet?",
+		"finish": "Afslut",
+		"really-finish": "Virkelig afslutte venskab?",
+		"really-finish-message": "Vil du afslutte venskabet for altid? Denne handling kan ikke fortrydes.",
+		"remove": "Fjerne",
+		"remove-message": "{{name}} blev fjernet fra dine venner"
+	},
+	"menu": {
+		"title": "Profil",
+		"sign-out": "Log ud",
+		"settings": "Indstillinger",
+		"loading": "Indlæser...",
+		"force-dark-mode": "Tving mørk tilstand",
+		"socket-connection": "Stikkontakt",
+		"connected": "Forbundet",
+		"disconnected": "Afbrudt",
+		"user-information": "Brugeroplysninger",
+		"label": "Udviklet i 🇨🇭 med ❤️",
+		"edit-profile": "Rediger profil"
+	},
+	"reset-password": {
+		"title": "Nulstille kodeord",
+		"instructions": "Indtast venligst den e-mailadresse, som du har registreret din brugerkonto med. Du vil derefter modtage en e-mail med et link til at nulstille din adgangskode.",
+		"reset": "Nulstil",
+		"mail-sent": "Din adgangskode vil blive nulstillet...<br> Du modtager en mail inden længe.",
+		"no-match": "Kodeordene er ikke ens",
+		"resetting": "Adgangskoden nulstilles...",
+		"password-confirmation": "Kodeords bekræftelse",
+		"email-sent": "E-mail sendt, hvis konto eksisterer",
+		"login-message": "Nulstil kodeord. Du kan logge ind nu"
+	},
+	"create-social-account": {
+		"title": "Tilføj tjeneste"
+	},
+	"edit-social-account": {
+		"title": "Skift brugernavn",
+		"update": "Opdatering",
+		"edit-title": "Rediger tjeneste"
+	},
+	"select-account": {
+		"description": "Vælg en tjeneste, du vil tilføje.",
+		"change": "Skift service",
+		"add": "Tilføj tjeneste",
+		"services": "Tjenester",
+		"search": "Søg"
+	},
+	"social-account": {
+		"question": "Hvad er dit {{name}}-brugernavn?",
+		"last-account": "Sidste konto",
+		"warning": "Du må ikke slette alle konti!",
+		"delete-confirmation": "Virkelig slette?",
+		"delete-warning": "Dette kan ikke fortrydes!",
+		"permanently-delete": "Slet {{name}} permanent",
+		"edit": "Rediger {{name}}",
+		"successfully-created": "Kontoen er oprettet",
+		"successfully-updated": "Kontoen er blevet opdateret"
+	},
+	"friends-page": {
+		"title": "Venner",
+		"requests": "Forespørgsler",
+		"description": "Du har ingen venner i øjeblikket. Det er på tide at ændre dette :)",
+		"nearby-users": "Brugere i nærheden",
+		"friend-with": "Du er nu ven med {{name}}"
+	}
+}

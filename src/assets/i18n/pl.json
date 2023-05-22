@@ -1,0 +1,249 @@
+{
+	"login-page": {
+		"login": "Zalogować się",
+		"register": "Zapisać się",
+		"create-account": "Utwórz konto",
+		"with-existing-account": "Użyj istniejącego konta",
+		"placeholder-name": "Pełne imię i nazwisko",
+		"placeholder-email": "E-mail",
+		"placeholder-password": "Hasło",
+		"register-button": "Rejestr",
+		"login-button": "Zaloguj sie",
+		"no-account": "Nie masz konta?",
+		"have-account": "Posiadasz już konto?",
+		"reset-password": "Zresetuj hasło",
+		"accept-terms": "Akceptuję <a href=\"https://frienradar.com/privacy/\">politykę prywatności</a> i <a href=\"https://frienradar.com/terms-conditions/\">warunki użytkowania</a>"
+	},
+	"social-accounts-page": {
+		"title": "Konta",
+		"add-account": "Dodaj usługę"
+	},
+	"additional-login-data": {
+		"title": "Konfiguracja",
+		"permissions": "Uprawnienia",
+		"location-access": "Dostęp do lokalizacji",
+		"email-confirmation": "Potwierdzenie wiadomości e-mail",
+		"email-confirmation-description": "Otrzymasz wiadomość e-mail z linkiem do potwierdzenia adresu e-mail.",
+		"email-confirmation-button": "Wysłać email",
+		"email-confirmation-sent": "E-mail wysłany",
+		"request": "Wniosek",
+		"photo-access": "Dostęp do zdjęć",
+		"optional": "Opcjonalny",
+		"notifications": "Powiadomienia",
+		"allow": "Umożliwić",
+		"your-email": "Twój e-mail: {{email}}",
+		"confirmed": "Potwierdzony",
+		"not-confirmed": "Nie potwierdzone",
+		"wait": "Poczekaj {{time}}s",
+		"add-service": "Dodaj usługę",
+		"added-service": "Dodana usługa",
+		"add-service-description": "Aby korzystać z Frienradar, musisz dodać co najmniej jedną usługę.",
+		"primary-service": "Podstawowa usługa",
+		"create": "Tworzyć",
+		"username": "Nazwa użytkownika",
+		"username-description-present": "Nazwę użytkownika można zmienić w ustawieniach profilu.",
+		"username-description-not-present": "Nazwa użytkownika jest używana do wyświetlania w aplikacji. Jest to widoczne dla Ciebie, ale także dla innych.",
+		"finish": "Skończyć",
+		"progress": "Rejestracja zostanie zakończona...",
+		"sign-out": "Wyloguj się",
+		"completed": "Konfiguracja pomyślnie zakończona",
+		"already-confirmed": "E-mail już potwierdzony",
+		"confirm-before-continue": "Potwierdź swój adres e-mail, aby kontynuować.",
+		"activate-mandatory-permissions": "Aktywuj wymagane uprawnienia",
+		"email-confirmed": "E-mail został pomyślnie potwierdzony",
+		"mail-sent": "E-mail wysłany"
+	},
+	"nearby-page": {
+		"title": "Blisko Ciebie",
+		"searching": "Trwają poszukiwania osób znajdujących się w pobliżu...",
+		"no-people-found": "Nie znaleziono żadnych osób w pobliżu.<br> Przenieś się w inne miejsce lub zmień odległość.",
+		"loading": "Ładuje się..."
+	},
+	"general": {
+		"loading": "Ładowanie...",
+		"being-signed-in": "Dołączanie do...",
+		"data-is-refreshing": "Odświeżanie danych...",
+		"cancel": "Anulować",
+		"save": "Ratować",
+		"back": "Z powrotem",
+		"close": "Zamknąć",
+		"open": "otwarty",
+		"edit": "Edytować",
+		"delete": "Usuwać",
+		"ok": "OK"
+	},
+	"validation-email": {
+		"required": "email jest wymagany",
+		"pattern": "adres email jest nieprawidłowy"
+	},
+	"validation-password": {
+		"required": "Wymagane jest hasło",
+		"minLength": "Hasło jest za krótkie",
+		"maxLength": "Hasło jest za długie",
+		"pattern": "Hasło musi zawierać wielkie i małe litery oraz cyfry. (min. 8 znaków)"
+	},
+	"validation-name": {
+		"required": "imie jest wymagane",
+		"minLength": "Imię jest za krótkie",
+		"maxLength": "Nazwa jest za długa"
+	},
+	"validation-description": {
+		"minLength": "Opis jest za krótki",
+		"maxLength": "Opis jest za długi"
+	},
+	"validation-profilePicture": {
+		"required": "Zdjęcie profilowe jest wymagane"
+	},
+	"validation-acceptTerms": {
+		"required": "Musisz zaakceptować warunki"
+	},
+	"validation-username": {
+		"required": "Wymagana jest nazwa użytkownika",
+		"minLength": "Nazwa użytkownika jest za krótka",
+		"maxLength": "Nazwa użytkownika jest za długa",
+		"pattern": "Nazwa użytkownika zawiera spacje"
+	},
+	"validation-social-account": {
+		"required": "Wymagana jest nazwa użytkownika",
+		"minLength": "Nazwa użytkownika jest za krótka",
+		"maxLength": "Nazwa użytkownika jest za długa",
+		"pattern": "Nazwa użytkownika zawiera spacje"
+	},
+	"validation-social-account-username": {
+		"required": "Wymagana jest nazwa użytkownika",
+		"minLength": "Nazwa użytkownika jest za krótka",
+		"maxLength": "Nazwa użytkownika jest za długa",
+		"pattern": "Nazwa użytkownika zawiera spacje"
+	},
+	"elements-distance-change": {
+		"near": "W pobliżu",
+		"distant": "Odległy",
+		"away": "Z dala",
+		"far-away": "Odległy"
+	},
+	"elements-user-element": {
+		"request": "Wniosek",
+		"request-sent": "Wniosek wysłany",
+		"request-received": "Prośba otrzymana",
+		"friends": "Przyjaciele"
+	},
+	"action-cable": {
+		"request-sent": "Prośba wysłana do {{name}}",
+		"request-received": "{{name}} chce zostać twoim przyjacielem",
+		"request-accepted": "{{name}} zaakceptował Twoją prośbę",
+		"request-declined": "{{name}} odrzucił Twoją prośbę"
+	},
+	"permission-service": {
+		"needs-permission": "{{name}} musi mieć pozwolenie"
+	},
+	"radar-page": {
+		"title": "Radar"
+	},
+	"maintenance": {
+		"message": "Serwer jest w trybie konserwacji...",
+		"try-again": "Spróbuj ponownie później",
+		"reconnected": "Połączono ponownie"
+	},
+	"edit-profile": {
+		"title": "Edytuj profil",
+		"username-description": "Twoje imię jest <strong>widoczne tylko dla Ciebie</strong> .",
+		"description": "Opis",
+		"description-description": "Twój opis...",
+		"updated": "Profil został pomyślnie zaktualizowany"
+	},
+	"profile-picture-select": {
+		"preview": "Zapowiedź",
+		"change": "Zmień zdjęcie profilowe",
+		"select-photo": "Wybierz zdjęcie",
+		"take-photo": "Zrobić zdjęcie",
+		"select": "Wybierz zdjęcie profilowe"
+	},
+	"radar-display": {
+		"not-loaded": "Nie można załadować mapy. Nie można wykryć Twojej pozycji.",
+		"try-again": "Spróbuj ponownie"
+	},
+	"friend-requests": {
+		"title": "Prośby znajomych",
+		"no-requests": "Obecnie nic tu nie ma",
+		"loading": "Żądania są ładowane...",
+		"wait": "Poczekaj na prośby znajomych",
+		"decline": "zostaje odrzucony...",
+		"decline-message": "Prośba o dodanie do znajomych została odrzucona",
+		"accept": "Jest akceptowane...",
+		"decline-invitation": "Odrzuć zaproszenie",
+		"decline-invitation-confirm": "Czy naprawdę chcesz odrzucić zaproszenie od {{name}}?",
+		"decline-confirm": "Spadek",
+		"find": "Znajdź przyjaciół"
+	},
+	"friends-display": {
+		"title": "Profil",
+		"friend-since": "Przyjaciel od:<br> <strong>{{data}}</strong>",
+		"services": "Połączone usługi",
+		"no-services": "{{name}} nie połączył jeszcze żadnych usług.",
+		"loading": "Trwa ładowanie profilu...",
+		"finish-friendship": "Zakończ przyjaźń",
+		"finish-friendship-confirm": "Czy naprawdę chcesz zakończyć przyjaźń?",
+		"finish": "Skończyć",
+		"really-finish": "Naprawdę zakończyć przyjaźń?",
+		"really-finish-message": "Chcesz zakończyć przyjaźń na zawsze? Tej czynności nie można cofnąć.",
+		"remove": "Usunąć",
+		"remove-message": "{{name}} został usunięty z Twoich znajomych"
+	},
+	"menu": {
+		"title": "Profil",
+		"sign-out": "Wyloguj się",
+		"settings": "Ustawienia",
+		"loading": "Ładuje się...",
+		"force-dark-mode": "Wymuś tryb ciemny",
+		"socket-connection": "Połączenie gniazdowe",
+		"connected": "Połączony",
+		"disconnected": "Bezładny",
+		"user-information": "Informacje o użytkowniku",
+		"label": "Opracowany w 🇨🇭 z ❤️",
+		"edit-profile": "Edytuj profil"
+	},
+	"reset-password": {
+		"title": "Zresetuj hasło",
+		"instructions": "Wprowadź adres e-mail, na który zarejestrowałeś swoje konto użytkownika. Następnie otrzymasz wiadomość e-mail z linkiem do zresetowania hasła.",
+		"reset": "Resetowanie",
+		"mail-sent": "Twoje hasło zostanie zresetowane...<br> Wkrótce otrzymasz wiadomość e-mail.",
+		"no-match": "Hasła nie pasują do siebie",
+		"resetting": "Hasło jest resetowane...",
+		"password-confirmation": "Potwierdzenie hasła",
+		"email-sent": "E-mail wysłany, jeśli konto istnieje",
+		"login-message": "Resetowania hasła. Możesz się teraz zalogować"
+	},
+	"create-social-account": {
+		"title": "Dodaj usługę"
+	},
+	"edit-social-account": {
+		"title": "Zmień nazwę użytkownika",
+		"update": "Aktualizacja",
+		"edit-title": "Edytuj usługę"
+	},
+	"select-account": {
+		"description": "Wybierz usługę, którą chcesz dodać.",
+		"change": "Zmień usługę",
+		"add": "Dodaj usługę",
+		"services": "Usługi",
+		"search": "Szukaj"
+	},
+	"social-account": {
+		"question": "Jaka jest Twoja nazwa użytkownika {{name}}?",
+		"last-account": "Ostatnie konto",
+		"warning": "Nie możesz usunąć wszystkich kont!",
+		"delete-confirmation": "Naprawdę usunąć?",
+		"delete-warning": "Tego nie da się cofnąć!",
+		"permanently-delete": "Trwale usuń {{name}}",
+		"edit": "Edytuj {{name}}",
+		"successfully-created": "Konto utworzone pomyślnie",
+		"successfully-updated": "Pomyślnie zaktualizowano konto"
+	},
+	"friends-page": {
+		"title": "Przyjaciele",
+		"requests": "Upraszanie",
+		"description": "W tej chwili nie masz żadnych przyjaciół. Czas to zmienić :)",
+		"nearby-users": "Użytkownicy w pobliżu",
+		"friend-with": "Jesteś teraz znajomym użytkownika {{name}}"
+	}
+}

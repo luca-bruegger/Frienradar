@@ -1,0 +1,249 @@
+{
+	"login-page": {
+		"login": "Registrazione",
+		"register": "Iscrizione",
+		"create-account": "Creare un account",
+		"with-existing-account": "Usa un account esistente",
+		"placeholder-name": "Nome e cognome",
+		"placeholder-email": "E-mail",
+		"placeholder-password": "Parola d'ordine",
+		"register-button": "Registrati",
+		"login-button": "Login",
+		"no-account": "Non hai un account?",
+		"have-account": "Hai già un account?",
+		"reset-password": "Resetta la password",
+		"accept-terms": "Accetto l&#39; <a href=\"https://frienradar.com/privacy/\">informativa sulla privacy</a> e i <a href=\"https://frienradar.com/terms-conditions/\">termini di utilizzo</a>"
+	},
+	"social-accounts-page": {
+		"title": "Conti",
+		"add-account": "Aggiungi servizio"
+	},
+	"additional-login-data": {
+		"title": "Configurazione",
+		"permissions": "Autorizzazioni",
+		"location-access": "Accesso alla posizione",
+		"email-confirmation": "Conferma via email",
+		"email-confirmation-description": "Riceverai un'e-mail con un link per confermare il tuo indirizzo e-mail.",
+		"email-confirmation-button": "Invia una email",
+		"email-confirmation-sent": "Email inviata",
+		"request": "Richiesta",
+		"photo-access": "Accesso alle foto",
+		"optional": "Opzionale",
+		"notifications": "Notifiche",
+		"allow": "Permettere",
+		"your-email": "La tua email: {{email}}",
+		"confirmed": "Confermato",
+		"not-confirmed": "Non confermato",
+		"wait": "Aspetta {{time}} secondi",
+		"add-service": "Aggiungi servizio",
+		"added-service": "Servizio aggiunto",
+		"add-service-description": "Per utilizzare Frienradar, devi aggiungere almeno un servizio.",
+		"primary-service": "Servizio primario",
+		"create": "Creare",
+		"username": "Nome utente",
+		"username-description-present": "Il nome utente può essere modificato nelle impostazioni del profilo.",
+		"username-description-not-present": "Il nome utente viene utilizzato per la visualizzazione nell'app. Questo è visibile per te, ma anche per gli altri.",
+		"finish": "Fine",
+		"progress": "La registrazione sarà completata...",
+		"sign-out": "disconnessione",
+		"completed": "Configurazione completata con successo",
+		"already-confirmed": "Email già confermata",
+		"confirm-before-continue": "Conferma il tuo indirizzo email per continuare.",
+		"activate-mandatory-permissions": "Attiva le autorizzazioni richieste",
+		"email-confirmed": "Email confermata con successo",
+		"mail-sent": "Email inviata"
+	},
+	"nearby-page": {
+		"title": "Vicino a te",
+		"searching": "Le persone vicine vengono cercate...",
+		"no-people-found": "Nessuna persona trovata nelle vicinanze.<br> Spostati in un&#39;altra posizione o modifica la distanza.",
+		"loading": "Caricamento in corso..."
+	},
+	"general": {
+		"loading": "Caricamento...",
+		"being-signed-in": "Registrarsi...",
+		"data-is-refreshing": "Aggiornamento dati...",
+		"cancel": "Annulla",
+		"save": "Salva",
+		"back": "Indietro",
+		"close": "Vicino",
+		"open": "Aprire",
+		"edit": "Modificare",
+		"delete": "Eliminare",
+		"ok": "OK"
+	},
+	"validation-email": {
+		"required": "L'e-mail è obbligatoria",
+		"pattern": "L'email non è valida"
+	},
+	"validation-password": {
+		"required": "E 'richiesta la password",
+		"minLength": "La password è troppo corta",
+		"maxLength": "La password è troppo lunga",
+		"pattern": "La password deve contenere lettere maiuscole e minuscole e numeri. (minimo 8 caratteri)"
+	},
+	"validation-name": {
+		"required": "Il nome è obbligatorio",
+		"minLength": "Il nome è troppo breve",
+		"maxLength": "Il nome è troppo lungo"
+	},
+	"validation-description": {
+		"minLength": "La descrizione è troppo breve",
+		"maxLength": "La descrizione è troppo lunga"
+	},
+	"validation-profilePicture": {
+		"required": "L'immagine del profilo è obbligatoria"
+	},
+	"validation-acceptTerms": {
+		"required": "Devi accettare i termini e le condizioni"
+	},
+	"validation-username": {
+		"required": "è richiesto il nome utente",
+		"minLength": "Il nome utente è troppo corto",
+		"maxLength": "Il nome utente è troppo lungo",
+		"pattern": "Il nome utente contiene spazi"
+	},
+	"validation-social-account": {
+		"required": "è richiesto il nome utente",
+		"minLength": "Il nome utente è troppo corto",
+		"maxLength": "Il nome utente è troppo lungo",
+		"pattern": "Il nome utente contiene spazi"
+	},
+	"validation-social-account-username": {
+		"required": "è richiesto il nome utente",
+		"minLength": "Il nome utente è troppo corto",
+		"maxLength": "Il nome utente è troppo lungo",
+		"pattern": "Il nome utente contiene spazi"
+	},
+	"elements-distance-change": {
+		"near": "Vicino",
+		"distant": "Distante",
+		"away": "Lontano",
+		"far-away": "Lontano"
+	},
+	"elements-user-element": {
+		"request": "Richiesta",
+		"request-sent": "Richiesta inviata",
+		"request-received": "richiesta ricevuta",
+		"friends": "Amici"
+	},
+	"action-cable": {
+		"request-sent": "Richiesta inviata a {{name}}",
+		"request-received": "{{name}} vuole essere tuo amico",
+		"request-accepted": "{{name}} ha accettato la tua richiesta",
+		"request-declined": "{{name}} ha rifiutato la tua richiesta"
+	},
+	"permission-service": {
+		"needs-permission": "{{name}} deve ricevere l'autorizzazione"
+	},
+	"radar-page": {
+		"title": "Radar"
+	},
+	"maintenance": {
+		"message": "Il server è in modalità di manutenzione...",
+		"try-again": "Riprovare più tardi",
+		"reconnected": "Riconnessione riuscita"
+	},
+	"edit-profile": {
+		"title": "Modifica Profilo",
+		"username-description": "Il tuo nome è <strong>visibile solo a te</strong> .",
+		"description": "Descrizione",
+		"description-description": "La tua descrizione...",
+		"updated": "Profilo aggiornato con successo"
+	},
+	"profile-picture-select": {
+		"preview": "Anteprima",
+		"change": "Cambia immagine del profilo",
+		"select-photo": "Seleziona foto",
+		"take-photo": "Fare foto",
+		"select": "Seleziona l'immagine del profilo"
+	},
+	"radar-display": {
+		"not-loaded": "Impossibile caricare la mappa. Non è stato possibile rilevare la tua posizione.",
+		"try-again": "Riprova"
+	},
+	"friend-requests": {
+		"title": "Richieste di amicizia",
+		"no-requests": "Al momento non c'è niente qui",
+		"loading": "Le richieste sono state caricate...",
+		"wait": "Aspetta le tue richieste di amicizia",
+		"decline": "Viene rifiutato...",
+		"decline-message": "Richiesta di amicizia rifiutata",
+		"accept": "Si accetta...",
+		"decline-invitation": "Rifiuta l'invito",
+		"decline-invitation-confirm": "Vuoi davvero rifiutare l'invito di {{name}}?",
+		"decline-confirm": "Declino",
+		"find": "Trova amici"
+	},
+	"friends-display": {
+		"title": "Profilo",
+		"friend-since": "Amico da:<br> <strong>{{data}}</strong>",
+		"services": "Servizi connessi",
+		"no-services": "{{name}} non ha ancora connesso alcun servizio.",
+		"loading": "Il profilo si sta caricando...",
+		"finish-friendship": "Termina l'amicizia",
+		"finish-friendship-confirm": "Vuoi davvero finire l'amicizia?",
+		"finish": "Fine",
+		"really-finish": "Finire davvero l'amicizia?",
+		"really-finish-message": "Vuoi porre fine all'amicizia per sempre? Questa azione non può essere annullata.",
+		"remove": "Rimuovere",
+		"remove-message": "{{name}} è stato rimosso dai tuoi amici"
+	},
+	"menu": {
+		"title": "Profilo",
+		"sign-out": "disconnessione",
+		"settings": "Impostazioni",
+		"loading": "Caricamento in corso...",
+		"force-dark-mode": "Forza la modalità oscura",
+		"socket-connection": "Connessione presa",
+		"connected": "Collegato",
+		"disconnected": "Disconnesso",
+		"user-information": "Informazioni utente",
+		"label": "Sviluppato in 🇨🇭 con ❤️",
+		"edit-profile": "Modifica Profilo"
+	},
+	"reset-password": {
+		"title": "Resetta la password",
+		"instructions": "Inserisci l'indirizzo e-mail con cui hai registrato il tuo account utente. Riceverai quindi un'e-mail con un link per reimpostare la password.",
+		"reset": "Ripristina",
+		"mail-sent": "La tua password verrà reimpostata...<br> Riceverai una mail a breve.",
+		"no-match": "le passwords non corrispondono",
+		"resetting": "La password è in fase di reimpostazione...",
+		"password-confirmation": "conferma password",
+		"email-sent": "Email inviata se l'account esiste",
+		"login-message": "Reimpostazione della password. Puoi accedere ora"
+	},
+	"create-social-account": {
+		"title": "Aggiungi servizio"
+	},
+	"edit-social-account": {
+		"title": "Cambia nome utente",
+		"update": "Aggiornamento",
+		"edit-title": "Modifica servizio"
+	},
+	"select-account": {
+		"description": "Seleziona un servizio che desideri aggiungere.",
+		"change": "Cambia servizio",
+		"add": "Aggiungi servizio",
+		"services": "Servizi",
+		"search": "Ricerca"
+	},
+	"social-account": {
+		"question": "Qual è il tuo nome utente {{name}}?",
+		"last-account": "Ultimo conto",
+		"warning": "Non puoi eliminare tutti gli account!",
+		"delete-confirmation": "Eliminare davvero?",
+		"delete-warning": "Questo non può essere annullato!",
+		"permanently-delete": "Elimina definitivamente {{name}}",
+		"edit": "Modifica {{nome}}",
+		"successfully-created": "Account creato con successo",
+		"successfully-updated": "Account aggiornato correttamente"
+	},
+	"friends-page": {
+		"title": "Amici",
+		"requests": "Richieste",
+		"description": "Non hai amici al momento. È ora di cambiarlo :)",
+		"nearby-users": "Utenti nelle vicinanze",
+		"friend-with": "Ora sei amico di {{name}}"
+	}
+}

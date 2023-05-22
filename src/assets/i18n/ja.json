@@ -1,0 +1,249 @@
+{
+	"login-page": {
+		"login": "ログイン",
+		"register": "サインアップ",
+		"create-account": "アカウントを作成する",
+		"with-existing-account": "既存のアカウントを使用する",
+		"placeholder-name": "フルネーム",
+		"placeholder-email": "Eメール",
+		"placeholder-password": "パスワード",
+		"register-button": "登録",
+		"login-button": "ログイン",
+		"no-account": "アカウントをお持ちでない場合は、",
+		"have-account": "すでにアカウントをお持ちですか？",
+		"reset-password": "パスワードを再設定する",
+		"accept-terms": "<a href=\"https://frienradar.com/privacy/\">プライバシーポリシー</a>と<a href=\"https://frienradar.com/terms-conditions/\">利用規約</a>に同意します"
+	},
+	"social-accounts-page": {
+		"title": "アカウント",
+		"add-account": "サービスの追加"
+	},
+	"additional-login-data": {
+		"title": "構成",
+		"permissions": "権限",
+		"location-access": "位置情報へのアクセス",
+		"email-confirmation": "メール確認",
+		"email-confirmation-description": "メールアドレスを確認するためのリンクが記載されたメールが届きます。",
+		"email-confirmation-button": "メールを送る",
+		"email-confirmation-sent": "メールを送信しました",
+		"request": "リクエスト",
+		"photo-access": "写真へのアクセス",
+		"optional": "オプション",
+		"notifications": "通知",
+		"allow": "許可する",
+		"your-email": "あなたのメールアドレス: {{メールアドレス}}",
+		"confirmed": "確認済み",
+		"not-confirmed": "確認されていません",
+		"wait": "{{時間}}秒待ってください",
+		"add-service": "サービスの追加",
+		"added-service": "追加サービス",
+		"add-service-description": "Frienradar を使用するには、少なくとも 1 つのサービスを追加する必要があります。",
+		"primary-service": "主なサービス",
+		"create": "作成",
+		"username": "ユーザー名",
+		"username-description-present": "ユーザー名はプロファイル設定で変更できます。",
+		"username-description-not-present": "ユーザー名はアプリ内での表示に使用されます。これはあなただけでなく他の人にも表示されます。",
+		"finish": "終了",
+		"progress": "登録が完了します...",
+		"sign-out": "サインアウト",
+		"completed": "設定が正常に完了しました",
+		"already-confirmed": "メールはすでに確認済みです",
+		"confirm-before-continue": "続行するにはメールアドレスを確認してください。",
+		"activate-mandatory-permissions": "必要な権限をアクティブ化する",
+		"email-confirmed": "メールが正常に確認されました",
+		"mail-sent": "メールを送信しました"
+	},
+	"nearby-page": {
+		"title": "あなたの近くで",
+		"searching": "近くの人が捜索されます...",
+		"no-people-found": "近くに人は見つかりませんでした。<br>別の場所に移動するか、距離を変更してください。",
+		"loading": "読み込み中..."
+	},
+	"general": {
+		"loading": "読み込み中...",
+		"being-signed-in": "サインイン...",
+		"data-is-refreshing": "データを更新しています...",
+		"cancel": "キャンセル",
+		"save": "保存",
+		"back": "戻る",
+		"close": "近い",
+		"open": "開ける",
+		"edit": "編集",
+		"delete": "消去",
+		"ok": "OK"
+	},
+	"validation-email": {
+		"required": "メールアドレスは必須です",
+		"pattern": "電子メールが無効です"
+	},
+	"validation-password": {
+		"required": "パスワードが必要",
+		"minLength": "パスワードが短すぎます",
+		"maxLength": "パスワードが長すぎます",
+		"pattern": "パスワードには大文字、小文字、数字を含める必要があります。 (8文字以上)"
+	},
+	"validation-name": {
+		"required": "名前は必須です",
+		"minLength": "名前は短すぎる",
+		"maxLength": "名前が長すぎます"
+	},
+	"validation-description": {
+		"minLength": "説明が短すぎます",
+		"maxLength": "説明が長すぎます"
+	},
+	"validation-profilePicture": {
+		"required": "プロフィール写真は必須です"
+	},
+	"validation-acceptTerms": {
+		"required": "あなたは利用規約に同意する必要があります"
+	},
+	"validation-username": {
+		"required": "ユーザー名は必須です",
+		"minLength": "ユーザー名が短すぎます",
+		"maxLength": "ユーザー名が長すぎます",
+		"pattern": "ユーザー名にスペースが含まれています"
+	},
+	"validation-social-account": {
+		"required": "ユーザー名は必須です",
+		"minLength": "ユーザー名が短すぎます",
+		"maxLength": "ユーザー名が長すぎます",
+		"pattern": "ユーザー名にスペースが含まれています"
+	},
+	"validation-social-account-username": {
+		"required": "ユーザー名は必須です",
+		"minLength": "ユーザー名が短すぎます",
+		"maxLength": "ユーザー名が長すぎます",
+		"pattern": "ユーザー名にスペースが含まれています"
+	},
+	"elements-distance-change": {
+		"near": "近く",
+		"distant": "遠い",
+		"away": "あちらへ",
+		"far-away": "遠く"
+	},
+	"elements-user-element": {
+		"request": "リクエスト",
+		"request-sent": "リクエストを送信しました",
+		"request-received": "リクエストを受信しました",
+		"friends": "友達"
+	},
+	"action-cable": {
+		"request-sent": "リクエストは {{name}} に送信されました",
+		"request-received": "{{name}}はあなたの友達になりたいと思っています",
+		"request-accepted": "{{name}} がリクエストを受け入れました",
+		"request-declined": "{{name}} はリクエストを拒否しました"
+	},
+	"permission-service": {
+		"needs-permission": "{{name}} には許可を与える必要があります"
+	},
+	"radar-page": {
+		"title": "レーダー"
+	},
+	"maintenance": {
+		"message": "サーバーはメンテナンス モードです...",
+		"try-again": "あとでもう一度試してみてください",
+		"reconnected": "正常に再接続されました"
+	},
+	"edit-profile": {
+		"title": "プロファイル編集",
+		"username-description": "あなたの名前は<strong>あなただけが見ることが</strong>できます。",
+		"description": "説明",
+		"description-description": "あなたの説明は...",
+		"updated": "プロファイルが正常に更新されました"
+	},
+	"profile-picture-select": {
+		"preview": "プレビュー",
+		"change": "プロフィール画像を変更",
+		"select-photo": "写真を選択",
+		"take-photo": "写真を撮る",
+		"select": "プロフィール写真を選択"
+	},
+	"radar-display": {
+		"not-loaded": "マップをロードできません。あなたの位置を検出できませんでした。",
+		"try-again": "再試行する"
+	},
+	"friend-requests": {
+		"title": "友達リクエスト",
+		"no-requests": "現在ここには何もありません",
+		"loading": "リクエストが読み込まれています...",
+		"wait": "友達リクエストを待ってください",
+		"decline": "拒否されてる…",
+		"decline-message": "友達リクエストが拒否されました",
+		"accept": "受け入れられます...",
+		"decline-invitation": "招待を断る",
+		"decline-invitation-confirm": "本当に {{name}} からの招待を拒否しますか?",
+		"decline-confirm": "却下",
+		"find": "友達を見つける"
+	},
+	"friends-display": {
+		"title": "プロフィール",
+		"friend-since": "それ以来の友達:<br> <strong>{{日にち}}</strong>",
+		"services": "コネクテッドサービス",
+		"no-services": "{{name}} はまだサービスに接続していません。",
+		"loading": "プロフィールを読み込んでいます...",
+		"finish-friendship": "友情を終わらせる",
+		"finish-friendship-confirm": "本当に友情を終わらせたいですか？",
+		"finish": "終了",
+		"really-finish": "本当に友情を終わらせますか？",
+		"really-finish-message": "永遠に友情を終わらせたいですか？この操作は元に戻すことができません。",
+		"remove": "削除",
+		"remove-message": "{{name}} が友達から削除されました"
+	},
+	"menu": {
+		"title": "プロフィール",
+		"sign-out": "サインアウト",
+		"settings": "設定",
+		"loading": "読み込み中...",
+		"force-dark-mode": "ダークモードを強制する",
+		"socket-connection": "ソケット接続",
+		"connected": "接続済み",
+		"disconnected": "切断されました",
+		"user-information": "ユーザー情報",
+		"label": "❤️ を使用して 🇨🇭 で開発されました",
+		"edit-profile": "プロファイル編集"
+	},
+	"reset-password": {
+		"title": "パスワードを再設定する",
+		"instructions": "ユーザーアカウントを登録したメールアドレスを入力してください。その後、パスワードをリセットするためのリンクが記載されたメールが届きます。",
+		"reset": "リセット",
+		"mail-sent": "パスワードがリセットされます...<br>すぐにメールが届きます。",
+		"no-match": "パスワードが一致していません",
+		"resetting": "パスワードをリセット中です...",
+		"password-confirmation": "パスワードの確認",
+		"email-sent": "アカウントが存在する場合に送信されるメール",
+		"login-message": "パスワードのリセット。今すぐログインできます"
+	},
+	"create-social-account": {
+		"title": "サービスの追加"
+	},
+	"edit-social-account": {
+		"title": "ユーザー名の変更",
+		"update": "アップデート",
+		"edit-title": "サービスの編集"
+	},
+	"select-account": {
+		"description": "追加するサービスを選択します。",
+		"change": "サービス変更",
+		"add": "サービスの追加",
+		"services": "サービス",
+		"search": "検索"
+	},
+	"social-account": {
+		"question": "{{name}} のユーザー名は何ですか?",
+		"last-account": "最後のアカウント",
+		"warning": "すべてのアカウントを削除することはできません。",
+		"delete-confirmation": "本当に削除しますか？",
+		"delete-warning": "これは、元に戻すことはできません！",
+		"permanently-delete": "{{name}}を完全に削除します",
+		"edit": "{{name}}を編集",
+		"successfully-created": "アカウントが正常に作成されました",
+		"successfully-updated": "アカウントが正常に更新されました"
+	},
+	"friends-page": {
+		"title": "友達",
+		"requests": "リクエスト",
+		"description": "現在あなたには友達がいません。これを変える時が来ました:)",
+		"nearby-users": "近くのユーザー",
+		"friend-with": "あなたは今、{{name}} と友達になりました"
+	}
+}

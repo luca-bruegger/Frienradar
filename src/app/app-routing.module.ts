@@ -1,17 +1,29 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { AuthGuard } from './helpers/auth.guard';
+import { AuthGuard } from './helper/auth.guard';
+import { ResetPasswordComponent } from './component/reset-password/reset-password.component';
+import { AdditionalLoginDataComponent } from './component/additional-login-data/additional-login-data.component';
 
 const routes: Routes = [
   {
-    path: '',
-    canLoad: [AuthGuard],
-    loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule)
-  },
-  {
     path: 'login',
     canLoad: [AuthGuard],
-    loadChildren: () => import('./pages/login/login.module').then( m => m.LoginPageModule)
+    loadChildren: () => import('./page/login/login.module').then(m => m.LoginPageModule)
+  },
+  {
+    path: 'reset-password',
+    canLoad: [AuthGuard],
+    component: ResetPasswordComponent
+  },
+  {
+    path: 'additional-login-data',
+    canLoad: [AuthGuard],
+    component: AdditionalLoginDataComponent
+  },
+  {
+    path: '',
+    redirectTo: '/login',
+    pathMatch: 'full'
   }
 ];
 

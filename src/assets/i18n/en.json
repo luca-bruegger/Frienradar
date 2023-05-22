@@ -1,0 +1,249 @@
+{
+  "login-page": {
+    "login": "Sign in",
+    "register": "Sign up",
+    "create-account": "Create an account",
+    "with-existing-account": "Use an existing account",
+    "placeholder-name": "Full name",
+    "placeholder-email": "Email",
+    "placeholder-password": "Password",
+    "register-button": "Register",
+    "login-button": "Login",
+    "no-account": "Don't have an account?",
+    "have-account": "Already have an account?",
+    "reset-password": "Reset password",
+    "accept-terms": "I accept the <a href=\"https://frienradar.com/privacy/\">privacy policy</a> and the <a href=\"https://frienradar.com/terms-conditions/\">terms of use</a>"
+  },
+  "social-accounts-page": {
+    "title": "Accounts",
+    "add-account": "Add service"
+  },
+  "additional-login-data": {
+    "title": "Configuration",
+    "permissions": "Permissions",
+    "location-access": "Location access",
+    "email-confirmation": "Email confirmation",
+    "email-confirmation-description": "You will receive an email with a link to confirm your email address.",
+    "email-confirmation-button": "Send email",
+    "email-confirmation-sent": "Email sent",
+    "request": "Request",
+    "photo-access": "Photo access",
+    "optional": "Optional",
+    "notifications": "Notifications",
+    "allow": "Allow",
+    "your-email": "Your email: {{email}}",
+    "confirmed": "Confirmed",
+    "not-confirmed": "Not confirmed",
+    "wait": "Wait {{time}}s",
+    "add-service": "Add service",
+    "added-service": "Added service",
+    "add-service-description": "In order to use Frienradar, you need to add at least one service.",
+    "primary-service": "Primary service",
+    "create": "Create",
+    "username": "Username",
+    "username-description-present": "The username can be changed in the profile settings.",
+    "username-description-not-present": "The username is used for the display in the app. This is visible for you, but also for others.",
+    "finish": "Finish",
+    "progress": "Registration will be completed...",
+    "sign-out": "Sign out",
+    "completed": "Configuration successfully completed",
+    "already-confirmed": "Email already confirmed",
+    "confirm-before-continue": "Confirm your email address to continue.",
+    "activate-mandatory-permissions": "Activate the required permissions",
+    "email-confirmed": "Email successfully confirmed",
+    "mail-sent": "Email sent"
+  },
+  "nearby-page": {
+    "title": "Near you",
+    "searching": "Nearby people are searched...",
+    "no-people-found": "No people found nearby. <br> Move to another location or change distance.",
+    "loading": "Is loading..."
+  },
+  "general": {
+    "loading": "Loading...",
+    "being-signed-in": "Signing in...",
+    "data-is-refreshing": "Refreshing data...",
+    "cancel": "Cancel",
+    "save": "Save",
+    "back": "Back",
+    "close": "Close",
+    "open": "Open",
+    "edit": "Edit",
+    "delete": "Delete",
+    "ok": "OK"
+  },
+  "validation-email": {
+    "required": "Email is required",
+    "pattern": "Email is not valid"
+  },
+  "validation-password": {
+    "required": "Password is required",
+    "minLength": "Password is too short",
+    "maxLength": "Password is too long",
+    "pattern": "Password must contain upper and lower case letters and numbers. (min. 8 characters)"
+  },
+  "validation-name": {
+    "required": "Name is required",
+    "minLength": "Name is too short",
+    "maxLength": "Name is too long"
+  },
+  "validation-description": {
+    "minLength": "Description is too short",
+    "maxLength": "Description is too long"
+  },
+  "validation-profilePicture": {
+    "required": "Profile picture is required"
+  },
+  "validation-acceptTerms": {
+    "required": "You must accept the terms and conditions"
+  },
+  "validation-username": {
+    "required": "Username is required",
+    "minLength": "Username is too short",
+    "maxLength": "Username is too long",
+    "pattern": "Username contains spaces"
+  },
+  "validation-social-account": {
+    "required": "Username is required",
+    "minLength": "Username is too short",
+    "maxLength": "Username is too long",
+    "pattern": "Username contains spaces"
+  },
+  "validation-social-account-username": {
+    "required": "Username is required",
+    "minLength": "Username is too short",
+    "maxLength": "Username is too long",
+    "pattern": "Username contains spaces"
+  },
+  "elements-distance-change": {
+    "near": "Near",
+    "distant": "Distant",
+    "away": "Away",
+    "far-away": "Far away"
+  },
+  "elements-user-element": {
+    "request": "Request",
+    "request-sent": "Request sent",
+    "request-received": "Request received",
+    "friends": "Friends"
+  },
+  "action-cable": {
+    "request-sent": "Request sent to {{name}}",
+    "request-received": "{{name}} wants to be your friend",
+    "request-accepted": "{{name}} accepted your request",
+    "request-declined": "{{name}} declined your request"
+  },
+  "permission-service": {
+    "needs-permission": "{{name}} needs to be given permission"
+  },
+  "radar-page": {
+    "title": "Radar"
+  },
+  "maintenance": {
+    "message": "Server is in maintenance mode...",
+    "try-again": "Try again later",
+    "reconnected": "Successfully reconnected"
+  },
+  "edit-profile": {
+    "title": "Edit profile",
+    "username-description": "Your name is <strong>only visible to you</strong>.",
+    "description": "Description",
+    "description-description": "Your description...",
+    "updated": "Profile successfully updated"
+  },
+  "profile-picture-select": {
+    "preview": "Preview",
+    "change": "Change profile picture",
+    "select-photo": "Select photo",
+    "take-photo": "Take photo",
+    "select": "Select profile picture"
+  },
+  "radar-display": {
+    "not-loaded": "Map cannot be loaded. Your position could not be detected.",
+    "try-again": "Try again"
+  },
+  "friend-requests": {
+    "title": "Friend requests",
+    "no-requests": "There is currently nothing here",
+    "loading": "Requests are loaded...",
+    "wait": "Wait for your friend requests",
+    "decline": "Is rejected...",
+    "decline-message": "Friend request declined",
+    "accept": "Is accepted...",
+    "decline-invitation": "Decline invitation",
+    "decline-invitation-confirm": "Do you really want to decline the invitation from {{name}}?",
+    "decline-confirm": "Decline",
+    "find": "Find friends"
+  },
+  "friends-display": {
+    "title": "Profile",
+    "friend-since": "Friend since: <br> <strong>{{date}}</strong>",
+    "services": "Connected services",
+    "no-services": "{{name}} has not connected any services yet.",
+    "loading": "Profile is loading...",
+    "finish-friendship": "Finish friendship",
+    "finish-friendship-confirm": "Do you really want to finish the friendship?",
+    "finish": "Finish",
+    "really-finish": "Really finish friendship?",
+    "really-finish-message": "Do you want to end the friendship for ever? This action cannot be undone.",
+    "remove": "Remove",
+    "remove-message": "{{name}} was removed from your friends"
+  },
+  "menu": {
+    "title": "Profile",
+    "sign-out": "Sign out",
+    "settings": "Settings",
+    "loading": "Is loading...",
+    "force-dark-mode": "Force dark mode",
+    "socket-connection": "Socket connection",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "user-information": "User information",
+    "label": "Developed in 🇨🇭 with ❤️",
+    "edit-profile": "Edit profile"
+  },
+  "reset-password": {
+    "title": "Reset password",
+    "instructions": "Please enter the email address by which you registered your user account. You will then receive an email with a link to reset your password.",
+    "reset": "Reset",
+    "mail-sent": "Your password will be reset... <br> You will receive a mail shortly.",
+    "no-match": "Passwords do not match",
+    "resetting": "Password is being reset...",
+    "password-confirmation": "Password confirmation",
+    "email-sent": "Email sent if account exists",
+    "login-message": "Password reset. You can login now"
+  },
+  "create-social-account": {
+    "title": "Add service"
+  },
+  "edit-social-account": {
+    "title": "Change username",
+    "update": "Update",
+    "edit-title": "Edit service"
+  },
+  "select-account": {
+    "description": "Select a service you want to add.",
+    "change": "Change service",
+    "add": "Add service",
+    "services": "Services",
+    "search": "Search"
+  },
+  "social-account": {
+    "question": "What is your {{name}} username?",
+    "last-account": "Last account",
+    "warning": "You may not delete all accounts!",
+    "delete-confirmation": "Really delete?",
+    "delete-warning": "This cannot be undone!",
+    "permanently-delete": "Permanently delete {{name}}",
+    "edit": "Edit {{name}}",
+    "successfully-created": "Successfully created account",
+    "successfully-updated": "Successfully updated account"
+  },
+  "friends-page": {
+    "title": "Friends",
+    "requests": "Requests",
+    "description": "You don't have any friends at the moment. It's time to change this :)",
+    "nearby-users": "Nearby users",
+    "friend-with": "You are now friend with {{name}}"
+  }
+}

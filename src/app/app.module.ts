@@ -1,60 +1,69 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
-
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
-
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PasswordStrengthMeterModule } from 'angular-password-strength-meter';
 import { TabsPageModule } from './tabs/tabs.module';
-
-import { ImagePicker } from '@ionic-native/image-picker/ngx';
 import { NgxIntlTelInputModule } from 'ngx-intl-tel-input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { LoginPageModule } from './pages/login/login.module';
-import { NgxsModule } from "@ngxs/store";
-import { environment } from "../environments/environment";
-import { AppState } from "./store";
-import { NgxsReduxDevtoolsPluginModule } from "@ngxs/devtools-plugin";
-import { HttpClientJsonpModule, HttpClientModule } from '@angular/common/http';
+import { LoginPageModule } from './page/login/login.module';
+import { NgxsModule } from '@ngxs/store';
+import { environment } from '../environments/environment';
+import { AppState } from './store';
+import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
+import { HTTP_INTERCEPTORS, HttpClientJsonpModule, HttpClientModule } from '@angular/common/http';
+import { MenuComponent } from './component/menu/menu.component';
+import { EditUserProfileComponent } from './component/edit-user-profile/edit-user-profile.component';
+import { IonicStorageModule } from '@ionic/storage-angular';
+import { Interceptor } from './interceptor/http.interceptor';
+import { ImageCropperModule } from 'ngx-image-cropper';
+import { HammerModule } from '../../node_modules/@angular/platform-browser';
+import { TranslocoRootModule } from './transloco-root.module';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    MenuComponent,
+    EditUserProfileComponent
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     IonicModule.forRoot(),
+    IonicStorageModule.forRoot(),
     AppRoutingModule,
     ReactiveFormsModule,
     FormsModule,
     PasswordStrengthMeterModule.forRoot(),
     TabsPageModule,
     LoginPageModule,
+    HammerModule,
     NgxIntlTelInputModule,
     NgxsModule.forRoot(AppState, {
       developmentMode: !environment.production
     }),
     HttpClientModule,
+    ImageCropperModule,
     HttpClientJsonpModule,
-    environment.production ? [] : NgxsReduxDevtoolsPluginModule.forRoot()
+    environment.production ? [] : NgxsReduxDevtoolsPluginModule.forRoot(),
+    TranslocoRootModule
   ],
-  providers: [ImagePicker,
-    {provide: RouteReuseStrategy, useClass: IonicRouteStrategy},
-/*    {
-      provide: APP_INITIALIZER,
-      useFactory: appConfigFactory,
-      deps: [AppInitService],
+  providers: [
+    {
+      provide: RouteReuseStrategy,
+      useClass: IonicRouteStrategy,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: Interceptor,
       multi: true
-    }*/
+    }
   ],
-  bootstrap: [AppComponent],
-  exports: [],
-  schemas: [
-  ]
+  bootstrap: [AppComponent]
 })
 
-export class AppModule {}
+export class AppModule {
+}

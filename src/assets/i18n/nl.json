@@ -1,0 +1,249 @@
+{
+	"login-page": {
+		"login": "Aanmelden",
+		"register": "Aanmelden",
+		"create-account": "Account aanmaken",
+		"with-existing-account": "Gebruik een bestaand account",
+		"placeholder-name": "Voor-en achternaam",
+		"placeholder-email": "E-mail",
+		"placeholder-password": "Wachtwoord",
+		"register-button": "Register",
+		"login-button": "Log in",
+		"no-account": "Heb je geen account?",
+		"have-account": "Heb je al een account?",
+		"reset-password": "Wachtwoord resetten",
+		"accept-terms": "Ik accepteer het <a href=\"https://frienradar.com/privacy/\">privacybeleid</a> en de <a href=\"https://frienradar.com/terms-conditions/\">gebruiksvoorwaarden</a>"
+	},
+	"social-accounts-page": {
+		"title": "rekeningen",
+		"add-account": "Dienst toevoegen"
+	},
+	"additional-login-data": {
+		"title": "Configuratie",
+		"permissions": "Rechten",
+		"location-access": "Locatie toegang",
+		"email-confirmation": "E-mail bevestiging",
+		"email-confirmation-description": "U ontvangt een e-mail met een link om uw e-mailadres te bevestigen.",
+		"email-confirmation-button": "Stuur e-mail",
+		"email-confirmation-sent": "Email verzonden",
+		"request": "Verzoek",
+		"photo-access": "Foto toegang",
+		"optional": "Optioneel",
+		"notifications": "Meldingen",
+		"allow": "Toestaan",
+		"your-email": "Je e-mailadres: {{email}}",
+		"confirmed": "Bevestigd",
+		"not-confirmed": "Niet bevestigd",
+		"wait": "Wacht {{time}}s",
+		"add-service": "Dienst toevoegen",
+		"added-service": "Toegevoegde dienst",
+		"add-service-description": "Om Frienradar te gebruiken, moet u minimaal één service toevoegen.",
+		"primary-service": "Primaire dienst",
+		"create": "Creëren",
+		"username": "Gebruikersnaam",
+		"username-description-present": "De gebruikersnaam kan worden gewijzigd in de profielinstellingen.",
+		"username-description-not-present": "De gebruikersnaam wordt gebruikt voor de weergave in de app. Dit is zichtbaar voor jou, maar ook voor anderen.",
+		"finish": "Finish",
+		"progress": "De inschrijving wordt afgerond...",
+		"sign-out": "Afmelden",
+		"completed": "Configuratie succesvol voltooid",
+		"already-confirmed": "E-mail al bevestigd",
+		"confirm-before-continue": "Bevestig uw e-mailadres om verder te gaan.",
+		"activate-mandatory-permissions": "Activeer de vereiste machtigingen",
+		"email-confirmed": "E-mail succesvol bevestigd",
+		"mail-sent": "Email verzonden"
+	},
+	"nearby-page": {
+		"title": "Dichtbij jou",
+		"searching": "Mensen in de buurt worden gefouilleerd...",
+		"no-people-found": "Geen mensen in de buurt gevonden.<br> Ga naar een andere locatie of wijzig de afstand.",
+		"loading": "Laadt..."
+	},
+	"general": {
+		"loading": "Bezig met laden...",
+		"being-signed-in": "Inloggen...",
+		"data-is-refreshing": "Gegevens vernieuwen...",
+		"cancel": "Annuleren",
+		"save": "Redden",
+		"back": "Rug",
+		"close": "Dichtbij",
+		"open": "Open",
+		"edit": "Bewerking",
+		"delete": "Verwijderen",
+		"ok": "OK"
+	},
+	"validation-email": {
+		"required": "E-mail is vereist",
+		"pattern": "E-mail is niet geldig"
+	},
+	"validation-password": {
+		"required": "Een wachtwoord is verplicht",
+		"minLength": "Wachtwoord is te kort",
+		"maxLength": "Wachtwoord is te lang",
+		"pattern": "Wachtwoord moet hoofdletters en kleine letters en cijfers bevatten. (min. 8 tekens)"
+	},
+	"validation-name": {
+		"required": "Naam is vereist",
+		"minLength": "Naam is te kort",
+		"maxLength": "Naam is te lang"
+	},
+	"validation-description": {
+		"minLength": "Beschrijving is te kort",
+		"maxLength": "Beschrijving is te lang"
+	},
+	"validation-profilePicture": {
+		"required": "Profielfoto is vereist"
+	},
+	"validation-acceptTerms": {
+		"required": "U moet de voorwaarden accepteren"
+	},
+	"validation-username": {
+		"required": "Gebruikersnaam is verplicht",
+		"minLength": "Gebruikersnaam is te kort",
+		"maxLength": "Gebruikersnaam is te lang",
+		"pattern": "Gebruikersnaam bevat spaties"
+	},
+	"validation-social-account": {
+		"required": "Gebruikersnaam is verplicht",
+		"minLength": "Gebruikersnaam is te kort",
+		"maxLength": "Gebruikersnaam is te lang",
+		"pattern": "Gebruikersnaam bevat spaties"
+	},
+	"validation-social-account-username": {
+		"required": "Gebruikersnaam is verplicht",
+		"minLength": "Gebruikersnaam is te kort",
+		"maxLength": "Gebruikersnaam is te lang",
+		"pattern": "Gebruikersnaam bevat spaties"
+	},
+	"elements-distance-change": {
+		"near": "In de buurt van",
+		"distant": "Ver weg",
+		"away": "Weg",
+		"far-away": "Ver weg"
+	},
+	"elements-user-element": {
+		"request": "Verzoek",
+		"request-sent": "Verzoek verzonden",
+		"request-received": "verzoek ontvangen",
+		"friends": "Vrienden"
+	},
+	"action-cable": {
+		"request-sent": "Verzoek verzonden naar {{name}}",
+		"request-received": "{{name}} wil je vriend zijn",
+		"request-accepted": "{{name}} heeft uw verzoek geaccepteerd",
+		"request-declined": "{{name}} heeft uw verzoek afgewezen"
+	},
+	"permission-service": {
+		"needs-permission": "{{name}} moet toestemming krijgen"
+	},
+	"radar-page": {
+		"title": "Radar"
+	},
+	"maintenance": {
+		"message": "Server is in onderhoudsmodus...",
+		"try-again": "Probeer het later nog eens",
+		"reconnected": "Opnieuw verbonden"
+	},
+	"edit-profile": {
+		"title": "Bewerk profiel",
+		"username-description": "Je naam is <strong>alleen zichtbaar voor jou</strong> .",
+		"description": "Beschrijving",
+		"description-description": "Uw beschrijving...",
+		"updated": "Profiel succesvol bijgewerkt"
+	},
+	"profile-picture-select": {
+		"preview": "Voorbeeld",
+		"change": "Profielfoto veranderen",
+		"select-photo": "Selecteer foto",
+		"take-photo": "Foto nemen",
+		"select": "Selecteer profielfoto"
+	},
+	"radar-display": {
+		"not-loaded": "Kaart kan niet worden geladen. Uw positie kon niet worden gedetecteerd.",
+		"try-again": "Probeer het nog eens"
+	},
+	"friend-requests": {
+		"title": "Vriendschapsverzoeken",
+		"no-requests": "Er is momenteel niets hier",
+		"loading": "Verzoeken zijn geladen...",
+		"wait": "Wacht op je vriendschapsverzoeken",
+		"decline": "Wordt afgewezen...",
+		"decline-message": "Vriendschapsverzoek afgewezen",
+		"accept": "Is geaccepteerd...",
+		"decline-invitation": "Uitnodiging weigeren",
+		"decline-invitation-confirm": "Wil je de uitnodiging van {{name}} echt weigeren?",
+		"decline-confirm": "Afwijzen",
+		"find": "Zoek vrienden"
+	},
+	"friends-display": {
+		"title": "Profiel",
+		"friend-since": "Vriend sinds:<br> <strong>{{datum}}</strong>",
+		"services": "Verbonden diensten",
+		"no-services": "{{name}} heeft nog geen services aangesloten.",
+		"loading": "Profiel wordt geladen...",
+		"finish-friendship": "Beëindig vriendschap",
+		"finish-friendship-confirm": "Wil je de vriendschap echt beëindigen?",
+		"finish": "Finish",
+		"really-finish": "Vriendschap echt beëindigen?",
+		"really-finish-message": "Wil je de vriendschap voor altijd beëindigen? Deze actie kan niet ongedaan gemaakt worden.",
+		"remove": "Verwijderen",
+		"remove-message": "{{name}} is verwijderd uit je vrienden"
+	},
+	"menu": {
+		"title": "Profiel",
+		"sign-out": "Afmelden",
+		"settings": "Instellingen",
+		"loading": "Laadt...",
+		"force-dark-mode": "Forceer de donkere modus",
+		"socket-connection": "Stekkerdoos aansluiting",
+		"connected": "Verbonden",
+		"disconnected": "Losgekoppeld",
+		"user-information": "Gebruikers informatie",
+		"label": "Ontwikkeld in 🇨🇭 met ❤️",
+		"edit-profile": "Bewerk profiel"
+	},
+	"reset-password": {
+		"title": "Wachtwoord opnieuw instellen",
+		"instructions": "Voer het e-mailadres in waarmee u uw gebruikersaccount hebt geregistreerd. Je ontvangt dan een e-mail met een link om je wachtwoord opnieuw in te stellen.",
+		"reset": "Resetten",
+		"mail-sent": "Je wachtwoord wordt gereset...<br> U ontvangt binnenkort een e-mail.",
+		"no-match": "Wachtwoorden komen niet overeen",
+		"resetting": "Wachtwoord wordt gereset...",
+		"password-confirmation": "wachtwoordbevestiging",
+		"email-sent": "E-mail verzonden als account bestaat",
+		"login-message": "Wachtwoord reset. U kunt nu inloggen"
+	},
+	"create-social-account": {
+		"title": "Dienst toevoegen"
+	},
+	"edit-social-account": {
+		"title": "Gebruikersnaam wijzigen",
+		"update": "Update",
+		"edit-title": "Dienst bewerken"
+	},
+	"select-account": {
+		"description": "Selecteer een dienst die u wilt toevoegen.",
+		"change": "Dienst wijzigen",
+		"add": "Dienst toevoegen",
+		"services": "Diensten",
+		"search": "Zoekopdracht"
+	},
+	"social-account": {
+		"question": "Wat is je {{name}} gebruikersnaam?",
+		"last-account": "Laatste rekening",
+		"warning": "Je mag niet alle accounts verwijderen!",
+		"delete-confirmation": "Echt verwijderen?",
+		"delete-warning": "Dit kan niet ongedaan gemaakt worden!",
+		"permanently-delete": "{{name}} permanent verwijderen",
+		"edit": "Bewerk {{name}}",
+		"successfully-created": "Account aangemaakt",
+		"successfully-updated": "Account succesvol bijgewerkt"
+	},
+	"friends-page": {
+		"title": "Vrienden",
+		"requests": "Verzoeken",
+		"description": "Je hebt momenteel geen vrienden. Tijd om hier verandering in te brengen :)",
+		"nearby-users": "Gebruikers in de buurt",
+		"friend-with": "Je bent nu bevriend met {{name}}"
+	}
+}

@@ -1,0 +1,42 @@
+.radar-card {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.map-canvas {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.map-wrapper {
+  height: 100%;
+  width: 100%;
+}
+
+//google-map *, #map {
+//  border-radius: 30px;
+//  overflow: hidden;
+//  -webkit-border-radius: 20px;
+//  z-index: 0 !important;
+//  -webkit-transform: translate3d(0px, 0px, 0px);
+//  -webkit-mask-image: -webkit-radial-gradient(circle, white, black);
+//}
+
+//#map {
+//  border-radius: 30px;
+//  -moz-border-radius: 30px;
+//  -webkit-border-radius: 30px;
+//  overflow: hidden;
+//  height: 0;
+//  padding-bottom: 100%;
+//}
+
+//:host ::ng-deep google-map, map-canvas, map-wrapper {
+//  border-radius: 30px;
+//  -moz-border-radius: 30px;
+//  -webkit-border-radius: 30px;
+//}
+
+

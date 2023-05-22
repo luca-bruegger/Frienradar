@@ -1,0 +1,34 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-title color="primary">{{title}}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="closeModal()">{{ 'general.close' | transloco }}</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content style="--{{accountPreset.backgroundStyle}}">
+  <div
+    style="position:absolute; top: 50%; left: 50%; display: flex; flex-direction: column; text-align: center; align-items: center; transform: translate(-50%, -50%); width: 100%; max-width: 500px"
+    class="ion-padding">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ 'edit-social-account.title' | transloco }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+
+        <ion-item fill="solid" lines="none" class="ion-margin-horizontal">
+          <ion-input [formControl]="usernameFormControl"></ion-input>
+        </ion-item>
+
+      </ion-card-content>
+    </ion-card>
+    <div *ngFor="let validation of usernameMessages" style="padding-left: 16px"
+         class="ion-margin-horizontal ion-margin-top">
+      <ion-note color="danger"
+                *ngIf="usernameFormControl.hasError(validation.type) && (usernameFormControl.dirty || usernameFormControl.touched)">
+        {{ 'validation-social-account-username.' + validation.type | transloco }}
+      </ion-note>
+    </div>
+    <ion-button expand="block" color="primary" (click)="updateUsername()" [disabled]="usernameFormControl.value === this.currentUsername"><strong>{{ 'edit-social-account.update' | transloco }}</strong></ion-button>
+  </div>
+</ion-content>

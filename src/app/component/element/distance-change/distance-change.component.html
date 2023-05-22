@@ -1,0 +1,16 @@
+<div class="ion-padding-horizontal">
+  <ion-segment [value]="currentDistance" (ionChange)="changeDistance($event)">
+    <ion-segment-button value="0">
+      <ion-label>{{'elements-distance-change.near' | transloco}}</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="1">
+      <ion-label>{{'elements-distance-change.distant' | transloco}}</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="2">
+      <ion-label>{{'elements-distance-change.away' | transloco}}</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="3">
+      <ion-label>{{'elements-distance-change.far-away' | transloco}}</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+</div>
