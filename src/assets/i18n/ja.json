@@ -26,6 +26,7 @@
 		"email-confirmation-description": "メールアドレスを確認するためのリンクが記載されたメールが届きます。",
 		"email-confirmation-button": "メールを送る",
 		"email-confirmation-sent": "メールを送信しました",
+    "confirm-to-continue": "続行するにはメールアドレスを確認してください。",
 		"request": "リクエスト",
 		"photo-access": "写真へのアクセス",
 		"optional": "オプション",

@@ -26,6 +26,7 @@
 		"email-confirmation-description": "Vous recevrez un e-mail avec un lien pour confirmer votre adresse e-mail.",
 		"email-confirmation-button": "Envoyer un e-mail",
 		"email-confirmation-sent": "Email envoyé",
+    "confirm-to-continue": "Confirmez votre adresse e-mail pour continuer.",
 		"request": "Demande",
 		"photo-access": "Accès aux photos",
 		"optional": "Facultatif",

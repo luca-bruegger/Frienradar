@@ -26,6 +26,7 @@
 		"email-confirmation-description": "Du vil modtage en e-mail med et link for at bekræfte din e-mailadresse.",
 		"email-confirmation-button": "Send e-mail",
 		"email-confirmation-sent": "Email sendt",
+    "confirm-to-continue": "Bekræft din e-mailadresse for at fortsætte.",
 		"request": "Anmodning",
 		"photo-access": "Fotoadgang",
 		"optional": "Valgfri",

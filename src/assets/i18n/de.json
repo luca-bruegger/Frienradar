@@ -34,6 +34,7 @@
 		"your-email": "Ihre Email: {{email}}",
 		"confirmed": "Bestätigt",
 		"not-confirmed": "Nicht bestätigt",
+    "confirm-to-continue": "Bestätigen Sie Ihre Email-Adresse, um fortzufahren.",
 		"wait": "Warten Sie {{time}}s",
 		"add-service": "Dienst hinzufügen",
 		"added-service": "Zusätzlicher Service",

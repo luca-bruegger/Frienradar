@@ -104,7 +104,7 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
 
     await AdMob.initialize({
-      requestTrackingAuthorization: true,
+      requestTrackingAuthorization: false,
       initializeForTesting: !environment.production,
     });
     this.appService.adsShown = true;

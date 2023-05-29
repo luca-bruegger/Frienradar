@@ -26,6 +26,7 @@
 		"email-confirmation-description": "이메일 주소를 확인하는 링크가 포함된 이메일을 받게 됩니다.",
 		"email-confirmation-button": "이메일을 보내",
 		"email-confirmation-sent": "이메일을 보냈습니다",
+    "confirm-to-continue": "계속하려면 이메일 주소를 확인하세요.",
 		"request": "요구",
 		"photo-access": "사진 액세스",
 		"optional": "선택 과목",
