@@ -81,7 +81,7 @@ export class LocationService implements OnDestroy {
     }
 
     if (!this.platform.is('capacitor')) {
-      await Geolocation.clearWatch({id: this.callbackId});
+      await Geolocation.clearWatch({ id: this.callbackId });
       this.callbackId = null;
       return;
     }

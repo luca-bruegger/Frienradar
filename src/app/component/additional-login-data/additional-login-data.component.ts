@@ -62,9 +62,10 @@ export class AdditionalLoginDataComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.store.select(AccountState.user).subscribe(user => {
+    this.store.select(AccountState.user).subscribe(async user => {
       if (user) {
         this.user = user;
+        await this.appInitService.startServices();
         this.usernameFormControl.patchValue(user.username);
         if (user.username && user.username !== '') {
           this.usernameFormControl.disable();
@@ -209,9 +210,19 @@ export class AdditionalLoginDataComponent implements OnInit {
       return false;
     }
 
-    if (!this.permissionService.hasMandatoryPermissions(this.isMobile)) {
+    if (!this.permissionService.checkPermissions(this.isMobile)) {
       this.store.dispatch(new GlobalActions.ShowToast({
         message: this.translocoService.translate('additional-login-data.activate-mandatory-permissions'),
+        color: 'danger'
+      }));
+
+      this.animateButtons();
+      return false;
+    }
+
+    if (!this.userHasSocialAccount()) {
+      this.store.dispatch(new GlobalActions.ShowToast({
+        message: this.translocoService.translate('additional-login-data.add-service'),
         color: 'danger'
       }));
 
@@ -228,5 +239,9 @@ export class AdditionalLoginDataComponent implements OnInit {
       this.askForNotificationPermission();
     }
     return true;
+  }
+
+  private userHasSocialAccount() {
+    return this.store.selectSnapshot(SocialAccountsState.all).length > 0;
   }
 }

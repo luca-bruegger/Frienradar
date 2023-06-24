@@ -1,9 +1,11 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { AccountState } from '../../../store';
+import { AccountState, GlobalActions } from '../../../store';
 import { Camera, ImageOptions } from '@capacitor/camera';
 import { ImageCroppedEvent } from 'ngx-image-cropper';
 import { TranslocoService } from '@ngneat/transloco';
+import { AppService } from '../../../service/app.service';
+import { PermissionService } from '../../../service/permission.service';
 
 @Component({
   selector: 'app-profile-picture-select',
@@ -18,7 +20,13 @@ export class ProfilePictureSelectComponent implements OnChanges, OnInit {
   imageSelected = false;
 
   constructor(private store: Store,
-              private translocoService: TranslocoService) {
+              private translocoService: TranslocoService,
+              private appService: AppService,
+              private permissionService: PermissionService) {
+  }
+
+  get isMobile() {
+    return this.appService.isMobile();
   }
 
   ngOnInit() {
@@ -46,7 +54,7 @@ export class ProfilePictureSelectComponent implements OnChanges, OnInit {
     }
   }
 
-  displayImagePicker() {
+  async displayImagePicker() {
     const imagePickerOptions = {
       width: 1000,
       height: 1000,
@@ -60,6 +68,7 @@ export class ProfilePictureSelectComponent implements OnChanges, OnInit {
       source: 'PHOTOS'
     } as ImageOptions;
 
+    await this.permissionService.requestPhoto(this.isMobile);
 
     Camera.getPhoto(imagePickerOptions).then(async (photo) => {
       this.profilePicture = photo.dataUrl;

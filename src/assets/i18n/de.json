@@ -36,7 +36,7 @@
 		"not-confirmed": "Nicht bestätigt",
     "confirm-to-continue": "Bestätigen Sie Ihre Email-Adresse, um fortzufahren.",
 		"wait": "Warten Sie {{time}}s",
-		"add-service": "Dienst hinzufügen",
+		"add-service": "Primärdienst hinzufügen",
 		"added-service": "Zusätzlicher Service",
 		"add-service-description": "Um Frienradar nutzen zu können, müssen Sie mindestens einen Dienst hinzufügen.",
 		"primary-service": "Primärdienst",
@@ -68,7 +68,7 @@
 		"save": "Speichern",
 		"back": "Zurück",
 		"close": "Schliessen",
-		"open": "Offen",
+		"open": "Öffnen",
 		"edit": "Bearbeiten",
 		"delete": "Löschen",
 		"ok": "OK"
@@ -178,7 +178,7 @@
 	},
 	"friends-display": {
 		"title": "Profil",
-		"friend-since": "Freund seit:<br> <strong>{{Datum}}</strong>",
+		"friend-since": "Freund seit:<br> <strong>{{date}}</strong>",
 		"services": "Vernetzte Dienste",
 		"no-services": "{{name}} hat noch keine Dienste verbunden.",
 		"loading": "Profil wird geladen...",

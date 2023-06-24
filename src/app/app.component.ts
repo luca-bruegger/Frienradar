@@ -38,7 +38,9 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
 
   async ngOnInit() {
-    this.tokenValid = await this.appService.init();
+    await this.platform.ready();
+    await this.appService.init();
+    this.tokenValid = this.appService.tokenValid;
     await this.showAds();
     this.jumpTo();
     this.initializeDeeplinking();
@@ -113,6 +115,8 @@ export class AppComponent implements OnInit, AfterViewInit {
       // Subscribe Banner Event Listener
     });
 
+    const isIos = this.platform.is('ios');
+
     AdMob.addListener(BannerAdPluginEvents.SizeChanged, (size: AdMobBannerSize) => {
       const appMargin = size.height;
       const root = document.documentElement;
@@ -128,11 +132,10 @@ export class AppComponent implements OnInit, AfterViewInit {
         const body = document.querySelector('body');
         const bodyStyles = window.getComputedStyle(body);
         const safeAreaBottom = bodyStyles.getPropertyValue('--ion-safe-area-bottom');
-        root.style.setProperty('--content-ad-padding-bottom', appMargin + 30 + 'px');
-        app.style.marginBottom = `calc(${safeAreaBottom} + ${appMargin - 20}px)`;
+        root.style.setProperty('--content-ad-padding-bottom', appMargin + (isIos ? 30 : 0) + 'px');
+        app.style.marginBottom = `calc(${safeAreaBottom} + ${appMargin - (isIos ? 20 : 0)}px)`;
       }
     });
-    const isIos = this.platform.is('ios');
 
     const options: BannerAdOptions = {
       adId: isIos ? environment.iosAdId : environment.androidAdId,

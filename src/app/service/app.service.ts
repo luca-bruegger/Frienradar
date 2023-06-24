@@ -19,6 +19,7 @@ import { TranslocoService } from '@ngneat/transloco';
 })
 export class AppService {
   adsShown = false;
+  tokenValid = false;
 
   constructor(private store: Store,
               private loadingController: LoadingController,
@@ -41,20 +42,21 @@ export class AppService {
       this.colorSchemeService.loadStoredTheme();
 
       await this.appStateListener();
-      const tokenValid = await this.tokenService.isTokenValid();
+      this.tokenValid = await this.tokenService.isTokenValid();
 
-      if (tokenValid) {
+      if (this.tokenValid) {
         await this.fetchCurrentUser();
         await this.redirectAfterSignIn();
       }
 
       await loadingSpinner.dismiss();
-      return resolve(tokenValid);
+      return resolve(true);
     });
   }
 
-  async startServices(token) {
+  async startServices() {
     const user = this.store.selectSnapshot(AccountState.user);
+    const token = await this.tokenService.getToken();
 
     await this.locationService.fetchCurrentPosition();
     await this.locationService.watch();
@@ -66,7 +68,7 @@ export class AppService {
     const fullyRegistered = await this.isRegistrationCompleted();
 
     if (fullyRegistered) {
-      await this.startServices(await this.tokenService.getToken());
+      await this.startServices();
       await this.fetchUserRelatedData();
       await this.redirectToDefault();
     } else {
@@ -106,17 +108,15 @@ export class AppService {
 
     const user = this.store.selectSnapshot(AccountState.user);
     const socialAccountsLength = this.store.selectSnapshot(SocialAccountsState.all).length;
-    await this.permissionService.checkPermissions(this.isMobile());
-    const permitted = this.permissionService.hasMandatoryPermissions(this.isMobile());
+    const permitted = await this.permissionService.checkPermissions(this.isMobile());
 
-    return user.confirmed && permitted && user.username && user.username.length > 0 && socialAccountsLength > 0 || false;
+    return user.confirmed && permitted && (user.username && user.username.length > 0) && (socialAccountsLength > 0 || false);
   }
 
   private oneSignalInit(user) {
     if (!this.platform.is('cordova')) {
       return;
     }
-
     OneSignal.setAppId(environment.oneSignalAppId);
     OneSignal.setExternalUserId(user.id);
 
@@ -135,10 +135,7 @@ export class AppService {
       const {isActive} = state;
       if (isActive && this.store.selectSnapshot(AccountState.user) !== null) {
         this.colorSchemeService.loadStoredTheme();
-        const spinner = await this.createLoadingSpinner(this.translocoService.translate('general.data-is-refreshing'));
-        await this.fetchCurrentUser();
-        await this.fetchUserRelatedData();
-        await spinner.dismiss();
+        await this.updateUserData();
         await this.permissionService.checkPermissions(this.isMobile());
         await this.locationService.watch();
       } else {
@@ -169,5 +166,12 @@ export class AppService {
       forward: true,
       navigateRoot: false
     }));
+  }
+
+  private async updateUserData() {
+    const spinner = await this.createLoadingSpinner(this.translocoService.translate('general.data-is-refreshing'));
+    await this.fetchCurrentUser();
+    await this.fetchUserRelatedData();
+    await spinner.dismiss();
   }
 }

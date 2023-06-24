@@ -41,6 +41,11 @@ export class PermissionService {
         }
 
         this.photo = data.photos === 'granted';
+      }).catch((error) => {
+        this.store.dispatch(new GlobalActions.ShowToast({
+          message: error.message,
+          color: 'danger'
+        }));
       });
     }
   }
@@ -53,30 +58,25 @@ export class PermissionService {
     }
   }
 
-  async hasMandatoryPermissions(isMobile: boolean) {
-    await this.checkPermissions(isMobile);
-
-    if (isMobile) {
-      return this.geolocation && this.photo;
-    } else {
-      return this.geolocation;
-    }
-  }
-
   async checkPermissions(isMobile: boolean) {
     if (isMobile) {
       const geolocationPermission = await Geolocation.checkPermissions();
       this.geolocation = geolocationPermission.location === 'granted';
 
       const cameraPermission = await Camera.checkPermissions();
+
       this.photo = cameraPermission.photos === 'granted';
 
       OneSignal.getDeviceState(async device => {
         this.notification = device.hasNotificationPermission;
       });
+
+      return this.geolocation && this.photo;
     } else {
       const geolocationQuery = await navigator.permissions.query({name: 'geolocation'});
       this.geolocation = geolocationQuery.state === 'granted';
+
+      return this.geolocation;
     }
   }
 

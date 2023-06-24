@@ -27,7 +27,7 @@ export namespace Account {
     static readonly type = '[Auth] Register';
 
     constructor(
-      public payload: { email: string; password: string; name: string; profilePicture: Blob; registerLoading: boolean }
+      public payload: { email: string; password: string; name: string; profilePicture: Blob }
     ) {
     }
   }
@@ -35,7 +35,7 @@ export namespace Account {
   export class Login {
     static readonly type = '[Auth] Login';
 
-    constructor(public payload: { email: string; password: string; loading: boolean }) {
+    constructor(public payload: { email: string; password: string }) {
     }
   }
 
@@ -157,7 +157,7 @@ export class AccountState {
     {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.Register
   ) {
-    let {email, password, name, profilePicture, registerLoading} = action.payload;
+    const {email, password, name, profilePicture} = action.payload;
 
     const formData = new FormData();
     formData.append('profile_picture', profilePicture, profilePicture.type);
@@ -172,11 +172,8 @@ export class AccountState {
       patchState({
         user
       });
-      await dispatch(new GlobalActions.Redirect({path: Path.additionalLoginData, forward: true, navigateRoot: false}));
     }, async (error) => {
       dispatch(new GlobalActions.HandleAuthError({error}));
-    }).finally(() => {
-      registerLoading = false;
     });
   }
 
@@ -185,7 +182,7 @@ export class AccountState {
     {patchState, dispatch}: StateContext<AccountStateModel>,
     action: Account.Login
   ) {
-    let {email, password, loading} = action.payload;
+    const {email, password} = action.payload;
 
     return this.apiService.post('/user/sign_in', {
       user: {
@@ -198,12 +195,8 @@ export class AccountState {
       patchState({
         user
       });
-
-      await this.appService.redirectAfterSignIn();
     }, async (error) => {
       dispatch(new GlobalActions.HandleAuthError({error}));
-    }).finally(() => {
-      loading = false;
     });
   }
 

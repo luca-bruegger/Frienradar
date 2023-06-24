@@ -1,8 +1,13 @@
+# trapeze config file
+# update by running `npx trapeze run config.yaml`
+
 vars:
   BUNDLE_ID:
     default: ch.lucabruegger.frienradar
   PACKAGE_NAME:
     default: ch.lucabruegger.frienradar
+  VERSION:
+    default: 1.02
 
 platforms:
   ios:
@@ -12,7 +17,7 @@ platforms:
         incrementBuild: true
         productName: Frienradar
         displayName: Frienradar
-        version: 1
+        version: $VERSION
 
         entitlements:
           - com.apple.developer.associated-domains: [
@@ -20,4 +25,7 @@ platforms:
               "webcredentials:frienradar.com"
             ]
   android:
+    appName: Frienradar
+    incrementVersionCode: true
+    versionName: $VERSION
     packageName: $PACKAGE_NAME

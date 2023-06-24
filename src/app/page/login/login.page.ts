@@ -1,17 +1,20 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { Account } from '../../store';
+import { Account, GlobalActions } from '../../store';
 import { IonInput, ModalController } from '@ionic/angular';
 import { ResetPasswordComponent } from '../../component/reset-password/reset-password.component';
 import { AccountValidation } from '../../validation/account-validation';
 import { environment } from '../../../environments/environment';
+import { AppService } from '../../service/app.service';
+import { TokenService } from '../../service/token.service';
+import { Path } from '../../helper/path';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
 })
-export class LoginPage implements OnInit, OnDestroy, AfterViewInit {
+export class LoginPage implements OnInit, OnDestroy {
   @ViewChild('emailInput', { static: true }) emailInput: IonInput;
   @ViewChild('passwordInput', { static: true }) passwordInput: IonInput;
 
@@ -26,7 +29,9 @@ export class LoginPage implements OnInit, OnDestroy, AfterViewInit {
   profilePicture = null;
 
   constructor(private store: Store,
-              private modalController: ModalController) {
+              private modalController: ModalController,
+              private appService: AppService,
+              private tokenService: TokenService) {
   }
 
   ngOnDestroy() {
@@ -65,17 +70,17 @@ export class LoginPage implements OnInit, OnDestroy, AfterViewInit {
 
     this.loginInProgress = true;
     if (this.isRegister) {
-      await this.store.dispatch(new Account.Register({
-        ...this.formGroup.value,
-        registerLoading: this.loginInProgress
-      })).toPromise();
+      await this.store.dispatch(new Account.Register(this.formGroup.value)).toPromise();
     } else {
-      await this.store.dispatch(new Account.Login({
-        ...this.formGroup.value,
-        loading: this.loginInProgress
-      })).toPromise();
+      await this.store.dispatch(new Account.Login(this.formGroup.value)).toPromise();
     }
-    this.loginInProgress = false;
+
+    if (!await this.tokenService.isTokenValid()) {
+      this.loginInProgress = false;
+      return;
+    }
+
+    await this.redirectAfterSignIn();
   }
 
   async resetPassword() {
@@ -114,5 +119,17 @@ export class LoginPage implements OnInit, OnDestroy, AfterViewInit {
         this.formGroup.get('password').patchValue((ev.target as HTMLInputElement).value);
       });
     });
+  }
+
+  private async redirectAfterSignIn(isRegister: boolean = false) {
+    if (isRegister) {
+      await this.store.dispatch(new GlobalActions.Redirect({
+        path: Path.additionalLoginData,
+        forward: true,
+        navigateRoot: false
+      }));
+    } else {
+      await this.appService.redirectAfterSignIn();
+    }
   }
 }

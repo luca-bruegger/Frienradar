@@ -42,6 +42,7 @@ export class MenuComponent  {
   async signOut() {
     await this.store.dispatch(new Account.Logout()).toPromise();
     await this.popover.dismiss();
+    window.location.reload();
   }
 
   changeDarkMode(event) {
